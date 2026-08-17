@@ -3,7 +3,12 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @StateObject private var fastManager: FastManager
     @State private var selectedTab: Tab = .fast
+
+    init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
+        _fastManager = StateObject(wrappedValue: FastManager(context: context))
+    }
 
     enum Tab: String, CaseIterable, Identifiable {
         case fast = "Fast"
@@ -23,7 +28,7 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            FastTabView()
+            FastTabView(fastManager: fastManager)
                 .tabItem {
                     Label(Tab.fast.rawValue, systemImage: Tab.fast.icon)
                 }
@@ -45,20 +50,13 @@ struct ContentView: View {
 }
 
 struct FastTabView: View {
+    @ObservedObject var fastManager: FastManager
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                Image(systemName: "timer")
-                    .font(.system(size: 60))
-                    .foregroundStyle(.secondary)
-                Text("Fast Tracker")
-                    .font(.title2.weight(.semibold))
-                Text("Start, edit, and track your active fast.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            .padding()
-            .navigationTitle("Fast")
+            FastTrackerView(fastManager: fastManager)
+                .navigationTitle("Fasted")
+                .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
@@ -102,6 +100,6 @@ struct SettingsTabView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(context: PersistenceController.preview.container.viewContext)
         .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

@@ -43,13 +43,21 @@ jobs:
         run: |
           xcodebuild test \
             -project Fasted.xcodeproj \
-            -scheme Fasted \
+            -scheme FastedTests \
             -destination 'platform=iOS Simulator,name=iPhone 16' \
-            -resultBundlePath TestResults.xcresult
+            -resultBundlePath TestResults-Unit.xcresult
+
+      - name: Run UI Tests
+        run: |
+          xcodebuild test \
+            -project Fasted.xcodeproj \
+            -scheme FastedUITests \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -resultBundlePath TestResults-UI.xcresult
 
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-test-results
-          path: TestResults.xcresult
+          name: test-results
+          path: "*.xcresult"
