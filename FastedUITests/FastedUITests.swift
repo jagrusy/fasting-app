@@ -133,4 +133,21 @@ final class FastedUITests: XCTestCase {
         // Verify returned to Fast dashboard
         XCTAssertTrue(endButton.waitForExistence(timeout: 4))
     }
+
+    func testHistoryTabDisplaysListOrEmptyState() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let historyTab = app.tabBars.buttons["History"]
+        XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
+        historyTab.tap()
+
+        let navBar = app.navigationBars["History"]
+        XCTAssertTrue(navBar.waitForExistence(timeout: 3))
+
+        let emptyView = app.otherElements["empty_history_view"]
+        let fastList = app.collectionViews["history_fast_list"]
+
+        XCTAssertTrue(emptyView.exists || fastList.exists)
+    }
 }

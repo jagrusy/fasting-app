@@ -34,7 +34,7 @@ struct ContentView: View {
                 }
                 .tag(Tab.fast)
 
-            HistoryTabView()
+            HistoryTabView(fastManager: fastManager)
                 .tabItem {
                     Label(Tab.history.rawValue, systemImage: Tab.history.icon)
                 }
@@ -62,20 +62,12 @@ struct FastTabView: View {
 }
 
 struct HistoryTabView: View {
+    @ObservedObject var fastManager: FastManager
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                Image(systemName: "chart.bar")
-                    .font(.system(size: 60))
-                    .foregroundStyle(.secondary)
-                Text("History & Trends")
-                    .font(.title2.weight(.semibold))
-                Text("View your logs, calendar heatmap, and fasting streaks.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            .padding()
-            .navigationTitle("History")
+            HistoryListView(fastManager: fastManager)
+                .navigationTitle("History")
         }
     }
 }

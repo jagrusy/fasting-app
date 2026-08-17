@@ -76,6 +76,21 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(saved.moodRating, 4)
     }
 
+    func testFastManagerDeletesFast() throws {
+        let manager = try XCTUnwrap(fastManager)
+        let ctx = try XCTUnwrap(context)
+
+        let fast = manager.startFast(startDate: Date())
+        XCTAssertTrue(manager.isFasting)
+
+        manager.deleteFast(fast)
+        XCTAssertFalse(manager.isFasting)
+
+        let request: NSFetchRequest<Fast> = Fast.fetchRequest()
+        let results = try ctx.fetch(request)
+        XCTAssertEqual(results.count, 0)
+    }
+
     func testFastManagerPreventsDuplicateActiveFasts() throws {
         let manager = try XCTUnwrap(fastManager)
         let ctx = try XCTUnwrap(context)
