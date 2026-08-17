@@ -145,9 +145,9 @@ final class FastedUITests: XCTestCase {
         let navBar = app.navigationBars["History"]
         XCTAssertTrue(navBar.waitForExistence(timeout: 3))
 
-        let emptyView = app.otherElements["empty_history_view"]
-        let fastList = app.collectionViews["history_fast_list"]
+        let emptyTitle = app.staticTexts["No Fasts Yet"]
+        let fastsCountLabel = app.staticTexts["total_fasts_count_label"]
 
-        XCTAssertTrue(emptyView.exists || fastList.exists)
+        XCTAssertTrue(emptyTitle.waitForExistence(timeout: 3) || fastsCountLabel.waitForExistence(timeout: 3))
     }
 }

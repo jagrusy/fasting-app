@@ -29,6 +29,8 @@ public struct EmptyHistoryView: View {
 
             Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("empty_history_view")
     }
 }
