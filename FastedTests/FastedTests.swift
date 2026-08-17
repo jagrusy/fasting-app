@@ -91,6 +91,24 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(results.count, 0)
     }
 
+    func testFastManagerUpdatesCompletedFast() throws {
+        let manager = try XCTUnwrap(fastManager)
+        let start = Date().addingTimeInterval(-72000)
+        let end = start.addingTimeInterval(50000)
+
+        let fast = manager.startFast(startDate: start, targetDuration: 57600)
+        manager.endFast(endDate: end)
+        XCTAssertFalse(fast.isCompleted)
+
+        let newStart = start.addingTimeInterval(-10000)
+        let newEnd = end
+        manager.updateCompletedFast(fast, startDate: newStart, endDate: newEnd)
+
+        XCTAssertEqual(fast.startDate, newStart)
+        XCTAssertEqual(fast.endDate, newEnd)
+        XCTAssertTrue(fast.isCompleted)
+    }
+
     func testFastManagerPreventsDuplicateActiveFasts() throws {
         let manager = try XCTUnwrap(fastManager)
         let ctx = try XCTUnwrap(context)

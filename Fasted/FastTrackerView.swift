@@ -222,6 +222,7 @@ public struct FastTrackerView: View {
                 DialEditorView(
                     startDate: $editableStartDate,
                     targetDuration: $editableTargetDuration,
+                    mode: .inProgress,
                     onSave: { newStart, newDuration in
                         fastManager.updateActiveFast(startDate: newStart, targetDuration: newDuration)
                         showDialEditor = false
