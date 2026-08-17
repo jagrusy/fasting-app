@@ -96,8 +96,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         for day in schedule.selectedDays {
             scheduleDayReminder(
                 weekday: day,
-                hour: startComponents.hour ?? 20,
-                minute: startComponents.minute ?? 0,
+                time: (startComponents.hour ?? 20, startComponents.minute ?? 0),
                 title: "Time to Start Fasting ⏱️",
                 body: "Your fasting window starts now. Have a great fast!",
                 identifier: "recurring_start_day_\(day)"
@@ -105,8 +104,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
 
             scheduleDayReminder(
                 weekday: day,
-                hour: endComponents.hour ?? 12,
-                minute: endComponents.minute ?? 0,
+                time: (endComponents.hour ?? 12, endComponents.minute ?? 0),
                 title: "Eating Window Open 🍽️",
                 body: "Your eating window is now open. Time to nourish your body!",
                 identifier: "recurring_end_day_\(day)"
@@ -116,16 +114,15 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
 
     private func scheduleDayReminder(
         weekday: Int,
-        hour: Int,
-        minute: Int,
+        time: (hour: Int, minute: Int),
         title: String,
         body: String,
         identifier: String
     ) {
         var dateComponents = DateComponents()
         dateComponents.weekday = weekday
-        dateComponents.hour = hour
-        dateComponents.minute = minute
+        dateComponents.hour = time.hour
+        dateComponents.minute = time.minute
 
         let content = UNMutableNotificationContent()
         content.title = title
