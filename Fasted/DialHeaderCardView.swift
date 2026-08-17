@@ -18,7 +18,6 @@ public struct DialHeaderCardView: View {
             }
             Text(formatTime(date))
                 .font(.title3.weight(.bold))
-                .accessibilityIdentifier(identifier)
             Text(formatRelativeDay(for: date))
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -27,6 +26,8 @@ public struct DialHeaderCardView: View {
         .padding(14)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(identifier)
     }
 
     private func formatTime(_ date: Date) -> String {

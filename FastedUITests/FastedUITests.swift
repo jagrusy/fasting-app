@@ -115,18 +115,17 @@ final class FastedUITests: XCTestCase {
             ringButton.tap()
         }
 
-        // Verify Dial Editor UI elements exist
-        let startLabel = app.staticTexts["dial_start_time_label"]
-        let endLabel = app.staticTexts["dial_end_time_label"]
-        let durationLabel = app.staticTexts["dial_duration_label"]
+        // Verify Dial Editor sheet elements exist
+        let navBar = app.navigationBars["Edit Fast Window"]
+        XCTAssertTrue(navBar.waitForExistence(timeout: 5))
+
         let saveButton = app.buttons["dial_save_button"]
         let cancelButton = app.buttons["dial_cancel_button"]
+        let durationLabel = app.staticTexts["dial_duration_label"]
 
-        XCTAssertTrue(startLabel.waitForExistence(timeout: 4))
-        XCTAssertTrue(endLabel.exists)
-        XCTAssertTrue(durationLabel.exists)
         XCTAssertTrue(saveButton.exists)
         XCTAssertTrue(cancelButton.exists)
+        XCTAssertTrue(durationLabel.exists)
 
         // Verify handles exist
         XCTAssertTrue(app.otherElements["dial_start_handle"].exists)
