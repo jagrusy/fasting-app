@@ -109,9 +109,9 @@ public struct ProgressRingView: View {
     }
 
     private func computeTouchAngle(point: CGPoint, center: CGPoint) -> Double {
-        let dx = Double(point.x - center.x)
-        let dy = Double(point.y - center.y)
-        let radians = atan2(dy, dx)
+        let deltaX = Double(point.x - center.x)
+        let deltaY = Double(point.y - center.y)
+        let radians = atan2(deltaY, deltaX)
         var degrees = radians * 180.0 / .pi
         degrees += 90 // 0 at top
         if degrees < 0 { degrees += 360 }

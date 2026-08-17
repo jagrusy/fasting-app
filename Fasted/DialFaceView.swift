@@ -37,15 +37,17 @@ public struct DialFaceView: View {
 
                 // Labels for key hours (12AM, 6AM, 12PM, 6PM)
                 if isMajor {
+                    let pos = labelPosition(for: angle, distance: radius - strokeWidth - 18)
                     Text(label(for: hour))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.primary)
-                        .position(labelPosition(for: angle, distance: radius - strokeWidth - 18))
+                        .position(pos)
                 } else if isMedium {
+                    let pos = labelPosition(for: angle, distance: radius - strokeWidth - 18)
                     Text("\(hour % 12 == 0 ? 12 : hour % 12)")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.secondary)
-                        .position(labelPosition(for: angle, distance: radius - strokeWidth - 18))
+                        .position(pos)
                 }
             }
 
