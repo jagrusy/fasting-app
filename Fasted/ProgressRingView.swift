@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct ProgressRingView: View {
-    public let progress: Double // 0.0 to 1.0 (or > 1.0 when exceeded)
+    public let progress: Double
     public let isFasting: Bool
     public var ringWidth: CGFloat = 22
     public var onProgressDragged: ((Double) -> Void)?
@@ -34,63 +34,72 @@ public struct ProgressRingView: View {
             let center = CGPoint(x: size / 2, y: size / 2)
 
             ZStack {
-                // Background track ring
-                Circle()
-                    .stroke(
-                        Color(.systemGray5),
-                        style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
-                    )
-
-                // Over-goal glow ring (when progress > 100%)
-                if isFasting && progress > 1.0 {
-                    Circle()
-                        .stroke(
-                            Color.green.opacity(0.35),
-                            style: StrokeStyle(lineWidth: ringWidth + 8, lineCap: .round)
-                        )
-                        .blur(radius: 6)
-                }
-
-                // Active Progress Arc
-                Circle()
-                    .trim(from: 0.0, to: CGFloat(clampedProgress))
-                    .stroke(
-                        progressGradient,
-                        style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .animation(isDragging ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: progress)
-
-                // Single Draggable Knob at tip of progress arc
+                backgroundTrack
+                overGoalGlow
+                progressArc
                 if isFasting {
-                    let angle = Angle.degrees(clampedProgress * 360.0 - 90.0)
-                    let knobX = center.x + CGFloat(cos(angle.radians)) * radius
-                    let knobY = center.y + CGFloat(sin(angle.radians)) * radius
-
-                    Circle()
-                        .fill(Color(.systemBackground))
-                        .frame(width: ringWidth + 6, height: ringWidth + 6)
-                        .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 1)
-                        .scaleEffect(isDragging ? 1.25 : 1.0)
-                        .position(x: knobX, y: knobY)
-                        .accessibilityIdentifier("progress_knob")
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { value in
-                                    isDragging = true
-                                    let touchAngle = computeTouchAngle(point: value.location, center: center)
-                                    let newProgress = touchAngle / 360.0
-                                    onProgressDragged?(newProgress)
-                                }
-                                .onEnded { _ in
-                                    isDragging = false
-                                    onProgressDragEnded?()
-                                }
-                        )
+                    dragKnob(center: center, radius: radius)
                 }
             }
             .frame(width: size, height: size)
         }
+    }
+
+    private var backgroundTrack: some View {
+        Circle()
+            .stroke(
+                Color(.systemGray5),
+                style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
+            )
+    }
+
+    @ViewBuilder
+    private var overGoalGlow: some View {
+        if isFasting && progress > 1.0 {
+            Circle()
+                .stroke(
+                    Color.green.opacity(0.35),
+                    style: StrokeStyle(lineWidth: ringWidth + 8, lineCap: .round)
+                )
+                .blur(radius: 6)
+        }
+    }
+
+    private var progressArc: some View {
+        Circle()
+            .trim(from: 0.0, to: CGFloat(clampedProgress))
+            .stroke(
+                progressGradient,
+                style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
+            )
+            .rotationEffect(.degrees(-90))
+            .animation(isDragging ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: progress)
+    }
+
+    private func dragKnob(center: CGPoint, radius: CGFloat) -> some View {
+        let angle = Angle.degrees(clampedProgress * 360.0 - 90.0)
+        let knobX = center.x + CGFloat(cos(angle.radians)) * radius
+        let knobY = center.y + CGFloat(sin(angle.radians)) * radius
+
+        return Circle()
+            .fill(Color(.systemBackground))
+            .frame(width: ringWidth + 6, height: ringWidth + 6)
+            .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 1)
+            .scaleEffect(isDragging ? 1.25 : 1.0)
+            .position(x: knobX, y: knobY)
+            .accessibilityIdentifier("progress_knob")
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { value in
+                        isDragging = true
+                        let touchAngle = computeTouchAngle(point: value.location, center: center)
+                        onProgressDragged?(touchAngle / 360.0)
+                    }
+                    .onEnded { _ in
+                        isDragging = false
+                        onProgressDragEnded?()
+                    }
+            )
     }
 
     private func computeTouchAngle(point: CGPoint, center: CGPoint) -> Double {
@@ -98,7 +107,7 @@ public struct ProgressRingView: View {
         let deltaY = Double(point.y - center.y)
         let radians = atan2(deltaY, deltaX)
         var degrees = radians * 180.0 / .pi
-        degrees += 90 // 0 at top (12 o'clock)
+        degrees += 90 // 0 at top
         if degrees < 0 { degrees += 360 }
         return degrees
     }

@@ -20,7 +20,20 @@ public struct FastTrackerView: View {
                     .padding(.vertical, 8)
 
                 if let fast = fastManager.activeFast {
-                    startedCard(fast: fast, now: now)
+                    FastStartedCardView(
+                        fast: fast,
+                        now: now,
+                        onSelectDayOffset: { offset in
+                            updateStartDate(dayOffset: offset, from: fast.startDate ?? now)
+                        },
+                        onSelectTime: {
+                            tempTime = fast.startDate ?? now
+                            showTimePickerSheet = true
+                        }
+                    )
+                    .sheet(isPresented: $showTimePickerSheet) {
+                        timePickerSheet(startDate: fast.startDate ?? now, now: now)
+                    }
                 }
 
                 Spacer()
@@ -84,88 +97,6 @@ public struct FastTrackerView: View {
         }
     }
 
-    private func startedCard(fast: Fast, now: Date) -> some View {
-        let startDate = fast.startDate ?? now
-        let isStartedYesterday = Calendar.current.isDateInYesterday(startDate)
-
-        return HStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("STARTED")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.secondary)
-
-                HStack(spacing: 8) {
-                    // Date switcher button (Today / Yesterday)
-                    Menu {
-                        Button("Today") {
-                            updateStartDate(dayOffset: 0, from: startDate)
-                        }
-                        Button("Yesterday") {
-                            updateStartDate(dayOffset: -1, from: startDate)
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(isStartedYesterday ? "Yesterday" : "Today")
-                                .font(.subheadline.weight(.semibold))
-                            Image(systemName: "chevron.down")
-                                .font(.system(size: 9, weight: .bold))
-                        }
-                        .foregroundStyle(Color.primary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Color(.tertiarySystemBackground))
-                        .clipShape(Capsule())
-                    }
-                    .accessibilityIdentifier("start_date_menu")
-
-                    // Time Picker Sheet Button
-                    Button {
-                        tempTime = startDate
-                        showTimePickerSheet = true
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(formatTime(startDate))
-                                .font(.subheadline.weight(.semibold))
-                            Image(systemName: "pencil")
-                                .font(.system(size: 10))
-                        }
-                        .foregroundStyle(Color.primary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Color(.tertiarySystemBackground))
-                        .clipShape(Capsule())
-                    }
-                    .accessibilityIdentifier("start_time_button")
-                }
-            }
-
-            Spacer()
-
-            VStack(alignment: .trailing, spacing: 6) {
-                Text("GOAL TARGET")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.secondary)
-
-                let targetDate = startDate.addingTimeInterval(fast.targetDuration)
-                let isTomorrow = Calendar.current.isDateInTomorrow(targetDate)
-                let dayPrefix = isTomorrow ? "Tom, " : ""
-
-                Text("\(dayPrefix)\(formatTime(targetDate))")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.primary)
-                    .padding(.vertical, 6)
-            }
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .padding(.horizontal, 20)
-        .sheet(isPresented: $showTimePickerSheet) {
-            timePickerSheet(startDate: startDate, now: now)
-        }
-    }
-
     private func timePickerSheet(startDate: Date, now: Date) -> some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -207,7 +138,6 @@ public struct FastTrackerView: View {
         dateComponents.second = 0
 
         if let combinedDate = calendar.date(from: dateComponents) {
-            // Ensure not in the future
             let finalDate = min(combinedDate, now)
             fastManager.updateActiveFast(startDate: finalDate)
         }
@@ -304,11 +234,5 @@ public struct FastTrackerView: View {
         let startDate = fast.startDate ?? date
         let elapsed = date.timeIntervalSince(startDate)
         return max(0.0, elapsed / fast.targetDuration)
-    }
-
-    private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
     }
 }
