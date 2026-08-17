@@ -152,7 +152,6 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(manager.currentProtocol.ratioString, "18:6")
         XCTAssertEqual(manager.currentProtocol.fastingHours, 18)
 
-        // Starting a new fast uses the newly selected protocol
         let fast = manager.startFast(startDate: Date())
         XCTAssertEqual(fast.protocolType, "18:6")
         XCTAssertEqual(fast.targetDuration, 18 * 3600)
@@ -164,7 +163,7 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(defaultSchedule.selectedDays.count, 7)
 
         var customSchedule = defaultSchedule
-        customSchedule.selectedDays = [2, 3, 4, 5, 6] // Weekdays
+        customSchedule.selectedDays = [2, 3, 4, 5, 6]
         customSchedule.notifyOnGoalReached = false
 
         manager.updateNotificationSchedule(enabled: true, schedule: customSchedule)
@@ -177,6 +176,83 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(CenterDisplayMode.elapsed.next, .remaining)
         XCTAssertEqual(CenterDisplayMode.remaining.next, .percentage)
         XCTAssertEqual(CenterDisplayMode.percentage.next, .elapsed)
+    }
+
+    // MARK: - Streak Calculator Unit Tests
+
+    func testStreakCalculatorWithConsecutiveDays() throws {
+        let ctx = try XCTUnwrap(context)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        var testFasts: [Fast] = []
+        for dayOffset in 0..<4 {
+            let fast = Fast(context: ctx)
+            fast.id = UUID()
+            let dayDate = calendar.date(byAdding: .day, value: -dayOffset, to: today) ?? today
+            fast.startDate = dayDate
+            fast.endDate = dayDate.addingTimeInterval(16 * 3600)
+            fast.targetDuration = 16 * 3600
+            fast.isCompleted = true
+            testFasts.append(fast)
+        }
+
+        let streakInfo = StreakCalculator.calculate(from: testFasts, calendar: calendar, relativeTo: Date())
+        XCTAssertEqual(streakInfo.currentStreak, 4)
+        XCTAssertEqual(streakInfo.bestStreak, 4)
+        XCTAssertEqual(streakInfo.totalCompletedFasts, 4)
+    }
+
+    func testStreakCalculatorWithBrokenStreak() throws {
+        let ctx = try XCTUnwrap(context)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        var testFasts: [Fast] = []
+        // Old streak of 3 days: 5, 6, 7 days ago
+        for dayOffset in [5, 6, 7] {
+            let fast = Fast(context: ctx)
+            fast.id = UUID()
+            let dayDate = calendar.date(byAdding: .day, value: -dayOffset, to: today) ?? today
+            fast.startDate = dayDate
+            fast.endDate = dayDate.addingTimeInterval(16 * 3600)
+            fast.targetDuration = 16 * 3600
+            fast.isCompleted = true
+            testFasts.append(fast)
+        }
+
+        // 1 fast today
+        let todayFast = Fast(context: ctx)
+        todayFast.id = UUID()
+        todayFast.startDate = today
+        todayFast.endDate = today.addingTimeInterval(16 * 3600)
+        todayFast.targetDuration = 16 * 3600
+        todayFast.isCompleted = true
+        testFasts.append(todayFast)
+
+        let streakInfo = StreakCalculator.calculate(from: testFasts, calendar: calendar, relativeTo: Date())
+        XCTAssertEqual(streakInfo.currentStreak, 1)
+        XCTAssertEqual(streakInfo.bestStreak, 3)
+    }
+
+    func testStreakCalculatorDailyFastStatus() throws {
+        let ctx = try XCTUnwrap(context)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        let goalFast = Fast(context: ctx)
+        goalFast.id = UUID()
+        goalFast.startDate = today.addingTimeInterval(3600)
+        goalFast.endDate = goalFast.startDate?.addingTimeInterval(16 * 3600)
+        goalFast.targetDuration = 16 * 3600
+        goalFast.isCompleted = true
+
+        let status = StreakCalculator.fastStatus(for: today, in: [goalFast], calendar: calendar)
+        XCTAssertEqual(status, .goalMet(hours: 16.0))
+
+        let emptyDate = calendar.date(byAdding: .day, value: -10, to: today) ?? today
+        let emptyStatus = StreakCalculator.fastStatus(for: emptyDate, in: [goalFast], calendar: calendar)
+        XCTAssertEqual(emptyStatus, .none)
     }
 
     // MARK: - Dial Math Unit Tests
@@ -244,20 +320,17 @@ final class FastedTests: XCTestCase {
     }
 
     func testDialMathSweepAndMidnightCrossing() {
-        // Simple day window: 12 PM (180°) to 8 PM (300°) -> 120° sweep = 8 hours
         let sweepDay = DialMath.sweepAngle(from: 180.0, to: 300.0)
         XCTAssertEqual(sweepDay, 120.0, accuracy: 0.1)
         XCTAssertEqual(DialMath.computeDuration(startAngle: 180.0, endAngle: 300.0), 8 * 3600, accuracy: 1.0)
 
-        // Midnight-crossing window: 8 PM (300°) to 12 PM next day (180°) -> 240° sweep = 16 hours
         let sweepMidnight = DialMath.sweepAngle(from: 300.0, to: 180.0)
         XCTAssertEqual(sweepMidnight, 240.0, accuracy: 0.1)
         XCTAssertEqual(DialMath.computeDuration(startAngle: 300.0, endAngle: 180.0), 16 * 3600, accuracy: 1.0)
 
-        // isAngle checks for midnight crossing
-        XCTAssertTrue(DialMath.isAngle(330.0, between: 300.0, and: 180.0)) // 10 PM is inside
-        XCTAssertTrue(DialMath.isAngle(90.0, between: 300.0, and: 180.0))  // 6 AM is inside
-        XCTAssertFalse(DialMath.isAngle(240.0, between: 300.0, and: 180.0)) // 4 PM is outside
+        XCTAssertTrue(DialMath.isAngle(330.0, between: 300.0, and: 180.0))
+        XCTAssertTrue(DialMath.isAngle(90.0, between: 300.0, and: 180.0))
+        XCTAssertFalse(DialMath.isAngle(240.0, between: 300.0, and: 180.0))
     }
 
     func testPreviewPersistenceController() throws {

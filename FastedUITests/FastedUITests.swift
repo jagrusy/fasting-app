@@ -116,27 +116,22 @@ final class FastedUITests: XCTestCase {
         let startButton = app.buttons["start_fast_button"]
         let endButton = app.buttons["end_fast_button"]
 
-        // Ensure active fast
         if startButton.waitForExistence(timeout: 2) {
             startButton.tap()
             XCTAssertTrue(endButton.waitForExistence(timeout: 4))
         }
 
-        // Find knob element
         let knob = app.otherElements["progress_knob"]
         XCTAssertTrue(knob.waitForExistence(timeout: 3), "Progress knob must exist and be accessible")
 
-        // Capture initial elapsed time string
         let elapsedLabel = app.staticTexts["elapsed_time_text"]
         XCTAssertTrue(elapsedLabel.waitForExistence(timeout: 2))
         let initialElapsed = elapsedLabel.label
 
-        // Drag knob clockwise to the right to increase elapsed time
         let startCoord = knob.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         let targetCoord = startCoord.withOffset(CGVector(dx: 90, dy: 90))
         startCoord.press(forDuration: 0.1, thenDragTo: targetCoord)
 
-        // Verify elapsed time updated
         let updatedElapsed = elapsedLabel.label
         XCTAssertNotEqual(initialElapsed, updatedElapsed, "Dragging the progress knob must update elapsed time!")
     }
@@ -153,9 +148,9 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(navBar.waitForExistence(timeout: 3))
 
         let emptyTitle = app.staticTexts["No Fasts Yet"]
-        let fastsCountLabel = app.staticTexts["total_fasts_count_label"]
+        let currentStreakLabel = app.staticTexts["current_streak_label"]
 
-        XCTAssertTrue(emptyTitle.waitForExistence(timeout: 3) || fastsCountLabel.waitForExistence(timeout: 3))
+        XCTAssertTrue(emptyTitle.waitForExistence(timeout: 3) || currentStreakLabel.waitForExistence(timeout: 3))
     }
 
     func testSettingsTabProtocolSelection() throws {

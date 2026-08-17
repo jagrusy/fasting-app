@@ -12,8 +12,23 @@ public struct HistoryListView: View {
     )
     private var completedFasts: FetchedResults<Fast>
 
+    @State private var selectedDate: Date?
+
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
+    }
+
+    private var streakInfo: StreakInfo {
+        StreakCalculator.calculate(from: Array(completedFasts))
+    }
+
+    private var filteredFasts: [Fast] {
+        guard let selected = selectedDate else { return Array(completedFasts) }
+        let calendar = Calendar.current
+        return completedFasts.filter { fast in
+            guard let start = fast.startDate else { return false }
+            return calendar.isDate(start, inSameDayAs: selected)
+        }
     }
 
     private var groupedFasts: [(String, [Fast])] {
@@ -23,7 +38,7 @@ public struct HistoryListView: View {
         var groups: [String: [Fast]] = [:]
         var order: [String] = []
 
-        for fast in completedFasts {
+        for fast in filteredFasts {
             let key = formatter.string(from: fast.startDate ?? Date())
             if groups[key] == nil {
                 groups[key] = []
@@ -48,13 +63,21 @@ public struct HistoryListView: View {
     private var historyContentList: some View {
         List {
             Section {
-                summaryCard
+                VStack(spacing: 16) {
+                    StreakSummaryCardsView(streakInfo: streakInfo)
+                    CalendarHeatmapView(fasts: Array(completedFasts), selectedDate: $selectedDate)
+                }
             }
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
 
+            if selectedDate != nil {
+                filterHeaderSection
+            }
+
             ForEach(groupedFasts, id: \.0) { month, fasts in
-                Section(header: Text(month).font(.subheadline.weight(.semibold))) {
+                Section(header: Text(selectedDate != nil ? "Fasts for Selected Day" : month)
+                    .font(.subheadline.weight(.semibold))) {
                     ForEach(fasts) { fast in
                         NavigationLink {
                             FastDetailView(fastManager: fastManager, fast: fast)
@@ -72,37 +95,25 @@ public struct HistoryListView: View {
         .accessibilityIdentifier("history_fast_list")
     }
 
-    private var summaryCard: some View {
-        HStack(spacing: 20) {
-            statItem(title: "TOTAL FASTS", value: "\(completedFasts.count)", identifier: "total_fasts_count_label")
-            Divider().frame(height: 36)
-            statItem(title: "TOTAL TIME", value: formatTotalTime(), identifier: "total_fasts_time_label")
-            Divider().frame(height: 36)
-            statItem(
-                title: "COMPLETION",
-                value: formatCompletionRate(),
-                identifier: "total_fasts_rate_label",
-                valueColor: .green
-            )
-        }
-        .padding(16)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-    }
+    @ViewBuilder
+    private var filterHeaderSection: some View {
+        if let selected = selectedDate {
+            Section {
+                HStack {
+                    Text("Filtered: \(formattedDate(selected))")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
 
-    private func statItem(title: String, value: String, identifier: String, valueColor: Color = .primary) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.title2.weight(.bold))
-                .foregroundStyle(valueColor)
-                .accessibilityIdentifier(identifier)
+                    Spacer()
+
+                    Button("Show All") {
+                        withAnimation { selectedDate = nil }
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .accessibilityIdentifier("clear_filter_button")
+                }
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func deleteFasts(at offsets: IndexSet, from list: [Fast]) {
@@ -112,25 +123,9 @@ public struct HistoryListView: View {
         }
     }
 
-    private func formatTotalTime() -> String {
-        let totalSeconds = completedFasts.reduce(0.0) { acc, fast in
-            let start = fast.startDate ?? Date()
-            let end = fast.endDate ?? start
-            return acc + max(0, end.timeIntervalSince(start))
-        }
-        let hours = Int(totalSeconds / 3600)
-        return "\(hours)h"
-    }
-
-    private func formatCompletionRate() -> String {
-        guard !completedFasts.isEmpty else { return "0%" }
-        let completedCount = completedFasts.filter { fast in
-            let start = fast.startDate ?? Date()
-            let end = fast.endDate ?? start
-            return fast.isCompleted || (end.timeIntervalSince(start) >= fast.targetDuration)
-        }.count
-
-        let rate = Int((Double(completedCount) / Double(completedFasts.count)) * 100)
-        return "\(rate)%"
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: date)
     }
 }
