@@ -40,7 +40,7 @@ struct ContentView: View {
                 }
                 .tag(Tab.history)
 
-            SettingsTabView()
+            SettingsTabView(fastManager: fastManager)
                 .tabItem {
                     Label(Tab.settings.rawValue, systemImage: Tab.settings.icon)
                 }
@@ -73,20 +73,11 @@ struct HistoryTabView: View {
 }
 
 struct SettingsTabView: View {
+    @ObservedObject var fastManager: FastManager
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                Image(systemName: "gearshape")
-                    .font(.system(size: 60))
-                    .foregroundStyle(.secondary)
-                Text("Settings")
-                    .font(.title2.weight(.semibold))
-                Text("Configure your fasting protocol and notification reminders.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            .padding()
-            .navigationTitle("Settings")
+            SettingsView(fastManager: fastManager)
         }
     }
 }
