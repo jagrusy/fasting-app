@@ -24,11 +24,9 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
         fastTab.tap()
 
-        // Check for navigation title
         let navBar = app.navigationBars["Fasted"]
         XCTAssertTrue(navBar.waitForExistence(timeout: 3))
 
-        // Check for either Start Fast or End Fast button
         let startButton = app.buttons["start_fast_button"]
         let endButton = app.buttons["end_fast_button"]
         XCTAssertTrue(startButton.waitForExistence(timeout: 3) || endButton.waitForExistence(timeout: 3))
@@ -49,11 +47,9 @@ final class FastedUITests: XCTestCase {
             startButton.tap()
             XCTAssertTrue(endButton.waitForExistence(timeout: 4))
 
-            // Verify active status header
             let statusHeader = app.staticTexts["fast_status_header"]
             XCTAssertTrue(statusHeader.waitForExistence(timeout: 2))
 
-            // End fast
             endButton.tap()
             let alert = app.alerts.firstMatch
             if alert.waitForExistence(timeout: 2) {
@@ -85,7 +81,6 @@ final class FastedUITests: XCTestCase {
         let startButton = app.buttons["start_fast_button"]
         let endButton = app.buttons["end_fast_button"]
 
-        // Ensure active fast
         if startButton.waitForExistence(timeout: 2) {
             startButton.tap()
             XCTAssertTrue(endButton.waitForExistence(timeout: 4))
@@ -108,6 +103,42 @@ final class FastedUITests: XCTestCase {
         // Tap again -> cycles back to ELAPSED
         ringButton.tap()
         XCTAssertTrue(app.staticTexts["ELAPSED"].waitForExistence(timeout: 2))
+    }
+
+    func testProgressRingKnobDraggingUpdatesProgressAndElapsedTime() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let fastTab = app.tabBars.buttons["Fast"]
+        XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
+        fastTab.tap()
+
+        let startButton = app.buttons["start_fast_button"]
+        let endButton = app.buttons["end_fast_button"]
+
+        // Ensure active fast
+        if startButton.waitForExistence(timeout: 2) {
+            startButton.tap()
+            XCTAssertTrue(endButton.waitForExistence(timeout: 4))
+        }
+
+        // Find knob element
+        let knob = app.otherElements["progress_knob"]
+        XCTAssertTrue(knob.waitForExistence(timeout: 3), "Progress knob must exist and be accessible")
+
+        // Capture initial elapsed time string
+        let elapsedLabel = app.staticTexts["elapsed_time_text"]
+        XCTAssertTrue(elapsedLabel.waitForExistence(timeout: 2))
+        let initialElapsed = elapsedLabel.label
+
+        // Drag knob clockwise to the right to increase elapsed time
+        let startCoord = knob.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        let targetCoord = startCoord.withOffset(CGVector(dx: 90, dy: 90))
+        startCoord.press(forDuration: 0.1, thenDragTo: targetCoord)
+
+        // Verify elapsed time updated
+        let updatedElapsed = elapsedLabel.label
+        XCTAssertNotEqual(initialElapsed, updatedElapsed, "Dragging the progress knob must update elapsed time!")
     }
 
     func testHistoryTabDisplaysListOrEmptyState() throws {
@@ -146,10 +177,8 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(warriorCard.waitForExistence(timeout: 3))
         warriorCard.tap()
 
-        // Navigate back
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
-        // Check if warrior is shown
         XCTAssertTrue(app.staticTexts["Warrior"].waitForExistence(timeout: 3))
     }
 }
