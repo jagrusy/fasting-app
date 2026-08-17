@@ -14,9 +14,10 @@ public struct FastTrackerView: View {
     public var body: some View {
         TimelineView(.animation(minimumInterval: 1.0)) { context in
             let now = context.date
+            let progress = calculateProgress(at: now)
             VStack(spacing: 28) {
-                headerView
-                progressSection(now: now)
+                headerView(progress: progress)
+                progressSection(now: now, progress: progress)
                     .padding(.vertical, 8)
 
                 if let fast = fastManager.activeFast {
@@ -38,34 +39,36 @@ public struct FastTrackerView: View {
 
                 Spacer()
 
-                actionButton(now: now)
+                actionButton(now: now, progress: progress)
             }
             .padding(.bottom, 20)
         }
     }
 
-    private var headerView: some View {
+    private func headerView(progress: Double) -> some View {
         VStack(spacing: 6) {
             Text(fastManager.isFasting ? "Current Fast" : "Ready to Fast")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
 
-            let statusTitle = fastManager.isFasting
-                ? "Fasting in Progress"
-                : "\(fastManager.currentProtocol.name) (\(fastManager.currentProtocol.ratioString))"
+            let statusTitle: String = {
+                if !fastManager.isFasting {
+                    return "\(fastManager.currentProtocol.name) (\(fastManager.currentProtocol.ratioString))"
+                }
+                return progress >= 1.0 ? "Goal Reached! 🎉" : "Fasting in Progress"
+            }()
 
             Text(statusTitle)
                 .font(.title2.weight(.bold))
+                .foregroundStyle(progress >= 1.0 && fastManager.isFasting ? .green : Color.primary)
                 .accessibilityIdentifier("fast_status_header")
         }
         .padding(.top, 16)
     }
 
-    private func progressSection(now: Date) -> some View {
+    private func progressSection(now: Date, progress: Double) -> some View {
         ZStack {
-            let progress = calculateProgress(at: now)
-
             ProgressRingView(
                 progress: progress,
                 isFasting: fastManager.isFasting,
@@ -159,33 +162,46 @@ public struct FastTrackerView: View {
         }
     }
 
-    private func actionButton(now: Date) -> some View {
+    private func actionButton(now: Date, progress: Double) -> some View {
         Group {
             if fastManager.isFasting {
-                endFastButton(now: now)
+                endFastButton(now: now, goalReached: progress >= 1.0)
             } else {
                 startFastButton(now: now)
             }
         }
     }
 
-    private func endFastButton(now: Date) -> some View {
-        Button(
-            action: { showStopConfirmation = true },
+    private func endFastButton(now: Date, goalReached: Bool) -> some View {
+        let buttonTitle = goalReached ? "Complete Fast" : "End Fast"
+        let buttonColor: Color = goalReached ? .green : .red
+        let dialogTitle = goalReached ? "Complete Fast" : "End Fast Early?"
+        let dialogMessage = goalReached
+            ? "Great work! You've reached your fasting goal."
+            : "Are you sure you want to end your current fast?"
+
+        return Button(
+            action: {
+                if goalReached {
+                    fastManager.endFast(endDate: now)
+                } else {
+                    showStopConfirmation = true
+                }
+            },
             label: {
-                Text("End Fast")
+                Text(buttonTitle)
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(Color.red)
+                    .background(buttonColor)
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
         )
         .accessibilityIdentifier("end_fast_button")
         .padding(.horizontal, 24)
         .confirmationDialog(
-            "End Fast Early?",
+            dialogTitle,
             isPresented: $showStopConfirmation,
             titleVisibility: .visible,
             actions: {
@@ -193,7 +209,7 @@ public struct FastTrackerView: View {
                 Button("Cancel", role: .cancel) {}
             },
             message: {
-                Text("Are you sure you want to end your current fast?")
+                Text(dialogMessage)
             }
         )
     }
