@@ -19,9 +19,7 @@ public struct DialEditorView: View {
     private let knobRadius: CGFloat = 18
 
     private enum DragHandle {
-        case start
-        case end
-        case arc
+        case start, end, arc
     }
 
     public init(
@@ -45,110 +43,28 @@ public struct DialEditorView: View {
             VStack(spacing: 24) {
                 // Header with Bedtime / Wake Up style cards
                 HStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "fork.knife.circle.fill")
-                                .foregroundStyle(.orange)
-                            Text("FAST START")
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(.secondary)
-                        }
-                        Text(formatTime(startDate))
-                            .font(.title3.weight(.bold))
-                            .accessibilityIdentifier("dial_start_time_label")
-                        Text(formatRelativeDay(for: startDate))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(14)
-                    .background(Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    DialHeaderCardView(
+                        title: "FAST START",
+                        systemImage: "fork.knife.circle.fill",
+                        imageColor: .orange,
+                        date: startDate,
+                        identifier: "dial_start_time_label"
+                    )
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "flag.checkered.circle.fill")
-                                .foregroundStyle(.green)
-                            Text("FAST END")
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(.secondary)
-                        }
-                        Text(formatTime(calculatedEndDate))
-                            .font(.title3.weight(.bold))
-                            .accessibilityIdentifier("dial_end_time_label")
-                        Text(formatRelativeDay(for: calculatedEndDate))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(14)
-                    .background(Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    DialHeaderCardView(
+                        title: "FAST END",
+                        systemImage: "flag.checkered.circle.fill",
+                        imageColor: .green,
+                        date: calculatedEndDate,
+                        identifier: "dial_end_time_label"
+                    )
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
 
                 // Interactive 24-hour Dial
-                ZStack {
-                    // Base 24h clock face
-                    DialFaceView(radius: dialRadius, strokeWidth: strokeWidth)
-
-                    // Fasting arc (draggable in the middle)
-                    FastingArcShape(startAngle: startAngle, endAngle: endAngle)
-                        .stroke(
-                            LinearGradient(
-                                colors: [Color.orange, Color.red],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round)
-                        )
-                        .frame(width: dialRadius * 2, height: dialRadius * 2)
-
-                    // Start Handle (Knob)
-                    let startPos = DialMath.pointOnCircle(
-                        center: CGPoint(x: dialRadius, y: dialRadius),
-                        radius: dialRadius,
-                        angleDegrees: startAngle
-                    )
-                    Circle()
-                        .fill(Color(.systemBackground))
-                        .frame(width: knobRadius * 2, height: knobRadius * 2)
-                        .overlay(
-                            Image(systemName: "fork.knife")
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundStyle(.orange)
-                        )
-                        .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
-                        .position(startPos)
-                        .accessibilityIdentifier("dial_start_handle")
-
-                    // End Handle (Knob)
-                    let endPos = DialMath.pointOnCircle(
-                        center: CGPoint(x: dialRadius, y: dialRadius),
-                        radius: dialRadius,
-                        angleDegrees: endAngle
-                    )
-                    Circle()
-                        .fill(Color(.systemBackground))
-                        .frame(width: knobRadius * 2, height: knobRadius * 2)
-                        .overlay(
-                            Image(systemName: "flag.fill")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundStyle(.green)
-                        )
-                        .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
-                        .position(endPos)
-                        .accessibilityIdentifier("dial_end_handle")
-                }
-                .frame(width: dialRadius * 2 + 40, height: dialRadius * 2 + 40)
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged(handleDragChanged)
-                        .onEnded(handleDragEnded)
-                )
-                .padding(.vertical, 10)
+                dialCanvas
+                    .padding(.vertical, 10)
 
                 // Duration summary under dial
                 VStack(spacing: 4) {
@@ -167,21 +83,74 @@ public struct DialEditorView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        onCancel()
-                    }
-                    .accessibilityIdentifier("dial_cancel_button")
+                    Button("Cancel", action: onCancel)
+                        .accessibilityIdentifier("dial_cancel_button")
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        onSave(startDate, targetDuration)
-                    }
-                    .fontWeight(.semibold)
-                    .accessibilityIdentifier("dial_save_button")
+                    Button("Save") { onSave(startDate, targetDuration) }
+                        .fontWeight(.semibold)
+                        .accessibilityIdentifier("dial_save_button")
                 }
             }
             .onAppear(perform: setupInitialAngles)
         }
+    }
+
+    private var dialCanvas: some View {
+        ZStack {
+            DialFaceView(radius: dialRadius, strokeWidth: strokeWidth)
+
+            FastingArcShape(startAngle: startAngle, endAngle: endAngle)
+                .stroke(
+                    LinearGradient(
+                        colors: [Color.orange, Color.red],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round)
+                )
+                .frame(width: dialRadius * 2, height: dialRadius * 2)
+
+            handleView(
+                angle: startAngle,
+                icon: "fork.knife",
+                color: .orange,
+                identifier: "dial_start_handle"
+            )
+
+            handleView(
+                angle: endAngle,
+                icon: "flag.fill",
+                color: .green,
+                identifier: "dial_end_handle"
+            )
+        }
+        .frame(width: dialRadius * 2 + 40, height: dialRadius * 2 + 40)
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged(handleDragChanged)
+                .onEnded(handleDragEnded)
+        )
+    }
+
+    private func handleView(angle: Double, icon: String, color: Color, identifier: String) -> some View {
+        let pos = DialMath.pointOnCircle(
+            center: CGPoint(x: dialRadius, y: dialRadius),
+            radius: dialRadius,
+            angleDegrees: angle
+        )
+        return Circle()
+            .fill(Color(.systemBackground))
+            .frame(width: knobRadius * 2, height: knobRadius * 2)
+            .overlay(
+                Image(systemName: icon)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(color)
+            )
+            .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
+            .position(pos)
+            .accessibilityIdentifier(identifier)
     }
 
     private func setupInitialAngles() {
@@ -263,27 +232,6 @@ public struct DialEditorView: View {
 
     private func handleDragEnded(_ value: DragGesture.Value) {
         activeDragHandle = nil
-    }
-
-    private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
-    }
-
-    private func formatRelativeDay(for date: Date) -> String {
-        let calendar = Calendar.current
-        if calendar.isDateInToday(date) {
-            return "Today"
-        } else if calendar.isDateInTomorrow(date) {
-            return "Tomorrow"
-        } else if calendar.isDateInYesterday(date) {
-            return "Yesterday"
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "EEE, MMM d"
-            return formatter.string(from: date)
-        }
     }
 
     private func formatDuration(_ interval: TimeInterval) -> String {
