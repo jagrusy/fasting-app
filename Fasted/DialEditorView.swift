@@ -190,51 +190,60 @@ public struct DialEditorView: View {
         endAngle = DialMath.angle(for: computedEnd)
     }
 
+    private func detectHandle(at touchPoint: CGPoint, touchAngle: Double, center: CGPoint) -> DragHandle? {
+        let startPoint = DialMath.pointOnCircle(center: center, radius: dialRadius, angleDegrees: startAngle)
+        let endPoint = DialMath.pointOnCircle(center: center, radius: dialRadius, angleDegrees: endAngle)
+
+        let distToStart = hypot(touchPoint.x - startPoint.x, touchPoint.y - startPoint.y)
+        let distToEnd = hypot(touchPoint.x - endPoint.x, touchPoint.y - endPoint.y)
+
+        let touchRadius = hypot(touchPoint.x - center.x, touchPoint.y - center.y)
+        let isNearRing = abs(touchRadius - dialRadius) <= (strokeWidth / 2 + 15)
+
+        if distToStart < knobRadius + 16 {
+            return .start
+        } else if distToEnd < knobRadius + 16 {
+            return .end
+        } else if isNearRing && DialMath.isAngle(touchAngle, between: startAngle, and: endAngle) {
+            return .arc
+        }
+        return nil
+    }
+
     private func handleDragChanged(_ value: DragGesture.Value) {
         let center = CGPoint(x: dialRadius + 20, y: dialRadius + 20)
-        let currentTouchAngle = DialMath.touchAngle(point: value.location, center: center)
+        let touchAngle = DialMath.touchAngle(point: value.location, center: center)
 
         if activeDragHandle == nil {
-            // Determine which handle was touched
-            let startPoint = DialMath.pointOnCircle(center: center, radius: dialRadius, angleDegrees: startAngle)
-            let endPoint = DialMath.pointOnCircle(center: center, radius: dialRadius, angleDegrees: endAngle)
-
-            let distToStart = hypot(value.startLocation.x - startPoint.x, value.startLocation.y - startPoint.y)
-            let distToEnd = hypot(value.startLocation.x - endPoint.x, value.startLocation.y - endPoint.y)
-
-            let touchRadius = hypot(value.startLocation.x - center.x, value.startLocation.y - center.y)
-            let isNearRing = abs(touchRadius - dialRadius) <= (strokeWidth / 2 + 15)
-
-            if distToStart < knobRadius + 16 {
-                activeDragHandle = .start
-            } else if distToEnd < knobRadius + 16 {
-                activeDragHandle = .end
-            } else if isNearRing && DialMath.isAngle(currentTouchAngle, between: startAngle, and: endAngle) {
-                activeDragHandle = .arc
+            guard let handle = detectHandle(at: value.startLocation, touchAngle: touchAngle, center: center) else {
+                return
+            }
+            activeDragHandle = handle
+            if handle == .arc {
                 initialStartAngle = startAngle
                 initialEndAngle = endAngle
-                lastDragAngle = currentTouchAngle
-            } else {
-                return
+                lastDragAngle = touchAngle
             }
         }
 
+        applyDragUpdate(touchAngle: touchAngle)
+    }
+
+    private func applyDragUpdate(touchAngle: Double) {
         switch activeDragHandle {
         case .start:
-            let snappedDate = DialMath.date(from: currentTouchAngle, baseDate: startDate, snapToMinutes: 5)
-            let newAngle = DialMath.angle(for: snappedDate)
-            startAngle = newAngle
+            let snappedDate = DialMath.date(from: touchAngle, baseDate: startDate, snapToMinutes: 5)
+            startAngle = DialMath.angle(for: snappedDate)
             startDate = snappedDate
             targetDuration = DialMath.computeDuration(startAngle: startAngle, endAngle: endAngle)
 
         case .end:
-            let rawEndDate = DialMath.date(from: currentTouchAngle, baseDate: startDate, snapToMinutes: 5)
-            let newAngle = DialMath.angle(for: rawEndDate)
-            endAngle = newAngle
+            let rawEndDate = DialMath.date(from: touchAngle, baseDate: startDate, snapToMinutes: 5)
+            endAngle = DialMath.angle(for: rawEndDate)
             targetDuration = DialMath.computeDuration(startAngle: startAngle, endAngle: endAngle)
 
         case .arc:
-            var delta = currentTouchAngle - lastDragAngle
+            var delta = touchAngle - lastDragAngle
             if delta > 180 { delta -= 360 }
             if delta < -180 { delta += 360 }
 
@@ -245,7 +254,7 @@ public struct DialEditorView: View {
             if endAngle < 0 { endAngle += 360 }
 
             startDate = DialMath.date(from: startAngle, baseDate: startDate, snapToMinutes: 5)
-            lastDragAngle = currentTouchAngle
+            lastDragAngle = touchAngle
 
         case .none:
             break
