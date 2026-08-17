@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="1" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Fast" representedClassName="Fast" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="startDate" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="targetDuration" optional="NO" attributeType="Double" defaultValueString="57600.0" usesScalarValueType="YES"/>
+        <attribute name="protocolType" optional="NO" attributeType="String" defaultValueString="16:8"/>
+        <attribute name="moodRating" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isCompleted" optional="NO" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="UserSettings" representedClassName="UserSettings" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="selectedProtocol" optional="NO" attributeType="String" defaultValueString="16:8"/>
+        <attribute name="notificationsEnabled" optional="NO" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="notificationSchedule" optional="YES" attributeType="Binary" usesScalarValueType="NO"/>
+    </entity>
+    <elements>
+        <element name="Fast" positionX="-63" positionY="-18" width="128" height="180"/>
+        <element name="UserSettings" positionX="108" positionY="-18" width="128" height="105"/>
+    </elements>
+</model>
