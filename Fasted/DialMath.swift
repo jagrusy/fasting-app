@@ -28,25 +28,25 @@ public struct DialMath {
         }
 
         let totalSecondsInDay = 86400.0
-        let secondsFromMidnight = (normalizedAngle / 360.0) * totalSecondsInDay
-
-        let startOfDay = calendar.startOfDay(for: baseDate)
-        var targetDate = startOfDay.addingTimeInterval(secondsFromMidnight)
+        var secondsFromMidnight = (normalizedAngle / 360.0) * totalSecondsInDay
 
         if snapToMinutes > 0 {
-            targetDate = snap(date: targetDate, intervalMinutes: snapToMinutes, calendar: calendar)
+            let snapSeconds = Double(snapToMinutes * 60)
+            secondsFromMidnight = (secondsFromMidnight / snapSeconds).rounded() * snapSeconds
         }
 
-        return targetDate
+        let startOfDay = calendar.startOfDay(for: baseDate)
+        return startOfDay.addingTimeInterval(secondsFromMidnight)
     }
 
     /// Snaps a given date to the nearest interval of minutes (e.g. 5 minutes).
     public static func snap(date: Date, intervalMinutes: Int = 5, calendar: Calendar = .current) -> Date {
         guard intervalMinutes > 0 else { return date }
+        let startOfDay = calendar.startOfDay(for: date)
+        let elapsed = date.timeIntervalSince(startOfDay)
         let intervalSeconds = TimeInterval(intervalMinutes * 60)
-        let time = date.timeIntervalSinceReferenceDate
-        let rounded = (time / intervalSeconds).rounded() * intervalSeconds
-        return Date(timeIntervalSinceReferenceDate: rounded)
+        let roundedElapsed = (elapsed / intervalSeconds).rounded() * intervalSeconds
+        return startOfDay.addingTimeInterval(roundedElapsed)
     }
 
     /// Converts a CGPoint relative to center into an angle in degrees [0, 360) where 0 is at top (12 o'clock).
@@ -55,10 +55,8 @@ public struct DialMath {
         let deltaY = Double(point.y - center.y)
 
         // atan2 gives 0 at positive X axis (3 o'clock) increasing counter-clockwise or clockwise depending on Y axis.
-        // In iOS Cartesian coords, Y is downwards.
-        // angle from positive X (3 o'clock): atan2(dy, dx) in radians
         let radians = atan2(deltaY, deltaX)
-        var degrees = radians * (180.0 / .pi) // -180 to +180. 0 is 3 o'clock, 90 is 6 o'clock, -90 is 12 o'clock
+        var degrees = radians * (180.0 / .pi)
 
         // Shift so that 12 o'clock (-90°) is 0°
         degrees += 90.0
@@ -70,7 +68,6 @@ public struct DialMath {
 
     /// Calculates point on circle given center, radius, and 24h dial angle (0° = 12 o'clock top).
     public static func pointOnCircle(center: CGPoint, radius: CGFloat, angleDegrees: Double) -> CGPoint {
-        // angleDegrees: 0 is top (-90° standard angle)
         let standardAngleRad = (angleDegrees - 90.0) * (.pi / 180.0)
         let posX = center.x + radius * CGFloat(cos(standardAngleRad))
         let posY = center.y + radius * CGFloat(sin(standardAngleRad))
@@ -116,7 +113,6 @@ public struct DialMath {
     ) -> TimeInterval {
         let sweep = sweepAngle(from: startAngle, to: endAngle)
         let hours = (sweep / 360.0) * 24.0
-        // Minimum 30 mins, max 24 hours
         let seconds = hours * 3600.0
         return max(1800.0, seconds)
     }
