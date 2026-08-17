@@ -4,23 +4,23 @@ public struct ProgressRingView: View {
     public let progress: Double // 0.0 to 1.0 (or > 1.0 when exceeded)
     public let isFasting: Bool
     public var ringWidth: CGFloat = 22
-    public var onStartKnobDragged: ((Double) -> Void)?
-    public var onStartKnobDragEnded: (() -> Void)?
+    public var onProgressDragged: ((Double) -> Void)?
+    public var onProgressDragEnded: (() -> Void)?
 
-    @State private var isDraggingKnob: Bool = false
+    @State private var isDragging: Bool = false
 
     public init(
         progress: Double,
         isFasting: Bool,
         ringWidth: CGFloat = 22,
-        onStartKnobDragged: ((Double) -> Void)? = nil,
-        onStartKnobDragEnded: (() -> Void)? = nil
+        onProgressDragged: ((Double) -> Void)? = nil,
+        onProgressDragEnded: (() -> Void)? = nil
     ) {
         self.progress = progress
         self.isFasting = isFasting
         self.ringWidth = ringWidth
-        self.onStartKnobDragged = onStartKnobDragged
-        self.onStartKnobDragEnded = onStartKnobDragEnded
+        self.onProgressDragged = onProgressDragged
+        self.onProgressDragEnded = onProgressDragEnded
     }
 
     private var clampedProgress: Double {
@@ -34,7 +34,7 @@ public struct ProgressRingView: View {
             let center = CGPoint(x: size / 2, y: size / 2)
 
             ZStack {
-                // Background track
+                // Background track ring
                 Circle()
                     .stroke(
                         Color(.systemGray5),
@@ -45,13 +45,13 @@ public struct ProgressRingView: View {
                 if isFasting && progress > 1.0 {
                     Circle()
                         .stroke(
-                            Color.green.opacity(0.3),
+                            Color.green.opacity(0.35),
                             style: StrokeStyle(lineWidth: ringWidth + 8, lineCap: .round)
                         )
                         .blur(radius: 6)
                 }
 
-                // Progress Arc
+                // Active Progress Arc
                 Circle()
                     .trim(from: 0.0, to: CGFloat(clampedProgress))
                     .stroke(
@@ -59,47 +59,32 @@ public struct ProgressRingView: View {
                         style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
-                    .animation(isDraggingKnob ? nil : .spring(response: 0.5, dampingFraction: 0.8), value: progress)
+                    .animation(isDragging ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: progress)
 
-                // End Tip indicator when fasting
-                if isFasting && clampedProgress > 0.03 {
-                    let endAngle = Angle.degrees(clampedProgress * 360 - 90)
-                    let endX = center.x + CGFloat(cos(endAngle.radians)) * radius
-                    let endY = center.y + CGFloat(sin(endAngle.radians)) * radius
-
-                    Circle()
-                        .fill(Color(.systemBackground))
-                        .frame(width: ringWidth - 6, height: ringWidth - 6)
-                        .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
-                        .position(x: endX, y: endY)
-                }
-
-                // Interactive Start Knob (at top / start of fast arc)
-                if isFasting && onStartKnobDragged != nil {
-                    let startKnobPos = CGPoint(x: center.x, y: center.y - radius)
+                // Single Draggable Knob at tip of progress arc
+                if isFasting {
+                    let angle = Angle.degrees(clampedProgress * 360.0 - 90.0)
+                    let knobX = center.x + CGFloat(cos(angle.radians)) * radius
+                    let knobY = center.y + CGFloat(sin(angle.radians)) * radius
 
                     Circle()
                         .fill(Color(.systemBackground))
-                        .frame(width: ringWidth + 10, height: ringWidth + 10)
-                        .overlay(
-                            Image(systemName: "arrow.counterclockwise")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundStyle(Color.orange)
-                        )
-                        .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
-                        .scaleEffect(isDraggingKnob ? 1.25 : 1.0)
-                        .position(startKnobPos)
-                        .accessibilityIdentifier("ring_start_knob")
+                        .frame(width: ringWidth + 6, height: ringWidth + 6)
+                        .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 1)
+                        .scaleEffect(isDragging ? 1.25 : 1.0)
+                        .position(x: knobX, y: knobY)
+                        .accessibilityIdentifier("progress_knob")
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
-                                    isDraggingKnob = true
+                                    isDragging = true
                                     let touchAngle = computeTouchAngle(point: value.location, center: center)
-                                    onStartKnobDragged?(touchAngle)
+                                    let newProgress = touchAngle / 360.0
+                                    onProgressDragged?(newProgress)
                                 }
                                 .onEnded { _ in
-                                    isDraggingKnob = false
-                                    onStartKnobDragEnded?()
+                                    isDragging = false
+                                    onProgressDragEnded?()
                                 }
                         )
                 }
@@ -113,7 +98,7 @@ public struct ProgressRingView: View {
         let deltaY = Double(point.y - center.y)
         let radians = atan2(deltaY, deltaX)
         var degrees = radians * 180.0 / .pi
-        degrees += 90 // 0 at top
+        degrees += 90 // 0 at top (12 o'clock)
         if degrees < 0 { degrees += 360 }
         return degrees
     }
