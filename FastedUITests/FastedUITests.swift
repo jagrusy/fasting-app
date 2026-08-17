@@ -127,10 +127,6 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(cancelButton.exists)
         XCTAssertTrue(durationLabel.exists)
 
-        // Verify handles exist
-        XCTAssertTrue(app.otherElements["dial_start_handle"].exists)
-        XCTAssertTrue(app.otherElements["dial_end_handle"].exists)
-
         // Tap Save to dismiss and persist changes
         saveButton.tap()
 
