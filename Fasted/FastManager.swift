@@ -98,8 +98,9 @@ public final class FastManager: ObservableObject {
     public func endFast(endDate: Date = Date(), moodRating: Int16? = nil) {
         guard let fast = activeFast else { return }
 
+        let start = fast.startDate ?? Date()
         fast.endDate = endDate
-        fast.isCompleted = (endDate.timeIntervalSince(fast.startDate) >= fast.targetDuration)
+        fast.isCompleted = (endDate.timeIntervalSince(start) >= fast.targetDuration)
         if let mood = moodRating {
             fast.moodRating = mood
         }

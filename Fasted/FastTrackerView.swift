@@ -43,7 +43,8 @@ public struct FastTrackerView: View {
                     // Inner Timer / Idle Content
                     VStack(spacing: 8) {
                         if let fast = fastManager.activeFast {
-                            let elapsed = max(0, now.timeIntervalSince(fast.startDate))
+                            let startDate = fast.startDate ?? now
+                            let elapsed = max(0, now.timeIntervalSince(startDate))
 
                             Text("ELAPSED")
                                 .font(.caption2.weight(.semibold))
@@ -90,12 +91,13 @@ public struct FastTrackerView: View {
 
                 // Fast details info card (when active)
                 if let fast = fastManager.activeFast {
+                    let startDate = fast.startDate ?? now
                     HStack(spacing: 24) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Started")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Text(formatTime(fast.startDate))
+                            Text(formatTime(startDate))
                                 .font(.subheadline.weight(.semibold))
                         }
 
@@ -106,7 +108,7 @@ public struct FastTrackerView: View {
                             Text("Target End")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Text(formatTime(fast.startDate.addingTimeInterval(fast.targetDuration)))
+                            Text(formatTime(startDate.addingTimeInterval(fast.targetDuration)))
                                 .font(.subheadline.weight(.semibold))
                         }
 
@@ -189,7 +191,8 @@ public struct FastTrackerView: View {
         guard let fast = fastManager.activeFast, fast.targetDuration > 0 else {
             return 0.0
         }
-        let elapsed = date.timeIntervalSince(fast.startDate)
+        let startDate = fast.startDate ?? date
+        let elapsed = date.timeIntervalSince(startDate)
         return max(0.0, elapsed / fast.targetDuration)
     }
 
