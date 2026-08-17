@@ -49,8 +49,7 @@ final class FastedUITests: XCTestCase {
 
             // Verify active fasting UI elements
             XCTAssertTrue(endButton.waitForExistence(timeout: 4))
-            XCTAssertTrue(app.staticTexts["elapsed_time_text"].exists)
-            XCTAssertTrue(app.staticTexts["progress_percentage_text"].exists)
+            XCTAssertTrue(app.buttons["progress_ring_button"].exists)
 
             // Tap End Fast button to bring up confirmation dialog
             endButton.tap()
@@ -88,7 +87,7 @@ final class FastedUITests: XCTestCase {
         }
     }
 
-    func testDialEditorPresentationAndInteraction() throws {
+    func testCenterMetricCyclingOnTap() throws {
         let app = XCUIApplication()
         app.launch()
 
@@ -99,39 +98,29 @@ final class FastedUITests: XCTestCase {
         let startButton = app.buttons["start_fast_button"]
         let endButton = app.buttons["end_fast_button"]
 
-        // If not fasting, start a fast first so dial editor is available
+        // Ensure active fast
         if startButton.waitForExistence(timeout: 2) {
             startButton.tap()
             XCTAssertTrue(endButton.waitForExistence(timeout: 4))
         }
 
-        // Tap the fast details button or ring button to present DialEditorView sheet
-        let detailsButton = app.buttons["fast_details_button"]
         let ringButton = app.buttons["progress_ring_button"]
+        XCTAssertTrue(ringButton.waitForExistence(timeout: 3))
 
-        if detailsButton.waitForExistence(timeout: 3) {
-            detailsButton.tap()
-        } else if ringButton.waitForExistence(timeout: 3) {
-            ringButton.tap()
-        }
+        // Initial mode: ELAPSED
+        XCTAssertTrue(app.staticTexts["ELAPSED"].exists)
 
-        // Verify Dial Editor sheet elements exist
-        let navBar = app.navigationBars["Edit Start Time"]
-        XCTAssertTrue(navBar.waitForExistence(timeout: 5))
+        // Tap once -> switches to REMAINING
+        ringButton.tap()
+        XCTAssertTrue(app.staticTexts["REMAINING"].waitForExistence(timeout: 2))
 
-        let saveButton = app.buttons["dial_save_button"]
-        let cancelButton = app.buttons["dial_cancel_button"]
-        let durationLabel = app.staticTexts["dial_duration_label"]
+        // Tap again -> switches to COMPLETED percentage
+        ringButton.tap()
+        XCTAssertTrue(app.staticTexts["COMPLETED"].waitForExistence(timeout: 2))
 
-        XCTAssertTrue(saveButton.exists)
-        XCTAssertTrue(cancelButton.exists)
-        XCTAssertTrue(durationLabel.exists)
-
-        // Tap Save to dismiss and persist changes
-        saveButton.tap()
-
-        // Verify returned to Fast dashboard
-        XCTAssertTrue(endButton.waitForExistence(timeout: 4))
+        // Tap again -> cycles back to ELAPSED
+        ringButton.tap()
+        XCTAssertTrue(app.staticTexts["ELAPSED"].waitForExistence(timeout: 2))
     }
 
     func testHistoryTabDisplaysListOrEmptyState() throws {

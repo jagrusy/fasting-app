@@ -91,6 +91,15 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(results.count, 0)
     }
 
+    func testFastManagerSnoozesFast() throws {
+        let manager = try XCTUnwrap(fastManager)
+        let fast = manager.startFast(startDate: Date(), targetDuration: 57600)
+        XCTAssertEqual(fast.targetDuration, 57600)
+
+        manager.snoozeFast(by: 1800) // 30 mins
+        XCTAssertEqual(fast.targetDuration, 57600 + 1800)
+    }
+
     func testFastManagerUpdatesCompletedFast() throws {
         let manager = try XCTUnwrap(fastManager)
         let start = Date().addingTimeInterval(-72000)
@@ -133,6 +142,12 @@ final class FastedTests: XCTestCase {
 
         XCTAssertEqual(manager.activeFast?.startDate, newStartDate)
         XCTAssertEqual(manager.activeFast?.targetDuration, newDuration)
+    }
+
+    func testCenterDisplayModeCycle() {
+        XCTAssertEqual(CenterDisplayMode.elapsed.next, .remaining)
+        XCTAssertEqual(CenterDisplayMode.remaining.next, .percentage)
+        XCTAssertEqual(CenterDisplayMode.percentage.next, .elapsed)
     }
 
     // MARK: - Dial Math Unit Tests

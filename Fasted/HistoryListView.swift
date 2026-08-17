@@ -12,10 +12,6 @@ public struct HistoryListView: View {
     )
     private var completedFasts: FetchedResults<Fast>
 
-    @State private var fastToEdit: Fast?
-    @State private var editStartDate: Date = Date()
-    @State private var editTargetDuration: TimeInterval = 57600
-
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
     }
@@ -56,12 +52,11 @@ public struct HistoryListView: View {
                     ForEach(groupedFasts, id: \.0) { month, fasts in
                         Section(header: Text(month).font(.subheadline.weight(.semibold))) {
                             ForEach(fasts) { fast in
-                                Button {
-                                    startEditing(fast: fast)
+                                NavigationLink {
+                                    FastDetailView(fastManager: fastManager, fast: fast)
                                 } label: {
                                     FastRowView(fast: fast)
                                 }
-                                .buttonStyle(.plain)
                             }
                             .onDelete { indexSet in
                                 deleteFasts(at: indexSet, from: fasts)
@@ -72,23 +67,6 @@ public struct HistoryListView: View {
                 .listStyle(.insetGrouped)
                 .accessibilityIdentifier("history_fast_list")
             }
-        }
-        .sheet(item: $fastToEdit) { fast in
-            DialEditorView(
-                startDate: $editStartDate,
-                targetDuration: $editTargetDuration,
-                mode: .completed,
-                onSave: { newStart, newDuration in
-                    let newEnd = newStart.addingTimeInterval(newDuration)
-                    fastManager.updateCompletedFast(fast, startDate: newStart, endDate: newEnd)
-                    fastToEdit = nil
-                },
-                onCancel: {
-                    fastToEdit = nil
-                }
-            )
-            .presentationDetents([.large])
-            .presentationDragIndicator(.visible)
         }
     }
 
@@ -136,15 +114,6 @@ public struct HistoryListView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
-    }
-
-    private func startEditing(fast: Fast) {
-        let start = fast.startDate ?? Date()
-        let end = fast.endDate ?? start
-        let duration = max(60, end.timeIntervalSince(start))
-        self.editStartDate = start
-        self.editTargetDuration = duration
-        self.fastToEdit = fast
     }
 
     private func deleteFasts(at offsets: IndexSet, from list: [Fast]) {

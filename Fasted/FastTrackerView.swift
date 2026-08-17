@@ -1,12 +1,25 @@
 import SwiftUI
 
+public enum CenterDisplayMode: String, CaseIterable {
+    case elapsed = "ELAPSED"
+    case remaining = "REMAINING"
+    case percentage = "COMPLETED"
+
+    public var next: CenterDisplayMode {
+        switch self {
+        case .elapsed: return .remaining
+        case .remaining: return .percentage
+        case .percentage: return .elapsed
+        }
+    }
+}
+
 public struct FastTrackerView: View {
     @ObservedObject var fastManager: FastManager
     @State private var showStopConfirmation: Bool = false
-    @State private var showDialEditor: Bool = false
-
-    @State private var editableStartDate: Date = Date()
-    @State private var editableTargetDuration: TimeInterval = 57600
+    @State private var showStartTimePicker: Bool = false
+    @State private var centerDisplayMode: CenterDisplayMode = .elapsed
+    @State private var tempStartDate: Date = Date()
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -34,139 +47,176 @@ public struct FastTrackerView: View {
                 .padding(.top, 16)
 
                 // Main Circular Progress Display
-                Button(
-                    action: {
-                        if fastManager.isFasting, let fast = fastManager.activeFast {
-                            editableStartDate = fast.startDate ?? now
-                            editableTargetDuration = fast.targetDuration
-                            showDialEditor = true
+                ZStack {
+                    let progress = calculateProgress(at: now)
+
+                    ProgressRingView(
+                        progress: progress,
+                        isFasting: fastManager.isFasting,
+                        ringWidth: 24,
+                        onStartKnobDragged: { touchAngle in
+                            handleStartKnobDragged(touchAngle: touchAngle, now: now)
                         }
-                    },
-                    label: {
-                        ZStack {
-                            let progress = calculateProgress(at: now)
+                    )
+                    .frame(width: 280, height: 280)
 
-                            ProgressRingView(
-                                progress: progress,
-                                isFasting: fastManager.isFasting,
-                                ringWidth: 24
-                            )
-                            .frame(width: 280, height: 280)
+                    // Inner Tap-to-Cycle Display
+                    Button {
+                        if fastManager.isFasting {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                centerDisplayMode = centerDisplayMode.next
+                            }
+                        }
+                    } label: {
+                        VStack(spacing: 6) {
+                            if let fast = fastManager.activeFast {
+                                let startDate = fast.startDate ?? now
+                                let elapsed = max(0, now.timeIntervalSince(startDate))
+                                let remaining = fast.targetDuration - elapsed
 
-                            // Inner Timer / Idle Content
-                            VStack(spacing: 8) {
-                                if let fast = fastManager.activeFast {
-                                    let startDate = fast.startDate ?? now
-                                    let elapsed = max(0, now.timeIntervalSince(startDate))
+                                Text(centerDisplayMode.rawValue)
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(.secondary)
 
-                                    Text("ELAPSED")
-                                        .font(.caption2.weight(.semibold))
-                                        .foregroundStyle(.secondary)
-
+                                switch centerDisplayMode {
+                                case .elapsed:
                                     Text(formatDuration(elapsed))
-                                        .font(.system(size: 38, weight: .bold, design: .monospaced))
+                                        .font(.system(size: 36, weight: .bold, design: .monospaced))
                                         .foregroundStyle(Color.primary)
-                                        .contentTransition(.numericText())
                                         .accessibilityIdentifier("elapsed_time_text")
 
-                                    Text("\(Int(progress * 100))%")
-                                        .font(.headline.weight(.medium))
+                                    Text("\(Int(progress * 100))% · \(fastManager.currentProtocol.ratioString)")
+                                        .font(.subheadline.weight(.medium))
                                         .foregroundStyle(progress >= 1.0 ? .green : .secondary)
                                         .accessibilityIdentifier("progress_percentage_text")
 
-                                    let remaining = fast.targetDuration - elapsed
-                                    if remaining > 0 {
-                                        Text("\(formatDuration(remaining)) remaining")
-                                            .font(.footnote)
-                                            .foregroundStyle(.secondary)
-                                    } else {
-                                        Text("Goal Completed!")
-                                            .font(.footnote.weight(.semibold))
-                                            .foregroundStyle(.green)
-                                    }
-                                } else {
-                                    Image(systemName: "flame.fill")
-                                        .font(.system(size: 44))
-                                        .foregroundStyle(.orange)
-                                        .padding(.bottom, 4)
+                                case .remaining:
+                                    let remainingText = remaining > 0 ? formatDuration(remaining) : "Goal Met!"
+                                    Text(remainingText)
+                                        .font(.system(size: 34, weight: .bold, design: .monospaced))
+                                        .foregroundStyle(remaining > 0 ? Color.primary : Color.green)
+                                        .accessibilityIdentifier("remaining_time_text")
 
-                                    Text(fastManager.currentProtocol.ratioString)
-                                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                                        .foregroundStyle(Color.primary)
-
-                                    Text(fastManager.currentProtocol.description)
-                                        .font(.caption)
+                                    Text("Goal: \(formatTime(startDate.addingTimeInterval(fast.targetDuration)))")
+                                        .font(.subheadline.weight(.medium))
                                         .foregroundStyle(.secondary)
-                                        .multilineTextAlignment(.center)
-                                        .padding(.horizontal, 32)
+
+                                case .percentage:
+                                    Text("\(Int(progress * 100))%")
+                                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                                        .foregroundStyle(progress >= 1.0 ? Color.green : Color.primary)
+                                        .accessibilityIdentifier("percentage_display_text")
+
+                                    Text("\(formatDuration(elapsed)) of \(Int(fast.targetDuration / 3600))h")
+                                        .font(.subheadline.weight(.medium))
+                                        .foregroundStyle(.secondary)
                                 }
+
+                                Text("Tap to switch metric")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                                    .padding(.top, 2)
+                            } else {
+                                Image(systemName: "flame.fill")
+                                    .font(.system(size: 44))
+                                    .foregroundStyle(.orange)
+                                    .padding(.bottom, 4)
+
+                                Text(fastManager.currentProtocol.ratioString)
+                                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                                    .foregroundStyle(Color.primary)
+
+                                Text(fastManager.currentProtocol.description)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 32)
                             }
                         }
                     }
-                )
-                .buttonStyle(.plain)
-                .disabled(!fastManager.isFasting)
-                .accessibilityIdentifier("progress_ring_button")
+                    .buttonStyle(.plain)
+                    .disabled(!fastManager.isFasting)
+                    .accessibilityIdentifier("progress_ring_button")
+                }
                 .padding(.vertical, 8)
 
-                // Fast details info card (when active)
+                // Inline Start Card with manual tap to edit
                 if let fast = fastManager.activeFast {
                     let startDate = fast.startDate ?? now
-                    Button(
-                        action: {
-                            editableStartDate = startDate
-                            editableTargetDuration = fast.targetDuration
-                            showDialEditor = true
-                        },
-                        label: {
-                            HStack(spacing: 24) {
-                                VStack(alignment: .leading, spacing: 4) {
+                    Button {
+                        tempStartDate = startDate
+                        showStartTimePicker = true
+                    } label: {
+                        HStack(spacing: 24) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(spacing: 4) {
                                     Text("Started")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
-                                    Text(formatTime(startDate))
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(Color.primary)
-                                }
-
-                                Divider()
-                                    .frame(height: 32)
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Target End")
-                                        .font(.caption)
+                                    Image(systemName: "pencil")
+                                        .font(.system(size: 10))
                                         .foregroundStyle(.secondary)
-                                    Text(formatTime(startDate.addingTimeInterval(fast.targetDuration)))
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(Color.primary)
                                 }
-
-                                Divider()
-                                    .frame(height: 32)
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Target")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                    Text("\(Int(fast.targetDuration / 3600))h")
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(Color.primary)
-                                }
+                                Text(formatTime(startDate))
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(Color.primary)
                             }
-                            .padding(.horizontal, 24)
-                            .padding(.vertical, 14)
-                            .background(Color(.secondarySystemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                            .padding(.horizontal, 20)
+
+                            Divider()
+                                .frame(height: 32)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Goal Target")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text(formatTime(startDate.addingTimeInterval(fast.targetDuration)))
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(Color.primary)
+                            }
                         }
-                    )
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 14)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("fast_details_button")
+                    .sheet(isPresented: $showStartTimePicker) {
+                        NavigationStack {
+                            VStack(spacing: 24) {
+                                DatePicker(
+                                    "Fast Start Time",
+                                    selection: $tempStartDate,
+                                    in: ...now,
+                                    displayedComponents: [.date, .hourAndMinute]
+                                )
+                                .datePickerStyle(.graphical)
+                                .padding()
+
+                                Spacer()
+                            }
+                            .navigationTitle("Adjust Start Time")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .cancellationAction) {
+                                    Button("Cancel") { showStartTimePicker = false }
+                                }
+                                ToolbarItem(placement: .confirmationAction) {
+                                    Button("Save") {
+                                        fastManager.updateActiveFast(startDate: tempStartDate)
+                                        showStartTimePicker = false
+                                    }
+                                    .fontWeight(.semibold)
+                                }
+                            }
+                        }
+                        .presentationDetents([.medium, .large])
+                    }
                 }
 
                 Spacer()
 
-                // Action Button (Start / End)
+                // Primary Start / End Button
                 if fastManager.isFasting {
                     Button(
                         action: {
@@ -201,6 +251,7 @@ public struct FastTrackerView: View {
                 } else {
                     Button(
                         action: {
+                            NotificationManager.shared.requestAuthorization()
                             fastManager.startFast(startDate: now)
                         },
                         label: {
@@ -218,23 +269,20 @@ public struct FastTrackerView: View {
                 }
             }
             .padding(.bottom, 20)
-            .sheet(isPresented: $showDialEditor) {
-                DialEditorView(
-                    startDate: $editableStartDate,
-                    targetDuration: $editableTargetDuration,
-                    mode: .inProgress,
-                    onSave: { newStart, newDuration in
-                        fastManager.updateActiveFast(startDate: newStart, targetDuration: newDuration)
-                        showDialEditor = false
-                    },
-                    onCancel: {
-                        showDialEditor = false
-                    }
-                )
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
-            }
         }
+    }
+
+    private func handleStartKnobDragged(touchAngle: Double, now: Date) {
+        guard let fast = fastManager.activeFast else { return }
+        // touchAngle: 0 at top, 90 at right, 270 at left
+        // Dragging counter-clockwise (towards 270) moves start time earlier
+        // Fraction of circle from top counter-clockwise: (360 - touchAngle) / 360
+        let fraction = touchAngle > 180 ? (360.0 - touchAngle) / 360.0 : 0.0
+        let maxAdjustmentHours: Double = 12.0
+        let hoursBack = fraction * maxAdjustmentHours
+        let adjustedStart = now.addingTimeInterval(-hoursBack * 3600.0)
+
+        fastManager.updateActiveFast(startDate: adjustedStart, targetDuration: fast.targetDuration)
     }
 
     private func calculateProgress(at date: Date) -> Double {

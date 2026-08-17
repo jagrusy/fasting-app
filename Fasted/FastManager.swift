@@ -5,13 +5,32 @@ import SwiftUI
 @MainActor
 public final class FastManager: ObservableObject {
     private let viewContext: NSManagedObjectContext
+    public let notificationManager: NotificationManager
 
     @Published public private(set) var activeFast: Fast?
     @Published public private(set) var userSettings: UserSettings?
 
-    public init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
+    public init(
+        context: NSManagedObjectContext = PersistenceController.shared.container.viewContext,
+        notificationManager: NotificationManager = .shared
+    ) {
         self.viewContext = context
+        self.notificationManager = notificationManager
+        self.setupNotificationCallbacks()
         self.refresh()
+    }
+
+    private func setupNotificationCallbacks() {
+        notificationManager.onEndFastRequested = { [weak self] in
+            Task { @MainActor [weak self] in
+                self?.endFast()
+            }
+        }
+        notificationManager.onSnoozeRequested = { [weak self] snoozeSeconds in
+            Task { @MainActor [weak self] in
+                self?.snoozeFast(by: snoozeSeconds)
+            }
+        }
     }
 
     public func refresh() {
@@ -69,7 +88,6 @@ public final class FastManager: ObservableObject {
         targetDuration: TimeInterval? = nil,
         protocolType: String? = nil
     ) -> Fast {
-        // If there is already an active fast, return it
         if let existing = activeFast {
             return existing
         }
@@ -89,6 +107,9 @@ public final class FastManager: ObservableObject {
         do {
             try viewContext.save()
             self.activeFast = fast
+
+            let targetEnd = startDate.addingTimeInterval(duration)
+            notificationManager.scheduleGoalNotification(targetEndDate: targetEnd, protocolName: proto)
         } catch {
             NSLog("Error starting fast: \(error)")
         }
@@ -109,22 +130,47 @@ public final class FastManager: ObservableObject {
         do {
             try viewContext.save()
             self.activeFast = nil
+            notificationManager.cancelGoalNotification()
         } catch {
             NSLog("Error ending fast: \(error)")
         }
     }
 
-    public func updateActiveFast(startDate: Date, targetDuration: TimeInterval) {
+    public func updateActiveFast(startDate: Date, targetDuration: TimeInterval? = nil) {
         guard let fast = activeFast else { return }
         fast.startDate = startDate
-        fast.targetDuration = targetDuration
+        if let duration = targetDuration {
+            fast.targetDuration = duration
+        }
         fast.updatedAt = Date()
 
         do {
             try viewContext.save()
             self.objectWillChange.send()
+
+            let targetEnd = startDate.addingTimeInterval(fast.targetDuration)
+            let proto = fast.protocolType ?? "16:8"
+            notificationManager.scheduleGoalNotification(targetEndDate: targetEnd, protocolName: proto)
         } catch {
             NSLog("Error updating active fast: \(error)")
+        }
+    }
+
+    public func snoozeFast(by extensionSeconds: TimeInterval) {
+        guard let fast = activeFast else { return }
+        fast.targetDuration += extensionSeconds
+        fast.updatedAt = Date()
+
+        do {
+            try viewContext.save()
+            self.objectWillChange.send()
+
+            let start = fast.startDate ?? Date()
+            let targetEnd = start.addingTimeInterval(fast.targetDuration)
+            let proto = fast.protocolType ?? "16:8"
+            notificationManager.scheduleGoalNotification(targetEndDate: targetEnd, protocolName: proto)
+        } catch {
+            NSLog("Error snoozing fast: \(error)")
         }
     }
 
@@ -150,6 +196,7 @@ public final class FastManager: ObservableObject {
     public func deleteFast(_ fast: Fast) {
         if activeFast?.id == fast.id {
             activeFast = nil
+            notificationManager.cancelGoalNotification()
         }
         viewContext.delete(fast)
 
