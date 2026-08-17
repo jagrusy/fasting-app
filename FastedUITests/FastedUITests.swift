@@ -105,10 +105,14 @@ final class FastedUITests: XCTestCase {
             XCTAssertTrue(endButton.waitForExistence(timeout: 4))
         }
 
-        // Tap the progress ring tap target to present DialEditorView sheet
-        let ringTarget = app.otherElements["progress_ring_tap_target"]
-        if ringTarget.waitForExistence(timeout: 3) {
-            ringTarget.tap()
+        // Tap the fast details button or ring button to present DialEditorView sheet
+        let detailsButton = app.buttons["fast_details_button"]
+        let ringButton = app.buttons["progress_ring_button"]
+
+        if detailsButton.waitForExistence(timeout: 3) {
+            detailsButton.tap()
+        } else if ringButton.waitForExistence(timeout: 3) {
+            ringButton.tap()
         }
 
         // Verify Dial Editor UI elements exist
