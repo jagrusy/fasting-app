@@ -3,6 +3,10 @@ import SwiftUI
 public struct FastTrackerView: View {
     @ObservedObject var fastManager: FastManager
     @State private var showStopConfirmation: Bool = false
+    @State private var showDialEditor: Bool = false
+
+    @State private var editableStartDate: Date = Date()
+    @State private var editableTargetDuration: TimeInterval = 57600
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -30,104 +34,134 @@ public struct FastTrackerView: View {
                 .padding(.top, 16)
 
                 // Main Circular Progress Display
-                ZStack {
-                    let progress = calculateProgress(at: now)
+                Button(
+                    action: {
+                        if fastManager.isFasting, let fast = fastManager.activeFast {
+                            editableStartDate = fast.startDate ?? now
+                            editableTargetDuration = fast.targetDuration
+                            showDialEditor = true
+                        }
+                    },
+                    label: {
+                        ZStack {
+                            let progress = calculateProgress(at: now)
 
-                    ProgressRingView(
-                        progress: progress,
-                        isFasting: fastManager.isFasting,
-                        ringWidth: 24
-                    )
-                    .frame(width: 280, height: 280)
+                            ProgressRingView(
+                                progress: progress,
+                                isFasting: fastManager.isFasting,
+                                ringWidth: 24
+                            )
+                            .frame(width: 280, height: 280)
 
-                    // Inner Timer / Idle Content
-                    VStack(spacing: 8) {
-                        if let fast = fastManager.activeFast {
-                            let startDate = fast.startDate ?? now
-                            let elapsed = max(0, now.timeIntervalSince(startDate))
+                            // Inner Timer / Idle Content
+                            VStack(spacing: 8) {
+                                if let fast = fastManager.activeFast {
+                                    let startDate = fast.startDate ?? now
+                                    let elapsed = max(0, now.timeIntervalSince(startDate))
 
-                            Text("ELAPSED")
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(.secondary)
+                                    Text("ELAPSED")
+                                        .font(.caption2.weight(.semibold))
+                                        .foregroundStyle(.secondary)
 
-                            Text(formatDuration(elapsed))
-                                .font(.system(size: 38, weight: .bold, design: .monospaced))
-                                .contentTransition(.numericText())
-                                .accessibilityIdentifier("elapsed_time_text")
+                                    Text(formatDuration(elapsed))
+                                        .font(.system(size: 38, weight: .bold, design: .monospaced))
+                                        .foregroundStyle(Color.primary)
+                                        .contentTransition(.numericText())
+                                        .accessibilityIdentifier("elapsed_time_text")
 
-                            Text("\(Int(progress * 100))%")
-                                .font(.headline.weight(.medium))
-                                .foregroundStyle(progress >= 1.0 ? .green : .secondary)
-                                .accessibilityIdentifier("progress_percentage_text")
+                                    Text("\(Int(progress * 100))%")
+                                        .font(.headline.weight(.medium))
+                                        .foregroundStyle(progress >= 1.0 ? .green : .secondary)
+                                        .accessibilityIdentifier("progress_percentage_text")
 
-                            let remaining = fast.targetDuration - elapsed
-                            if remaining > 0 {
-                                Text("\(formatDuration(remaining)) remaining")
-                                    .font(.footnote)
-                                    .foregroundStyle(.secondary)
-                            } else {
-                                Text("Goal Completed!")
-                                    .font(.footnote.weight(.semibold))
-                                    .foregroundStyle(.green)
+                                    let remaining = fast.targetDuration - elapsed
+                                    if remaining > 0 {
+                                        Text("\(formatDuration(remaining)) remaining")
+                                            .font(.footnote)
+                                            .foregroundStyle(.secondary)
+                                    } else {
+                                        Text("Goal Completed!")
+                                            .font(.footnote.weight(.semibold))
+                                            .foregroundStyle(.green)
+                                    }
+                                } else {
+                                    Image(systemName: "flame.fill")
+                                        .font(.system(size: 44))
+                                        .foregroundStyle(.orange)
+                                        .padding(.bottom, 4)
+
+                                    Text(fastManager.currentProtocol.ratioString)
+                                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                                        .foregroundStyle(Color.primary)
+
+                                    Text(fastManager.currentProtocol.description)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 32)
+                                }
                             }
-                        } else {
-                            Image(systemName: "flame.fill")
-                                .font(.system(size: 44))
-                                .foregroundStyle(.orange)
-                                .padding(.bottom, 4)
-
-                            Text(fastManager.currentProtocol.ratioString)
-                                .font(.system(size: 32, weight: .bold, design: .rounded))
-
-                            Text(fastManager.currentProtocol.description)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 32)
                         }
                     }
-                }
+                )
+                .buttonStyle(.plain)
+                .disabled(!fastManager.isFasting)
+                .accessibilityIdentifier("progress_ring_button")
                 .padding(.vertical, 8)
 
                 // Fast details info card (when active)
                 if let fast = fastManager.activeFast {
                     let startDate = fast.startDate ?? now
-                    HStack(spacing: 24) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Started")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text(formatTime(startDate))
-                                .font(.subheadline.weight(.semibold))
+                    Button(
+                        action: {
+                            editableStartDate = startDate
+                            editableTargetDuration = fast.targetDuration
+                            showDialEditor = true
+                        },
+                        label: {
+                            HStack(spacing: 24) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Started")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Text(formatTime(startDate))
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(Color.primary)
+                                }
+
+                                Divider()
+                                    .frame(height: 32)
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Target End")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Text(formatTime(startDate.addingTimeInterval(fast.targetDuration)))
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(Color.primary)
+                                }
+
+                                Divider()
+                                    .frame(height: 32)
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Target")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Text("\(Int(fast.targetDuration / 3600))h")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(Color.primary)
+                                }
+                            }
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 14)
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .padding(.horizontal, 20)
                         }
-
-                        Divider()
-                            .frame(height: 32)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Target End")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text(formatTime(startDate.addingTimeInterval(fast.targetDuration)))
-                                .font(.subheadline.weight(.semibold))
-                        }
-
-                        Divider()
-                            .frame(height: 32)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Target")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text("\(Int(fast.targetDuration / 3600))h")
-                                .font(.subheadline.weight(.semibold))
-                        }
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 14)
-                    .background(Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .padding(.horizontal, 20)
+                    )
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("fast_details_button")
                 }
 
                 Spacer()
@@ -184,6 +218,21 @@ public struct FastTrackerView: View {
                 }
             }
             .padding(.bottom, 20)
+            .sheet(isPresented: $showDialEditor) {
+                DialEditorView(
+                    startDate: $editableStartDate,
+                    targetDuration: $editableTargetDuration,
+                    onSave: { newStart, newDuration in
+                        fastManager.updateActiveFast(startDate: newStart, targetDuration: newDuration)
+                        showDialEditor = false
+                    },
+                    onCancel: {
+                        showDialEditor = false
+                    }
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+            }
         }
     }
 
