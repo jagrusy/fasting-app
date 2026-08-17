@@ -27,8 +27,9 @@ public struct FastRowView: View {
         HStack(spacing: 16) {
             // Status Icon badge
             ZStack {
+                let badgeColor = isCompletedGoal ? Color.green : Color.orange
                 Circle()
-                    .fill(isCompletedGoal ? Color.green.opacity(0.15) : Color.orange.opacity(0.15))
+                    .fill(badgeColor.opacity(0.15))
                     .frame(width: 44, height: 44)
 
                 Image(systemName: isCompletedGoal ? "checkmark.seal.fill" : "timer")

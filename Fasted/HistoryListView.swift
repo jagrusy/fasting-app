@@ -12,10 +12,6 @@ public struct HistoryListView: View {
     )
     private var completedFasts: FetchedResults<Fast>
 
-    @State private var fastToEdit: Fast?
-    @State private var editStartDate: Date = Date()
-    @State private var editTargetDuration: TimeInterval = 57600
-
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
     }
@@ -44,92 +40,50 @@ public struct HistoryListView: View {
             if completedFasts.isEmpty {
                 EmptyHistoryView()
             } else {
-                List {
-                    // Summary header stats
-                    Section {
-                        summaryCard
-                    }
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-
-                    // Month Grouped Fasts
-                    ForEach(groupedFasts, id: \.0) { month, fasts in
-                        Section(header: Text(month).font(.subheadline.weight(.semibold))) {
-                            ForEach(fasts) { fast in
-                                Button {
-                                    startEditing(fast: fast)
-                                } label: {
-                                    FastRowView(fast: fast)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            .onDelete { indexSet in
-                                deleteFasts(at: indexSet, from: fasts)
-                            }
-                        }
-                    }
-                }
-                .listStyle(.insetGrouped)
-                .accessibilityIdentifier("history_fast_list")
+                historyContentList
             }
         }
-        .sheet(item: $fastToEdit) { fast in
-            DialEditorView(
-                startDate: $editStartDate,
-                targetDuration: $editTargetDuration,
-                mode: .completed,
-                onSave: { newStart, newDuration in
-                    let newEnd = newStart.addingTimeInterval(newDuration)
-                    fastManager.updateCompletedFast(fast, startDate: newStart, endDate: newEnd)
-                    fastToEdit = nil
-                },
-                onCancel: {
-                    fastToEdit = nil
+    }
+
+    private var historyContentList: some View {
+        List {
+            Section {
+                summaryCard
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+
+            ForEach(groupedFasts, id: \.0) { month, fasts in
+                Section(header: Text(month).font(.subheadline.weight(.semibold))) {
+                    ForEach(fasts) { fast in
+                        NavigationLink {
+                            FastDetailView(fastManager: fastManager, fast: fast)
+                        } label: {
+                            FastRowView(fast: fast)
+                        }
+                    }
+                    .onDelete { indexSet in
+                        deleteFasts(at: indexSet, from: fasts)
+                    }
                 }
-            )
-            .presentationDetents([.large])
-            .presentationDragIndicator(.visible)
+            }
         }
+        .listStyle(.insetGrouped)
+        .accessibilityIdentifier("history_fast_list")
     }
 
     private var summaryCard: some View {
         HStack(spacing: 20) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("TOTAL FASTS")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.secondary)
-                Text("\(completedFasts.count)")
-                    .font(.title2.weight(.bold))
-                    .accessibilityIdentifier("total_fasts_count_label")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Divider()
-                .frame(height: 36)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("TOTAL TIME")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.secondary)
-                Text(formatTotalTime())
-                    .font(.title2.weight(.bold))
-                    .accessibilityIdentifier("total_fasts_time_label")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Divider()
-                .frame(height: 36)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("COMPLETION")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.secondary)
-                Text(formatCompletionRate())
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(.green)
-                    .accessibilityIdentifier("total_fasts_rate_label")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            statItem(title: "TOTAL FASTS", value: "\(completedFasts.count)", identifier: "total_fasts_count_label")
+            Divider().frame(height: 36)
+            statItem(title: "TOTAL TIME", value: formatTotalTime(), identifier: "total_fasts_time_label")
+            Divider().frame(height: 36)
+            statItem(
+                title: "COMPLETION",
+                value: formatCompletionRate(),
+                identifier: "total_fasts_rate_label",
+                valueColor: .green
+            )
         }
         .padding(16)
         .background(Color(.secondarySystemBackground))
@@ -138,13 +92,17 @@ public struct HistoryListView: View {
         .padding(.vertical, 8)
     }
 
-    private func startEditing(fast: Fast) {
-        let start = fast.startDate ?? Date()
-        let end = fast.endDate ?? start
-        let duration = max(60, end.timeIntervalSince(start))
-        self.editStartDate = start
-        self.editTargetDuration = duration
-        self.fastToEdit = fast
+    private func statItem(title: String, value: String, identifier: String, valueColor: Color = .primary) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.title2.weight(.bold))
+                .foregroundStyle(valueColor)
+                .accessibilityIdentifier(identifier)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func deleteFasts(at offsets: IndexSet, from list: [Fast]) {
