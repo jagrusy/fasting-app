@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */; };
+		0B2AD02224339FDBB03BCC7B /* CalendarHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C410780F466CF5987E506477 /* CalendarHeatmapView.swift */; };
 		0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71CDC6BEC973FA849ACE8BB /* DialMath.swift */; };
 		0DA5795F7E3BF7899CCB21F3 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */; };
 		1A1CEC7520DE250DBA021796 /* FastDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44F4C21FE2197D21744A872 /* FastDetailView.swift */; };
@@ -31,11 +32,13 @@
 		94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8810ED7037826FE830C9 /* FastedUITests.swift */; };
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
 		B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */; };
+		B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */; };
 		B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D4D805535A363DDAF977B89 /* FastingArcShape.swift */; };
 		CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145B081A157492E5B631A378 /* ProtocolCardView.swift */; };
 		DEFA541DB7379B894DDBE400 /* FastStartedCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */; };
 		E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47F0F9EAF3379520543128F /* FastedTests.swift */; };
 		F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1845606048434908EA9499 /* ContentView.swift */; };
+		F501504029E2FF98114B915E /* StreakCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA35504122572AB7F1EB512 /* StreakCalculator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +62,7 @@
 		0B49461E82EC597415611F11 /* FastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManager.swift; sourceTree = "<group>"; };
 		145B081A157492E5B631A378 /* ProtocolCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolCardView.swift; sourceTree = "<group>"; };
 		2D4D805535A363DDAF977B89 /* FastingArcShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingArcShape.swift; sourceTree = "<group>"; };
+		2EA35504122572AB7F1EB512 /* StreakCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalculator.swift; sourceTree = "<group>"; };
 		37F15CA34B550C7DFC463680 /* FastedTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterDisplayMode.swift; sourceTree = "<group>"; };
 		49AFD758FFD1AFB86BE41633 /* Fasted.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Fasted.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -80,6 +84,8 @@
 		A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialFaceView.swift; sourceTree = "<group>"; };
 		B7160CB9DE9689FEF2EFEC10 /* FastedUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C410780F466CF5987E506477 /* CalendarHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeatmapView.swift; sourceTree = "<group>"; };
+		C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSummaryCardsView.swift; sourceTree = "<group>"; };
 		C8A408558CA277F27154BD5D /* FastRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastRowView.swift; sourceTree = "<group>"; };
 		DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTrackerView.swift; sourceTree = "<group>"; };
 		E1F3859AA323EFA3BAE7F2B4 /* FastMetricsCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastMetricsCenterView.swift; sourceTree = "<group>"; };
@@ -124,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */,
+				C410780F466CF5987E506477 /* CalendarHeatmapView.swift */,
 				3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */,
 				9C1845606048434908EA9499 /* ContentView.swift */,
 				7BE11165A3D641BFB1B2908C /* DialEditorView.swift */,
@@ -151,6 +158,8 @@
 				145B081A157492E5B631A378 /* ProtocolCardView.swift */,
 				978196104603395EF5659F9F /* ProtocolPickerView.swift */,
 				8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */,
+				2EA35504122572AB7F1EB512 /* StreakCalculator.swift */,
+				C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */,
 			);
 			path = Fasted;
 			sourceTree = "<group>";
@@ -279,6 +288,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B2AD02224339FDBB03BCC7B /* CalendarHeatmapView.swift in Sources */,
 				043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */,
 				F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */,
 				86F8832A8B8687F6245D630B /* DialEditorView.swift in Sources */,
@@ -305,6 +315,8 @@
 				CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */,
 				48744890067ECB53BA38115A /* ProtocolPickerView.swift in Sources */,
 				0DA5795F7E3BF7899CCB21F3 /* SettingsView.swift in Sources */,
+				F501504029E2FF98114B915E /* StreakCalculator.swift in Sources */,
+				B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
