@@ -35,3 +35,7 @@ Package.resolved
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Git Worktrees
+.worktrees/
+
