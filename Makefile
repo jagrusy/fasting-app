@@ -1,23 +1,37 @@
 PROJECT_NAME = Fasted
 SCHEME_IOS = Fasted
 SCHEME_WATCH = FastedWatch
+SCHEME_TESTS = FastedTests
 SCHEME_UI_TESTS = FastedUITests
 
-DESTINATION_IOS = 'platform=iOS Simulator,name=iPhone 16'
+# Dynamically discover first available iPhone simulator on the machine
+SIM_NAME := $(shell xcrun simctl list devices available -j 2>/dev/null | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
+ifeq ($(SIM_NAME),)
+SIM_NAME := iPhone 16
+endif
+
+DESTINATION_IOS = 'platform=iOS Simulator,name=$(SIM_NAME)'
 DESTINATION_WATCH = 'platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)'
 
-.PHONY: all build build-ios build-watch test uitest lint clean
+.PHONY: all build build-ios build-watch test uitest lint hooks clean
 
 all: lint build test
 
-build: build-ios build-watch
+hooks:
+	chmod +x scripts/pre-commit scripts/pre-push scripts/pre-commit.sh scripts/pre-push.sh
+	git config core.hooksPath scripts
+	@echo "✅ Git hooks configured to run locally (.git/hooks -> scripts/)"
+
+build: build-ios
 
 build-ios:
+	@echo "🔨 Building with simulator target: $(SIM_NAME)"
 	xcodebuild build \
 		-project $(PROJECT_NAME).xcodeproj \
 		-scheme $(SCHEME_IOS) \
 		-destination $(DESTINATION_IOS) \
-		SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+		SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
+		-quiet
 
 build-watch:
 	xcodebuild build \
@@ -27,17 +41,20 @@ build-watch:
 		SWIFT_TREAT_WARNINGS_AS_ERRORS=YES || echo "Watch scheme not built yet"
 
 test:
+	@echo "🧪 Running Unit Tests with simulator target: $(SIM_NAME)"
 	xcodebuild test \
 		-project $(PROJECT_NAME).xcodeproj \
-		-scheme $(SCHEME_IOS) \
+		-scheme $(SCHEME_TESTS) \
 		-destination $(DESTINATION_IOS) \
-		-resultBundlePath TestResults.xcresult
+		-resultBundlePath TestResults-Unit.xcresult
 
 uitest:
+	@echo "📱 Running UI Tests with simulator target: $(SIM_NAME)"
 	xcodebuild test \
 		-project $(PROJECT_NAME).xcodeproj \
 		-scheme $(SCHEME_UI_TESTS) \
-		-destination $(DESTINATION_IOS)
+		-destination $(DESTINATION_IOS) \
+		-resultBundlePath TestResults-UI.xcresult
 
 lint:
 	@if which swiftlint >/dev/null; then \
@@ -47,4 +64,4 @@ lint:
 	fi
 
 clean:
-	rm -rf build DerivedData TestResults.xcresult
+	rm -rf build DerivedData *.xcresult
