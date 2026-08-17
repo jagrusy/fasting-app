@@ -31,25 +31,43 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Discover Simulator
+        id: sim
+        run: |
+          SIM_NAME=$(xcrun simctl list devices available -j | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
+          if [ -z "$SIM_NAME" ]; then
+            SIM_NAME="iPhone 15"
+          fi
+          echo "Found available iOS Simulator: $SIM_NAME"
+          echo "name=$SIM_NAME" >> $GITHUB_OUTPUT
+
       - name: Build iOS Application
         run: |
           xcodebuild build \
             -project Fasted.xcodeproj \
             -scheme Fasted \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
             SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 
       - name: Run Unit Tests
         run: |
           xcodebuild test \
             -project Fasted.xcodeproj \
-            -scheme Fasted \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
-            -resultBundlePath TestResults.xcresult
+            -scheme FastedTests \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -resultBundlePath TestResults-Unit.xcresult
+
+      - name: Run UI Tests
+        run: |
+          xcodebuild test \
+            -project Fasted.xcodeproj \
+            -scheme FastedUITests \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -resultBundlePath TestResults-UI.xcresult
 
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-test-results
-          path: TestResults.xcresult
+          name: test-results
+          path: "*.xcresult"
