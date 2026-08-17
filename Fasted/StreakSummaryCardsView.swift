@@ -10,25 +10,8 @@ public struct StreakSummaryCardsView: View {
     public var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
-                streakCard(
-                    title: "CURRENT STREAK",
-                    countText: "\(streakInfo.currentStreak)",
-                    unitText: streakInfo.currentStreak == 1 ? "DAY" : "DAYS",
-                    iconName: "flame.fill",
-                    iconColor: .orange,
-                    badgeColor: Color.orange.opacity(0.12),
-                    identifier: "current_streak_label"
-                )
-
-                streakCard(
-                    title: "BEST STREAK",
-                    countText: "\(streakInfo.bestStreak)",
-                    unitText: streakInfo.bestStreak == 1 ? "DAY" : "DAYS",
-                    iconName: "trophy.fill",
-                    iconColor: .yellow,
-                    badgeColor: Color.yellow.opacity(0.12),
-                    identifier: "best_streak_label"
-                )
+                currentStreakCard
+                bestStreakCard
             }
 
             // Secondary metrics row
@@ -55,13 +38,31 @@ public struct StreakSummaryCardsView: View {
         }
     }
 
-    private func streakCard(
+    private var currentStreakCard: some View {
+        streakCardLayout(
+            title: "CURRENT STREAK",
+            countText: "\(streakInfo.currentStreak)",
+            unitText: streakInfo.currentStreak == 1 ? "DAY" : "DAYS",
+            icon: ("flame.fill", .orange),
+            identifier: "current_streak_label"
+        )
+    }
+
+    private var bestStreakCard: some View {
+        streakCardLayout(
+            title: "BEST STREAK",
+            countText: "\(streakInfo.bestStreak)",
+            unitText: streakInfo.bestStreak == 1 ? "DAY" : "DAYS",
+            icon: ("trophy.fill", .yellow),
+            identifier: "best_streak_label"
+        )
+    }
+
+    private func streakCardLayout(
         title: String,
         countText: String,
         unitText: String,
-        iconName: String,
-        iconColor: Color,
-        badgeColor: Color,
+        icon: (name: String, color: Color),
         identifier: String
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -72,9 +73,9 @@ public struct StreakSummaryCardsView: View {
 
                 Spacer()
 
-                Image(systemName: iconName)
+                Image(systemName: icon.name)
                     .font(.subheadline.weight(.bold))
-                    .foregroundStyle(iconColor)
+                    .foregroundStyle(icon.color)
             }
 
             HStack(alignment: .lastTextBaseline, spacing: 4) {
