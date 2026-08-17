@@ -1,0 +1,24 @@
+disabled_rules:
+  - trailing_whitespace
+
+opt_in_rules:
+  - empty_count
+  - closure_spacing
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+
+line_length:
+  warning: 120
+  error: 150
+
+included:
+  - Fasted
+  - FastedTests
+  - FastedUITests
+  - FastedWatch
+  - FastedWatchTests
+
+excluded:
+  - Fasted.xcodeproj
+  - DerivedData
+  - build
