@@ -81,7 +81,8 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     }
 
     public func cancelGoalNotification() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["fast_goal_notification"])
+        let identifiers = ["fast_goal_notification"]
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
     // UNUserNotificationCenterDelegate

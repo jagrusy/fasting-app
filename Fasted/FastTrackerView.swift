@@ -15,39 +15,38 @@ public struct FastTrackerView: View {
         TimelineView(.animation(minimumInterval: 1.0)) { context in
             let now = context.date
             VStack(spacing: 28) {
-                // Header status
-                VStack(spacing: 6) {
-                    Text(fastManager.isFasting ? "Current Fast" : "Ready to Fast")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .textCase(.uppercase)
-
-                    let statusTitle = fastManager.isFasting
-                        ? "Fasting in Progress"
-                        : "\(fastManager.currentProtocol.name) (\(fastManager.currentProtocol.ratioString))"
-
-                    Text(statusTitle)
-                        .font(.title2.weight(.bold))
-                        .accessibilityIdentifier("fast_status_header")
-                }
-                .padding(.top, 16)
-
-                // Main Circular Progress Display
+                headerView
                 progressSection(now: now)
                     .padding(.vertical, 8)
 
-                // Inline Start Card with manual tap to edit
                 if let fast = fastManager.activeFast {
                     startCardButton(fast: fast, now: now)
                 }
 
                 Spacer()
 
-                // Primary Start / End Button
                 actionButton(now: now)
             }
             .padding(.bottom, 20)
         }
+    }
+
+    private var headerView: some View {
+        VStack(spacing: 6) {
+            Text(fastManager.isFasting ? "Current Fast" : "Ready to Fast")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+
+            let statusTitle = fastManager.isFasting
+                ? "Fasting in Progress"
+                : "\(fastManager.currentProtocol.name) (\(fastManager.currentProtocol.ratioString))"
+
+            Text(statusTitle)
+                .font(.title2.weight(.bold))
+                .accessibilityIdentifier("fast_status_header")
+        }
+        .padding(.top, 16)
     }
 
     private func progressSection(now: Date) -> some View {
@@ -91,43 +90,46 @@ public struct FastTrackerView: View {
             tempStartDate = startDate
             showStartTimePicker = true
         } label: {
-            HStack(spacing: 24) {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 4) {
-                        Text("Started")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Image(systemName: "pencil")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.secondary)
-                    }
-                    Text(formatTime(startDate))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color.primary)
-                }
-
-                Divider()
-                    .frame(height: 32)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Goal Target")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(formatTime(startDate.addingTimeInterval(fast.targetDuration)))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color.primary)
-                }
-            }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 14)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            startCardContent(startDate: startDate, targetDuration: fast.targetDuration)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("fast_details_button")
         .sheet(isPresented: $showStartTimePicker) {
             startPickerSheet(now: now)
         }
+    }
+
+    private func startCardContent(startDate: Date, targetDuration: TimeInterval) -> some View {
+        HStack(spacing: 24) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 4) {
+                    Text("Started")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "pencil")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+                }
+                Text(formatTime(startDate))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.primary)
+            }
+
+            Divider().frame(height: 32)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Goal Target")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(formatTime(startDate.addingTimeInterval(targetDuration)))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.primary)
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 14)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private func startPickerSheet(now: Date) -> some View {
@@ -165,56 +167,60 @@ public struct FastTrackerView: View {
     private func actionButton(now: Date) -> some View {
         Group {
             if fastManager.isFasting {
-                Button(
-                    action: {
-                        showStopConfirmation = true
-                    },
-                    label: {
-                        Text("End Fast")
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(Color.red)
-                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    }
-                )
-                .accessibilityIdentifier("end_fast_button")
-                .padding(.horizontal, 24)
-                .confirmationDialog(
-                    "End Fast Early?",
-                    isPresented: $showStopConfirmation,
-                    titleVisibility: .visible,
-                    actions: {
-                        Button("End Fast", role: .destructive) {
-                            fastManager.endFast(endDate: now)
-                        }
-                        Button("Cancel", role: .cancel) {}
-                    },
-                    message: {
-                        Text("Are you sure you want to end your current fast?")
-                    }
-                )
+                endFastButton(now: now)
             } else {
-                Button(
-                    action: {
-                        NotificationManager.shared.requestAuthorization()
-                        fastManager.startFast(startDate: now)
-                    },
-                    label: {
-                        Text("Start Fast")
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(Color.accentColor)
-                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    }
-                )
-                .accessibilityIdentifier("start_fast_button")
-                .padding(.horizontal, 24)
+                startFastButton(now: now)
             }
         }
+    }
+
+    private func endFastButton(now: Date) -> some View {
+        Button(
+            action: { showStopConfirmation = true },
+            label: {
+                Text("End Fast")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(Color.red)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+        )
+        .accessibilityIdentifier("end_fast_button")
+        .padding(.horizontal, 24)
+        .confirmationDialog(
+            "End Fast Early?",
+            isPresented: $showStopConfirmation,
+            titleVisibility: .visible,
+            actions: {
+                Button("End Fast", role: .destructive) { fastManager.endFast(endDate: now) }
+                Button("Cancel", role: .cancel) {}
+            },
+            message: {
+                Text("Are you sure you want to end your current fast?")
+            }
+        )
+    }
+
+    private func startFastButton(now: Date) -> some View {
+        Button(
+            action: {
+                NotificationManager.shared.requestAuthorization()
+                fastManager.startFast(startDate: now)
+            },
+            label: {
+                Text("Start Fast")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(Color.accentColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+        )
+        .accessibilityIdentifier("start_fast_button")
+        .padding(.horizontal, 24)
     }
 
     private func handleStartKnobDragged(touchAngle: Double, now: Date) {
