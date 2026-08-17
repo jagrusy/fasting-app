@@ -157,8 +157,7 @@ public struct FastTrackerView: View {
         combinedComponents.second = timeComponents.second
 
         if let newStartDate = calendar.date(from: combinedComponents) {
-            let finalDate = min(newStartDate, Date())
-            fastManager.updateActiveFast(startDate: finalDate)
+            fastManager.updateActiveFast(startDate: min(newStartDate, Date()))
         }
     }
 
@@ -174,30 +173,26 @@ public struct FastTrackerView: View {
 
     private func endFastButton(now: Date, goalReached: Bool) -> some View {
         let buttonTitle = goalReached ? "Complete Fast" : "End Fast"
-        let buttonColor: Color = goalReached ? .green : .red
         let dialogTitle = goalReached ? "Complete Fast" : "End Fast Early?"
         let dialogMessage = goalReached
             ? "Great work! You've reached your fasting goal."
             : "Are you sure you want to end your current fast?"
 
-        return Button(
-            action: {
-                if goalReached {
-                    fastManager.endFast(endDate: now)
-                } else {
-                    showStopConfirmation = true
-                }
-            },
-            label: {
-                Text(buttonTitle)
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(buttonColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        return Button {
+            if goalReached {
+                fastManager.endFast(endDate: now)
+            } else {
+                showStopConfirmation = true
             }
-        )
+        } label: {
+            Text(buttonTitle)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(goalReached ? Color.green : Color.red)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
         .accessibilityIdentifier("end_fast_button")
         .padding(.horizontal, 24)
         .confirmationDialog(
@@ -208,28 +203,23 @@ public struct FastTrackerView: View {
                 Button("End Fast", role: .destructive) { fastManager.endFast(endDate: now) }
                 Button("Cancel", role: .cancel) {}
             },
-            message: {
-                Text(dialogMessage)
-            }
+            message: { Text(dialogMessage) }
         )
     }
 
     private func startFastButton(now: Date) -> some View {
-        Button(
-            action: {
-                NotificationManager.shared.requestAuthorization()
-                fastManager.startFast(startDate: now)
-            },
-            label: {
-                Text("Start Fast")
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(Color.accentColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            }
-        )
+        Button {
+            NotificationManager.shared.requestAuthorization()
+            fastManager.startFast(startDate: now)
+        } label: {
+            Text("Start Fast")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(Color.accentColor)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
         .accessibilityIdentifier("start_fast_button")
         .padding(.horizontal, 24)
     }
