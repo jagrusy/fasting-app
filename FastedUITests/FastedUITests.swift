@@ -116,7 +116,7 @@ final class FastedUITests: XCTestCase {
         }
 
         // Verify Dial Editor sheet elements exist
-        let navBar = app.navigationBars["Edit Fast Window"]
+        let navBar = app.navigationBars["Edit Start Time"]
         XCTAssertTrue(navBar.waitForExistence(timeout: 5))
 
         let saveButton = app.buttons["dial_save_button"]

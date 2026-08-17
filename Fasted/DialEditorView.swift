@@ -1,8 +1,16 @@
 import SwiftUI
 
+public enum FastEditMode: Equatable {
+    /// Active in-progress fast: only the start time can be adjusted (target duration and end handle remain fixed)
+    case inProgress
+    /// Completed historical fast: both start and end times / duration and window shifting can be edited
+    case completed
+}
+
 public struct DialEditorView: View {
     @Binding public var startDate: Date
     @Binding public var targetDuration: TimeInterval
+    public let mode: FastEditMode
     public let onSave: (Date, TimeInterval) -> Void
     public let onCancel: () -> Void
 
@@ -25,11 +33,13 @@ public struct DialEditorView: View {
     public init(
         startDate: Binding<Date>,
         targetDuration: Binding<TimeInterval>,
+        mode: FastEditMode = .inProgress,
         onSave: @escaping (Date, TimeInterval) -> Void,
         onCancel: @escaping () -> Void
     ) {
         self._startDate = startDate
         self._targetDuration = targetDuration
+        self.mode = mode
         self.onSave = onSave
         self.onCancel = onCancel
     }
@@ -52,7 +62,7 @@ public struct DialEditorView: View {
                     )
 
                     DialHeaderCardView(
-                        title: "FAST END",
+                        title: mode == .inProgress ? "TARGET END" : "FAST END",
                         systemImage: "flag.checkered.circle.fill",
                         imageColor: .green,
                         date: calculatedEndDate,
@@ -72,14 +82,18 @@ public struct DialEditorView: View {
                         .font(.title2.weight(.bold))
                         .accessibilityIdentifier("dial_duration_label")
 
-                    Text(targetDuration >= 57600 ? "Meets popular 16:8 goal." : "Custom fasting window.")
+                    Text(mode == .inProgress
+                         ? "Drag start handle to adjust when your active fast started."
+                         : (targetDuration >= 57600 ? "Meets popular 16:8 goal." : "Custom fasting window."))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
                 }
 
                 Spacer()
             }
-            .navigationTitle("Edit Fast Window")
+            .navigationTitle(mode == .inProgress ? "Edit Start Time" : "Edit Fast Window")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -115,14 +129,16 @@ public struct DialEditorView: View {
                 angle: startAngle,
                 icon: "fork.knife",
                 color: .orange,
-                identifier: "dial_start_handle"
+                identifier: "dial_start_handle",
+                isLocked: false
             )
 
             handleView(
                 angle: endAngle,
-                icon: "flag.fill",
-                color: .green,
-                identifier: "dial_end_handle"
+                icon: mode == .inProgress ? "lock.fill" : "flag.fill",
+                color: mode == .inProgress ? .secondary : .green,
+                identifier: "dial_end_handle",
+                isLocked: mode == .inProgress
             )
         }
         .frame(width: dialRadius * 2 + 40, height: dialRadius * 2 + 40)
@@ -134,21 +150,27 @@ public struct DialEditorView: View {
         )
     }
 
-    private func handleView(angle: Double, icon: String, color: Color, identifier: String) -> some View {
+    private func handleView(
+        angle: Double,
+        icon: String,
+        color: Color,
+        identifier: String,
+        isLocked: Bool
+    ) -> some View {
         let pos = DialMath.pointOnCircle(
             center: CGPoint(x: dialRadius, y: dialRadius),
             radius: dialRadius,
             angleDegrees: angle
         )
         return Circle()
-            .fill(Color(.systemBackground))
+            .fill(isLocked ? Color(.secondarySystemBackground) : Color(.systemBackground))
             .frame(width: knobRadius * 2, height: knobRadius * 2)
             .overlay(
                 Image(systemName: icon)
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: isLocked ? 11 : 13, weight: .bold))
                     .foregroundStyle(color)
             )
-            .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(isLocked ? 0.1 : 0.25), radius: 4, x: 0, y: 2)
             .position(pos)
             .accessibilityIdentifier(identifier)
     }
@@ -161,17 +183,23 @@ public struct DialEditorView: View {
 
     private func detectHandle(at touchPoint: CGPoint, touchAngle: Double, center: CGPoint) -> DragHandle? {
         let startPoint = DialMath.pointOnCircle(center: center, radius: dialRadius, angleDegrees: startAngle)
-        let endPoint = DialMath.pointOnCircle(center: center, radius: dialRadius, angleDegrees: endAngle)
-
         let distToStart = hypot(touchPoint.x - startPoint.x, touchPoint.y - startPoint.y)
-        let distToEnd = hypot(touchPoint.x - endPoint.x, touchPoint.y - endPoint.y)
-
-        let touchRadius = hypot(touchPoint.x - center.x, touchPoint.y - center.y)
-        let isNearRing = abs(touchRadius - dialRadius) <= (strokeWidth / 2 + 15)
 
         if distToStart < knobRadius + 16 {
             return .start
-        } else if distToEnd < knobRadius + 16 {
+        }
+
+        // If fast is in progress, only start knob can be dragged
+        if mode == .inProgress {
+            return nil
+        }
+
+        let endPoint = DialMath.pointOnCircle(center: center, radius: dialRadius, angleDegrees: endAngle)
+        let distToEnd = hypot(touchPoint.x - endPoint.x, touchPoint.y - endPoint.y)
+        let touchRadius = hypot(touchPoint.x - center.x, touchPoint.y - center.y)
+        let isNearRing = abs(touchRadius - dialRadius) <= (strokeWidth / 2 + 15)
+
+        if distToEnd < knobRadius + 16 {
             return .end
         } else if isNearRing && DialMath.isAngle(touchAngle, between: startAngle, and: endAngle) {
             return .arc
@@ -204,7 +232,14 @@ public struct DialEditorView: View {
             let snappedDate = DialMath.date(from: touchAngle, baseDate: startDate, snapToMinutes: 5)
             startAngle = DialMath.angle(for: snappedDate)
             startDate = snappedDate
-            targetDuration = DialMath.computeDuration(startAngle: startAngle, endAngle: endAngle)
+            if mode == .inProgress {
+                // In-progress: duration stays preserved, end angle moves with start
+                let computedEnd = startDate.addingTimeInterval(targetDuration)
+                endAngle = DialMath.angle(for: computedEnd)
+            } else {
+                // Completed: adjust duration based on fixed end knob
+                targetDuration = DialMath.computeDuration(startAngle: startAngle, endAngle: endAngle)
+            }
 
         case .end:
             let rawEndDate = DialMath.date(from: touchAngle, baseDate: startDate, snapToMinutes: 5)
@@ -238,10 +273,12 @@ public struct DialEditorView: View {
         let totalMinutes = Int(interval / 60)
         let hours = totalMinutes / 60
         let minutes = totalMinutes % 60
-        if minutes == 0 {
-            return "\(hours) hr"
+        if hours == 0 {
+            return "\(minutes) min"
+        } else if minutes == 0 {
+            return "\(hours) hrs"
         } else {
-            return "\(hours) hr \(minutes) min"
+            return "\(hours) hrs \(minutes) min"
         }
     }
 }

@@ -128,6 +128,25 @@ public final class FastManager: ObservableObject {
         }
     }
 
+    public func updateCompletedFast(
+        _ fast: Fast,
+        startDate: Date,
+        endDate: Date
+    ) {
+        fast.startDate = startDate
+        fast.endDate = endDate
+        let elapsed = endDate.timeIntervalSince(startDate)
+        fast.isCompleted = (elapsed >= fast.targetDuration)
+        fast.updatedAt = Date()
+
+        do {
+            try viewContext.save()
+            self.objectWillChange.send()
+        } catch {
+            NSLog("Error updating completed fast: \(error)")
+        }
+    }
+
     public func deleteFast(_ fast: Fast) {
         if activeFast?.id == fast.id {
             activeFast = nil
