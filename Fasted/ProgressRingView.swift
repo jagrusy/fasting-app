@@ -42,6 +42,7 @@ public struct ProgressRingView: View {
                 }
             }
             .frame(width: size, height: size)
+            .coordinateSpace(name: "ringContainer")
         }
     }
 
@@ -80,16 +81,18 @@ public struct ProgressRingView: View {
         let angle = Angle.degrees(clampedProgress * 360.0 - 90.0)
         let knobX = center.x + CGFloat(cos(angle.radians)) * radius
         let knobY = center.y + CGFloat(sin(angle.radians)) * radius
+        let knobSize = ringWidth + 6
 
         return Circle()
             .fill(Color(.systemBackground))
-            .frame(width: ringWidth + 6, height: ringWidth + 6)
+            .frame(width: knobSize, height: knobSize)
             .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 1)
             .scaleEffect(isDragging ? 1.25 : 1.0)
-            .position(x: knobX, y: knobY)
             .accessibilityIdentifier("progress_knob")
+            .position(x: knobX, y: knobY)
+            .contentShape(Circle().size(CGSize(width: knobSize * 2, height: knobSize * 2)))
             .gesture(
-                DragGesture(minimumDistance: 0)
+                DragGesture(minimumDistance: 0, coordinateSpace: .named("ringContainer"))
                     .onChanged { value in
                         isDragging = true
                         let touchAngle = computeTouchAngle(point: value.location, center: center)
