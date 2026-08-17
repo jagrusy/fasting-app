@@ -54,7 +54,8 @@ public struct DialMath {
         let deltaX = Double(point.x - center.x)
         let deltaY = Double(point.y - center.y)
 
-        // atan2 gives 0 at positive X axis (3 o'clock) increasing counter-clockwise or clockwise depending on Y axis.
+        // atan2 gives 0 at positive X axis (3 o'clock)
+        // increasing counter-clockwise or clockwise depending on Y axis.
         let radians = atan2(deltaY, deltaX)
         var degrees = radians * (180.0 / .pi)
 

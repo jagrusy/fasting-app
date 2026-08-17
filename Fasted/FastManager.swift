@@ -62,16 +62,20 @@ public final class FastManager: ObservableObject {
             if let existing = results.first {
                 self.userSettings = existing
             } else {
-                let initial = UserSettings(context: viewContext)
-                initial.id = UUID()
-                initial.selectedProtocol = FastingProtocol.default.ratioString
-                initial.notificationsEnabled = false
-                try? viewContext.save()
-                self.userSettings = initial
+                self.userSettings = createDefaultUserSettings()
             }
         } catch {
             NSLog("Failed to fetch UserSettings: \(error)")
         }
+    }
+
+    private func createDefaultUserSettings() -> UserSettings {
+        let initial = UserSettings(context: viewContext)
+        initial.id = UUID()
+        initial.selectedProtocol = FastingProtocol.default.ratioString
+        initial.notificationsEnabled = false
+        try? viewContext.save()
+        return initial
     }
 
     public var currentProtocol: FastingProtocol {
