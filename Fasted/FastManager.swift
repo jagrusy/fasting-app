@@ -86,6 +86,44 @@ public final class FastManager: ObservableObject {
         activeFast != nil
     }
 
+    public var notificationSchedule: NotificationSchedule {
+        guard let data = userSettings?.notificationSchedule,
+              let decoded = try? JSONDecoder().decode(NotificationSchedule.self, from: data) else {
+            return .default
+        }
+        return decoded
+    }
+
+    public func updateSelectedProtocol(_ protocolType: String) {
+        guard let settings = userSettings else { return }
+        settings.selectedProtocol = protocolType
+
+        do {
+            try viewContext.save()
+            self.objectWillChange.send()
+        } catch {
+            NSLog("Error saving protocol setting: \(error)")
+        }
+    }
+
+    public func updateNotificationSchedule(enabled: Bool, schedule: NotificationSchedule) {
+        guard let settings = userSettings else { return }
+        settings.notificationsEnabled = enabled
+
+        if let encoded = try? JSONEncoder().encode(schedule) {
+            settings.notificationSchedule = encoded
+        }
+
+        do {
+            try viewContext.save()
+            self.objectWillChange.send()
+
+            notificationManager.scheduleRecurringReminders(schedule: schedule, enabled: enabled)
+        } catch {
+            NSLog("Error updating notification settings: \(error)")
+        }
+    }
+
     @discardableResult
     public func startFast(
         startDate: Date = Date(),

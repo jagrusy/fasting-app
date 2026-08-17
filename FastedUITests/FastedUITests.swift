@@ -1,41 +1,43 @@
 import XCTest
 
 final class FastedUITests: XCTestCase {
+
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
-    func testTabBarNavigation() throws {
+    func testAppLaunchesWithThreeTabs() throws {
         let app = XCUIApplication()
         app.launch()
 
-        // Check tabs exist
+        let tabBarsQuery = app.tabBars
+        XCTAssertTrue(tabBarsQuery.buttons["Fast"].waitForExistence(timeout: 5))
+        XCTAssertTrue(tabBarsQuery.buttons["History"].exists)
+        XCTAssertTrue(tabBarsQuery.buttons["Settings"].exists)
+    }
+
+    func testFastTabBasicUIElements() throws {
+        let app = XCUIApplication()
+        app.launch()
+
         let fastTab = app.tabBars.buttons["Fast"]
-        let historyTab = app.tabBars.buttons["History"]
-        let settingsTab = app.tabBars.buttons["Settings"]
-
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
-        XCTAssertTrue(historyTab.exists)
-        XCTAssertTrue(settingsTab.exists)
-
-        // Switch to history tab
-        historyTab.tap()
-        XCTAssertTrue(app.navigationBars["History"].waitForExistence(timeout: 2))
-
-        // Switch to settings tab
-        settingsTab.tap()
-        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 2))
-
-        // Switch back to fast tab
         fastTab.tap()
-        XCTAssertTrue(app.navigationBars["Fasted"].waitForExistence(timeout: 2))
+
+        // Check for navigation title
+        let navBar = app.navigationBars["Fasted"]
+        XCTAssertTrue(navBar.waitForExistence(timeout: 3))
+
+        // Check for either Start Fast or End Fast button
+        let startButton = app.buttons["start_fast_button"]
+        let endButton = app.buttons["end_fast_button"]
+        XCTAssertTrue(startButton.waitForExistence(timeout: 3) || endButton.waitForExistence(timeout: 3))
     }
 
     func testStartAndEndFastFlow() throws {
         let app = XCUIApplication()
         app.launch()
 
-        // Ensure we are on Fast tab
         let fastTab = app.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
         fastTab.tap()
@@ -44,44 +46,29 @@ final class FastedUITests: XCTestCase {
         let endButton = app.buttons["end_fast_button"]
 
         if startButton.waitForExistence(timeout: 3) {
-            // Start a fast
             startButton.tap()
-
-            // Verify active fasting UI elements
             XCTAssertTrue(endButton.waitForExistence(timeout: 4))
-            XCTAssertTrue(app.buttons["progress_ring_button"].exists)
 
-            // Tap End Fast button to bring up confirmation dialog
+            // Verify active status header
+            let statusHeader = app.staticTexts["fast_status_header"]
+            XCTAssertTrue(statusHeader.waitForExistence(timeout: 2))
+
+            // End fast
             endButton.tap()
-
-            // Scope confirmation action to sheets or alert dialogs to avoid query collision
-            let sheet = app.sheets["End Fast Early?"]
-            if sheet.waitForExistence(timeout: 3) {
-                sheet.buttons["End Fast"].tap()
-            } else {
-                let alert = app.alerts.firstMatch
-                if alert.waitForExistence(timeout: 2) {
-                    alert.buttons["End Fast"].tap()
-                } else if app.buttons["End Fast"].exists {
-                    app.buttons["End Fast"].firstMatch.tap()
-                }
+            let alert = app.alerts.firstMatch
+            if alert.waitForExistence(timeout: 2) {
+                alert.buttons["End Fast"].tap()
+            } else if app.buttons["End Fast"].exists {
+                app.buttons["End Fast"].firstMatch.tap()
             }
-
-            // Verify returned to start fast state
             XCTAssertTrue(startButton.waitForExistence(timeout: 4))
-        } else if endButton.exists {
-            // If already active, end it
+        } else if endButton.waitForExistence(timeout: 3) {
             endButton.tap()
-            let sheet = app.sheets["End Fast Early?"]
-            if sheet.waitForExistence(timeout: 3) {
-                sheet.buttons["End Fast"].tap()
-            } else {
-                let alert = app.alerts.firstMatch
-                if alert.waitForExistence(timeout: 2) {
-                    alert.buttons["End Fast"].tap()
-                } else if app.buttons["End Fast"].exists {
-                    app.buttons["End Fast"].firstMatch.tap()
-                }
+            let alert = app.alerts.firstMatch
+            if alert.waitForExistence(timeout: 2) {
+                alert.buttons["End Fast"].tap()
+            } else if app.buttons["End Fast"].exists {
+                app.buttons["End Fast"].firstMatch.tap()
             }
             XCTAssertTrue(startButton.waitForExistence(timeout: 4))
         }
@@ -138,5 +125,31 @@ final class FastedUITests: XCTestCase {
         let fastsCountLabel = app.staticTexts["total_fasts_count_label"]
 
         XCTAssertTrue(emptyTitle.waitForExistence(timeout: 3) || fastsCountLabel.waitForExistence(timeout: 3))
+    }
+
+    func testSettingsTabProtocolSelection() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let settingsTab = app.tabBars.buttons["Settings"]
+        XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
+        settingsTab.tap()
+
+        let navBar = app.navigationBars["Settings"]
+        XCTAssertTrue(navBar.waitForExistence(timeout: 3))
+
+        let protocolLink = app.buttons["settings_protocol_navigation_link"]
+        XCTAssertTrue(protocolLink.waitForExistence(timeout: 3))
+        protocolLink.tap()
+
+        let warriorCard = app.buttons["protocol_card_20:4"]
+        XCTAssertTrue(warriorCard.waitForExistence(timeout: 3))
+        warriorCard.tap()
+
+        // Navigate back
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+
+        // Check if warrior is shown
+        XCTAssertTrue(app.staticTexts["Warrior"].waitForExistence(timeout: 3))
     }
 }

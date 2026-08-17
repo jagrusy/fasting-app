@@ -85,6 +85,71 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
+    public func scheduleRecurringReminders(schedule: NotificationSchedule, enabled: Bool) {
+        cancelRecurringReminders()
+        guard enabled else { return }
+
+        let calendar = Calendar.current
+        let startComponents = calendar.dateComponents([.hour, .minute], from: schedule.startReminderTime)
+        let endComponents = calendar.dateComponents([.hour, .minute], from: schedule.endReminderTime)
+
+        for day in schedule.selectedDays {
+            scheduleDayReminder(
+                weekday: day,
+                hour: startComponents.hour ?? 20,
+                minute: startComponents.minute ?? 0,
+                title: "Time to Start Fasting ⏱️",
+                body: "Your fasting window starts now. Have a great fast!",
+                identifier: "recurring_start_day_\(day)"
+            )
+
+            scheduleDayReminder(
+                weekday: day,
+                hour: endComponents.hour ?? 12,
+                minute: endComponents.minute ?? 0,
+                title: "Eating Window Open 🍽️",
+                body: "Your eating window is now open. Time to nourish your body!",
+                identifier: "recurring_end_day_\(day)"
+            )
+        }
+    }
+
+    private func scheduleDayReminder(
+        weekday: Int,
+        hour: Int,
+        minute: Int,
+        title: String,
+        body: String,
+        identifier: String
+    ) {
+        var dateComponents = DateComponents()
+        dateComponents.weekday = weekday
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                NSLog("Failed to schedule reminder \(identifier): \(error)")
+            }
+        }
+    }
+
+    public func cancelRecurringReminders() {
+        let identifiers = (1...7).flatMap { [
+            "recurring_start_day_\($0)",
+            "recurring_end_day_\($0)"
+        ] }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+    }
+
     // UNUserNotificationCenterDelegate
     public func userNotificationCenter(
         _ center: UNUserNotificationCenter,

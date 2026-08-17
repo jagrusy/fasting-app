@@ -144,6 +144,35 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(manager.activeFast?.targetDuration, newDuration)
     }
 
+    func testFastManagerUpdatesSelectedProtocol() throws {
+        let manager = try XCTUnwrap(fastManager)
+        XCTAssertEqual(manager.currentProtocol.ratioString, "16:8")
+
+        manager.updateSelectedProtocol("18:6")
+        XCTAssertEqual(manager.currentProtocol.ratioString, "18:6")
+        XCTAssertEqual(manager.currentProtocol.fastingHours, 18)
+
+        // Starting a new fast uses the newly selected protocol
+        let fast = manager.startFast(startDate: Date())
+        XCTAssertEqual(fast.protocolType, "18:6")
+        XCTAssertEqual(fast.targetDuration, 18 * 3600)
+    }
+
+    func testNotificationScheduleEncodingAndUpdating() throws {
+        let manager = try XCTUnwrap(fastManager)
+        let defaultSchedule = manager.notificationSchedule
+        XCTAssertEqual(defaultSchedule.selectedDays.count, 7)
+
+        var customSchedule = defaultSchedule
+        customSchedule.selectedDays = [2, 3, 4, 5, 6] // Weekdays
+        customSchedule.notifyOnGoalReached = false
+
+        manager.updateNotificationSchedule(enabled: true, schedule: customSchedule)
+        XCTAssertTrue(manager.userSettings?.notificationsEnabled == true)
+        XCTAssertEqual(manager.notificationSchedule.selectedDays, [2, 3, 4, 5, 6])
+        XCTAssertFalse(manager.notificationSchedule.notifyOnGoalReached)
+    }
+
     func testCenterDisplayModeCycle() {
         XCTAssertEqual(CenterDisplayMode.elapsed.next, .remaining)
         XCTAssertEqual(CenterDisplayMode.remaining.next, .percentage)
