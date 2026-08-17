@@ -3,9 +3,9 @@ import SwiftUI
 public struct FastTrackerView: View {
     @ObservedObject var fastManager: FastManager
     @State private var showStopConfirmation: Bool = false
-    @State private var showStartTimePicker: Bool = false
+    @State private var showTimePickerSheet: Bool = false
     @State private var centerDisplayMode: CenterDisplayMode = .elapsed
-    @State private var tempStartDate: Date = Date()
+    @State private var tempTime: Date = Date()
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -20,7 +20,20 @@ public struct FastTrackerView: View {
                     .padding(.vertical, 8)
 
                 if let fast = fastManager.activeFast {
-                    startCardButton(fast: fast, now: now)
+                    FastStartedCardView(
+                        fast: fast,
+                        now: now,
+                        onSelectDayOffset: { offset in
+                            updateStartDate(dayOffset: offset, from: fast.startDate ?? now)
+                        },
+                        onSelectTime: {
+                            tempTime = fast.startDate ?? now
+                            showTimePickerSheet = true
+                        }
+                    )
+                    .sheet(isPresented: $showTimePickerSheet) {
+                        timePickerSheet(startDate: fast.startDate ?? now, now: now)
+                    }
                 }
 
                 Spacer()
@@ -57,8 +70,8 @@ public struct FastTrackerView: View {
                 progress: progress,
                 isFasting: fastManager.isFasting,
                 ringWidth: 24,
-                onStartKnobDragged: { touchAngle in
-                    handleStartKnobDragged(touchAngle: touchAngle, now: now)
+                onProgressDragged: { newProgress in
+                    handleProgressDragged(newProgress: newProgress, now: now)
                 }
             )
             .frame(width: 280, height: 280)
@@ -84,64 +97,16 @@ public struct FastTrackerView: View {
         }
     }
 
-    private func startCardButton(fast: Fast, now: Date) -> some View {
-        let startDate = fast.startDate ?? now
-        return Button {
-            tempStartDate = startDate
-            showStartTimePicker = true
-        } label: {
-            startCardContent(startDate: startDate, targetDuration: fast.targetDuration)
-        }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("fast_details_button")
-        .sheet(isPresented: $showStartTimePicker) {
-            startPickerSheet(now: now)
-        }
-    }
-
-    private func startCardContent(startDate: Date, targetDuration: TimeInterval) -> some View {
-        HStack(spacing: 24) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 4) {
-                    Text("Started")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Image(systemName: "pencil")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.secondary)
-                }
-                Text(formatTime(startDate))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.primary)
-            }
-
-            Divider().frame(height: 32)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Goal Target")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(formatTime(startDate.addingTimeInterval(targetDuration)))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.primary)
-            }
-        }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 14)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-
-    private func startPickerSheet(now: Date) -> some View {
+    private func timePickerSheet(startDate: Date, now: Date) -> some View {
         NavigationStack {
-            VStack(spacing: 24) {
+            VStack(spacing: 20) {
                 DatePicker(
-                    "Fast Start Time",
-                    selection: $tempStartDate,
-                    in: ...now,
-                    displayedComponents: [.date, .hourAndMinute]
+                    "Start Time",
+                    selection: $tempTime,
+                    displayedComponents: [.hourAndMinute]
                 )
-                .datePickerStyle(.graphical)
+                .datePickerStyle(.wheel)
+                .labelsHidden()
                 .padding()
 
                 Spacer()
@@ -150,18 +115,48 @@ public struct FastTrackerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showStartTimePicker = false }
+                    Button("Cancel") { showTimePickerSheet = false }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        fastManager.updateActiveFast(startDate: tempStartDate)
-                        showStartTimePicker = false
+                        applyTimeChange(newTime: tempTime, originalDate: startDate, now: now)
+                        showTimePickerSheet = false
                     }
                     .fontWeight(.semibold)
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.height(300)])
+    }
+
+    private func applyTimeChange(newTime: Date, originalDate: Date, now: Date) {
+        let calendar = Calendar.current
+        let timeComponents = calendar.dateComponents([.hour, .minute], from: newTime)
+        var dateComponents = calendar.dateComponents([.year, .month, .day], from: originalDate)
+        dateComponents.hour = timeComponents.hour
+        dateComponents.minute = timeComponents.minute
+        dateComponents.second = 0
+
+        if let combinedDate = calendar.date(from: dateComponents) {
+            let finalDate = min(combinedDate, now)
+            fastManager.updateActiveFast(startDate: finalDate)
+        }
+    }
+
+    private func updateStartDate(dayOffset: Int, from currentDate: Date) {
+        let calendar = Calendar.current
+        let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: currentDate)
+        let targetDay = calendar.date(byAdding: .day, value: dayOffset, to: calendar.startOfDay(for: Date())) ?? Date()
+
+        var combinedComponents = calendar.dateComponents([.year, .month, .day], from: targetDay)
+        combinedComponents.hour = timeComponents.hour
+        combinedComponents.minute = timeComponents.minute
+        combinedComponents.second = timeComponents.second
+
+        if let newStartDate = calendar.date(from: combinedComponents) {
+            let finalDate = min(newStartDate, Date())
+            fastManager.updateActiveFast(startDate: finalDate)
+        }
     }
 
     private func actionButton(now: Date) -> some View {
@@ -223,12 +218,11 @@ public struct FastTrackerView: View {
         .padding(.horizontal, 24)
     }
 
-    private func handleStartKnobDragged(touchAngle: Double, now: Date) {
+    private func handleProgressDragged(newProgress: Double, now: Date) {
         guard let fast = fastManager.activeFast else { return }
-        let fraction = touchAngle > 180 ? (360.0 - touchAngle) / 360.0 : 0.0
-        let maxAdjustmentHours: Double = 12.0
-        let hoursBack = fraction * maxAdjustmentHours
-        let adjustedStart = now.addingTimeInterval(-hoursBack * 3600.0)
+        let clamped = min(max(newProgress, 0.0), 1.0)
+        let elapsedSeconds = clamped * fast.targetDuration
+        let adjustedStart = now.addingTimeInterval(-elapsedSeconds)
 
         fastManager.updateActiveFast(startDate: adjustedStart, targetDuration: fast.targetDuration)
     }
@@ -240,11 +234,5 @@ public struct FastTrackerView: View {
         let startDate = fast.startDate ?? date
         let elapsed = date.timeIntervalSince(startDate)
         return max(0.0, elapsed / fast.targetDuration)
-    }
-
-    private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
     }
 }
