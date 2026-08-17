@@ -43,34 +43,48 @@ final class FastedUITests: XCTestCase {
         let startButton = app.buttons["start_fast_button"]
         let endButton = app.buttons["end_fast_button"]
 
-        if startButton.exists {
+        if startButton.waitForExistence(timeout: 3) {
             // Start a fast
             startButton.tap()
 
-            // Verify active fasting UI
-            XCTAssertTrue(endButton.waitForExistence(timeout: 3))
+            // Verify active fasting UI elements
+            XCTAssertTrue(endButton.waitForExistence(timeout: 4))
             XCTAssertTrue(app.staticTexts["elapsed_time_text"].exists)
             XCTAssertTrue(app.staticTexts["progress_percentage_text"].exists)
 
-            // End the fast
+            // Tap End Fast button to bring up confirmation dialog
             endButton.tap()
 
-            // Confirm in dialog if shown
-            let confirmEndButton = app.buttons["End Fast"]
-            if confirmEndButton.waitForExistence(timeout: 2) {
-                confirmEndButton.tap()
+            // Scope confirmation action to sheets or alert dialogs to avoid query collision
+            let sheet = app.sheets["End Fast Early?"]
+            if sheet.waitForExistence(timeout: 3) {
+                sheet.buttons["End Fast"].tap()
+            } else {
+                let alert = app.alerts.firstMatch
+                if alert.waitForExistence(timeout: 2) {
+                    alert.buttons["End Fast"].tap()
+                } else if app.buttons["End Fast"].exists {
+                    app.buttons["End Fast"].firstMatch.tap()
+                }
             }
 
             // Verify returned to start fast state
-            XCTAssertTrue(startButton.waitForExistence(timeout: 3))
+            XCTAssertTrue(startButton.waitForExistence(timeout: 4))
         } else if endButton.exists {
             // If already active, end it
             endButton.tap()
-            let confirmEndButton = app.buttons["End Fast"]
-            if confirmEndButton.waitForExistence(timeout: 2) {
-                confirmEndButton.tap()
+            let sheet = app.sheets["End Fast Early?"]
+            if sheet.waitForExistence(timeout: 3) {
+                sheet.buttons["End Fast"].tap()
+            } else {
+                let alert = app.alerts.firstMatch
+                if alert.waitForExistence(timeout: 2) {
+                    alert.buttons["End Fast"].tap()
+                } else if app.buttons["End Fast"].exists {
+                    app.buttons["End Fast"].firstMatch.tap()
+                }
             }
-            XCTAssertTrue(startButton.waitForExistence(timeout: 3))
+            XCTAssertTrue(startButton.waitForExistence(timeout: 4))
         }
     }
 }
