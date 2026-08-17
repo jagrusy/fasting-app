@@ -127,4 +127,18 @@ public final class FastManager: ObservableObject {
             NSLog("Error updating active fast: \(error)")
         }
     }
+
+    public func deleteFast(_ fast: Fast) {
+        if activeFast?.id == fast.id {
+            activeFast = nil
+        }
+        viewContext.delete(fast)
+
+        do {
+            try viewContext.save()
+            self.objectWillChange.send()
+        } catch {
+            NSLog("Error deleting fast: \(error)")
+        }
+    }
 }

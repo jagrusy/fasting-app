@@ -10,6 +10,7 @@
 		0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71CDC6BEC973FA849ACE8BB /* DialMath.swift */; };
 		230E8F5D74F41671E07B1BDE /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906DF983BABCA66D6350B45A /* FastingProtocol.swift */; };
 		3D385853457F9BE5FE7B2073 /* DialHeaderCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */; };
+		42B7EDBE72C5CBDF62F4E7EF /* FastRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A408558CA277F27154BD5D /* FastRowView.swift */; };
 		48FB0D427459DB6A18EF8ADB /* DialFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */; };
 		4C57B9976769EFFCFCD58D14 /* Fasted.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 79E00FFDBAD21B51249AC6C9 /* Fasted.xcdatamodeld */; };
 		62B0C00563C611B6973E931E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */; };
@@ -20,6 +21,8 @@
 		86F8832A8B8687F6245D630B /* DialEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE11165A3D641BFB1B2908C /* DialEditorView.swift */; };
 		8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */; };
 		94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8810ED7037826FE830C9 /* FastedUITests.swift */; };
+		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
+		B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */; };
 		B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D4D805535A363DDAF977B89 /* FastingArcShape.swift */; };
 		E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47F0F9EAF3379520543128F /* FastedTests.swift */; };
 		F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1845606048434908EA9499 /* ContentView.swift */; };
@@ -56,13 +59,16 @@
 		9703687703B4FF485009663A /* Fasted.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Fasted.xcdatamodel; sourceTree = "<group>"; };
 		97ABFA5E1D53249C053A768E /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		9C1845606048434908EA9499 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListView.swift; sourceTree = "<group>"; };
 		A71CDC6BEC973FA849ACE8BB /* DialMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialMath.swift; sourceTree = "<group>"; };
 		A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialFaceView.swift; sourceTree = "<group>"; };
 		B7160CB9DE9689FEF2EFEC10 /* FastedUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8A408558CA277F27154BD5D /* FastRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastRowView.swift; sourceTree = "<group>"; };
 		DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTrackerView.swift; sourceTree = "<group>"; };
 		E95F8810ED7037826FE830C9 /* FastedUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedUITests.swift; sourceTree = "<group>"; };
 		F47F0F9EAF3379520543128F /* FastedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedTests.swift; sourceTree = "<group>"; };
+		FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyHistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -103,12 +109,15 @@
 				B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */,
 				8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */,
 				A71CDC6BEC973FA849ACE8BB /* DialMath.swift */,
+				FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */,
 				79E00FFDBAD21B51249AC6C9 /* Fasted.xcdatamodeld */,
 				8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */,
 				2D4D805535A363DDAF977B89 /* FastingArcShape.swift */,
 				906DF983BABCA66D6350B45A /* FastingProtocol.swift */,
 				0B49461E82EC597415611F11 /* FastManager.swift */,
+				C8A408558CA277F27154BD5D /* FastRowView.swift */,
 				DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */,
+				9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */,
 				80ABF2C76FAC79CAD26EEC81 /* Info.plist */,
 				97ABFA5E1D53249C053A768E /* PersistenceController.swift */,
 				6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */,
@@ -245,12 +254,15 @@
 				48FB0D427459DB6A18EF8ADB /* DialFaceView.swift in Sources */,
 				3D385853457F9BE5FE7B2073 /* DialHeaderCardView.swift in Sources */,
 				0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */,
+				9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */,
 				70A1E82B96E8466B544F780D /* FastManager.swift in Sources */,
+				42B7EDBE72C5CBDF62F4E7EF /* FastRowView.swift in Sources */,
 				73B5FF9FD0E9363FCC6A241D /* FastTrackerView.swift in Sources */,
 				4C57B9976769EFFCFCD58D14 /* Fasted.xcdatamodeld in Sources */,
 				8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */,
 				B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */,
 				230E8F5D74F41671E07B1BDE /* FastingProtocol.swift in Sources */,
+				B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */,
 				65BCCE113DE373261E9D27CF /* PersistenceController.swift in Sources */,
 				78B975439882F6B9107E507D /* ProgressRingView.swift in Sources */,
 			);
