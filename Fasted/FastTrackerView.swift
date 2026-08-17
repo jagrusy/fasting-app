@@ -3,6 +3,10 @@ import SwiftUI
 public struct FastTrackerView: View {
     @ObservedObject var fastManager: FastManager
     @State private var showStopConfirmation: Bool = false
+    @State private var showDialEditor: Bool = false
+
+    @State private var editableStartDate: Date = Date()
+    @State private var editableTargetDuration: TimeInterval = 57600
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -29,7 +33,7 @@ public struct FastTrackerView: View {
                 }
                 .padding(.top, 16)
 
-                // Main Circular Progress Display
+                // Main Circular Progress Display (Tap to Edit)
                 ZStack {
                     let progress = calculateProgress(at: now)
 
@@ -87,6 +91,15 @@ public struct FastTrackerView: View {
                         }
                     }
                 }
+                .contentShape(Circle())
+                .onTapGesture {
+                    if fastManager.isFasting, let fast = fastManager.activeFast {
+                        editableStartDate = fast.startDate ?? now
+                        editableTargetDuration = fast.targetDuration
+                        showDialEditor = true
+                    }
+                }
+                .accessibilityIdentifier("progress_ring_tap_target")
                 .padding(.vertical, 8)
 
                 // Fast details info card (when active)
@@ -128,6 +141,11 @@ public struct FastTrackerView: View {
                     .background(Color(.secondarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .padding(.horizontal, 20)
+                    .onTapGesture {
+                        editableStartDate = startDate
+                        editableTargetDuration = fast.targetDuration
+                        showDialEditor = true
+                    }
                 }
 
                 Spacer()
@@ -184,6 +202,21 @@ public struct FastTrackerView: View {
                 }
             }
             .padding(.bottom, 20)
+            .sheet(isPresented: $showDialEditor) {
+                DialEditorView(
+                    startDate: $editableStartDate,
+                    targetDuration: $editableTargetDuration,
+                    onSave: { newStart, newDuration in
+                        fastManager.updateActiveFast(startDate: newStart, targetDuration: newDuration)
+                        showDialEditor = false
+                    },
+                    onCancel: {
+                        showDialEditor = false
+                    }
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+            }
         }
     }
 

@@ -87,4 +87,51 @@ final class FastedUITests: XCTestCase {
             XCTAssertTrue(startButton.waitForExistence(timeout: 4))
         }
     }
+
+    func testDialEditorPresentationAndInteraction() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let fastTab = app.tabBars.buttons["Fast"]
+        XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
+        fastTab.tap()
+
+        let startButton = app.buttons["start_fast_button"]
+        let endButton = app.buttons["end_fast_button"]
+
+        // If not fasting, start a fast first so dial editor is available
+        if startButton.waitForExistence(timeout: 2) {
+            startButton.tap()
+            XCTAssertTrue(endButton.waitForExistence(timeout: 4))
+        }
+
+        // Tap the progress ring tap target to present DialEditorView sheet
+        let ringTarget = app.otherElements["progress_ring_tap_target"]
+        if ringTarget.waitForExistence(timeout: 3) {
+            ringTarget.tap()
+        }
+
+        // Verify Dial Editor UI elements exist
+        let startLabel = app.staticTexts["dial_start_time_label"]
+        let endLabel = app.staticTexts["dial_end_time_label"]
+        let durationLabel = app.staticTexts["dial_duration_label"]
+        let saveButton = app.buttons["dial_save_button"]
+        let cancelButton = app.buttons["dial_cancel_button"]
+
+        XCTAssertTrue(startLabel.waitForExistence(timeout: 4))
+        XCTAssertTrue(endLabel.exists)
+        XCTAssertTrue(durationLabel.exists)
+        XCTAssertTrue(saveButton.exists)
+        XCTAssertTrue(cancelButton.exists)
+
+        // Verify handles exist
+        XCTAssertTrue(app.otherElements["dial_start_handle"].exists)
+        XCTAssertTrue(app.otherElements["dial_end_handle"].exists)
+
+        // Tap Save to dismiss and persist changes
+        saveButton.tap()
+
+        // Verify returned to Fast dashboard
+        XCTAssertTrue(endButton.waitForExistence(timeout: 4))
+    }
 }
