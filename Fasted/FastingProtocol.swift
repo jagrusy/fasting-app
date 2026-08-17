@@ -28,12 +28,42 @@ public struct FastingProtocol: Identifiable, Hashable {
     }
 
     public static let presets: [FastingProtocol] = [
-        FastingProtocol(name: "Beginner", fastingHours: 12, eatingHours: 12, description: "12 hours fasting, 12 hours eating"),
-        FastingProtocol(name: "Light", fastingHours: 14, eatingHours: 10, description: "14 hours fasting, 10 hours eating"),
-        FastingProtocol(name: "Popular", fastingHours: 16, eatingHours: 8, description: "16 hours fasting, 8 hours eating"),
-        FastingProtocol(name: "Advanced", fastingHours: 18, eatingHours: 6, description: "18 hours fasting, 6 hours eating"),
-        FastingProtocol(name: "Warrior", fastingHours: 20, eatingHours: 4, description: "20 hours fasting, 4 hours eating"),
-        FastingProtocol(name: "OMAD", fastingHours: 23, eatingHours: 1, description: "23 hours fasting, 1 hour eating")
+        FastingProtocol(
+            name: "Beginner",
+            fastingHours: 12,
+            eatingHours: 12,
+            description: "12 hours fasting, 12 hours eating"
+        ),
+        FastingProtocol(
+            name: "Light",
+            fastingHours: 14,
+            eatingHours: 10,
+            description: "14 hours fasting, 10 hours eating"
+        ),
+        FastingProtocol(
+            name: "Popular",
+            fastingHours: 16,
+            eatingHours: 8,
+            description: "16 hours fasting, 8 hours eating"
+        ),
+        FastingProtocol(
+            name: "Advanced",
+            fastingHours: 18,
+            eatingHours: 6,
+            description: "18 hours fasting, 6 hours eating"
+        ),
+        FastingProtocol(
+            name: "Warrior",
+            fastingHours: 20,
+            eatingHours: 4,
+            description: "20 hours fasting, 4 hours eating"
+        ),
+        FastingProtocol(
+            name: "OMAD",
+            fastingHours: 23,
+            eatingHours: 1,
+            description: "23 hours fasting, 1 hour eating"
+        )
     ]
 
     public static let `default` = presets[2] // 16:8

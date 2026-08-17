@@ -40,14 +40,14 @@ public struct ProgressRingView: View {
                     let size = min(geometry.size.width, geometry.size.height)
                     let radius = (size - ringWidth) / 2
                     let angle = Angle.degrees(clampedProgress * 360 - 90)
-                    let x = size / 2 + CGFloat(cos(angle.radians)) * radius
-                    let y = size / 2 + CGFloat(sin(angle.radians)) * radius
+                    let posX = size / 2 + CGFloat(cos(angle.radians)) * radius
+                    let posY = size / 2 + CGFloat(sin(angle.radians)) * radius
 
                     Circle()
                         .fill(Color(.systemBackground))
                         .frame(width: ringWidth - 4, height: ringWidth - 4)
                         .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 1)
-                        .position(x: x, y: y)
+                        .position(x: posX, y: posY)
                 }
             }
         }

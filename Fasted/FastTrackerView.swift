@@ -19,7 +19,11 @@ public struct FastTrackerView: View {
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
 
-                    Text(fastManager.isFasting ? "Fasting in Progress" : "\(fastManager.currentProtocol.name) (\(fastManager.currentProtocol.ratioString))")
+                    let statusTitle = fastManager.isFasting
+                        ? "Fasting in Progress"
+                        : "\(fastManager.currentProtocol.name) (\(fastManager.currentProtocol.ratioString))"
+
+                    Text(statusTitle)
                         .font(.title2.weight(.bold))
                         .accessibilityIdentifier("fast_status_header")
                 }
@@ -141,7 +145,11 @@ public struct FastTrackerView: View {
                     }
                     .accessibilityIdentifier("end_fast_button")
                     .padding(.horizontal, 24)
-                    .confirmationDialog("End Fast Early?", isPresented: $showStopConfirmation, titleVisibility: .visible) {
+                    .confirmationDialog(
+                        "End Fast Early?",
+                        isPresented: $showStopConfirmation,
+                        titleVisibility: .visible
+                    ) {
                         Button("End Fast", role: .destructive) {
                             fastManager.endFast(endDate: now)
                         }

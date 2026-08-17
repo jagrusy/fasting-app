@@ -64,7 +64,11 @@ public final class FastManager: ObservableObject {
     }
 
     @discardableResult
-    public func startFast(startDate: Date = Date(), targetDuration: TimeInterval? = nil, protocolType: String? = nil) -> Fast {
+    public func startFast(
+        startDate: Date = Date(),
+        targetDuration: TimeInterval? = nil,
+        protocolType: String? = nil
+    ) -> Fast {
         // If there is already an active fast, return it
         if let existing = activeFast {
             return existing
