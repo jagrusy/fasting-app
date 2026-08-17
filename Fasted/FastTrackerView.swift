@@ -132,43 +132,51 @@ public struct FastTrackerView: View {
 
                 // Action Button (Start / End)
                 if fastManager.isFasting {
-                    Button(action: {
-                        showStopConfirmation = true
-                    }) {
-                        Text("End Fast")
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(Color.red)
-                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    }
+                    Button(
+                        action: {
+                            showStopConfirmation = true
+                        },
+                        label: {
+                            Text("End Fast")
+                                .font(.headline.weight(.semibold))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 56)
+                                .background(Color.red)
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        }
+                    )
                     .accessibilityIdentifier("end_fast_button")
                     .padding(.horizontal, 24)
                     .confirmationDialog(
                         "End Fast Early?",
                         isPresented: $showStopConfirmation,
-                        titleVisibility: .visible
-                    ) {
-                        Button("End Fast", role: .destructive) {
-                            fastManager.endFast(endDate: now)
+                        titleVisibility: .visible,
+                        actions: {
+                            Button("End Fast", role: .destructive) {
+                                fastManager.endFast(endDate: now)
+                            }
+                            Button("Cancel", role: .cancel) {}
+                        },
+                        message: {
+                            Text("Are you sure you want to end your current fast?")
                         }
-                        Button("Cancel", role: .cancel) {}
-                    } message: {
-                        Text("Are you sure you want to end your current fast?")
-                    }
+                    )
                 } else {
-                    Button(action: {
-                        fastManager.startFast(startDate: now)
-                    }) {
-                        Text("Start Fast")
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(Color.accentColor)
-                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    }
+                    Button(
+                        action: {
+                            fastManager.startFast(startDate: now)
+                        },
+                        label: {
+                            Text("Start Fast")
+                                .font(.headline.weight(.semibold))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 56)
+                                .background(Color.accentColor)
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        }
+                    )
                     .accessibilityIdentifier("start_fast_button")
                     .padding(.horizontal, 24)
                 }
