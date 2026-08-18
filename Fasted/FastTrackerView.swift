@@ -14,51 +14,54 @@ public struct FastTrackerView: View {
 
     public var body: some View {
         TimelineView(.animation(minimumInterval: 1.0)) { context in
-            let now = context.date
-            let progress = calculateProgress(at: now)
-            VStack(spacing: 20) {
-                headerView(progress: progress)
-                progressSection(now: now, progress: progress)
-
-                if fastManager.isFasting {
-                    let elapsed = fastManager.elapsedTime(at: now)
-                    let currentStage = MetabolicStage.stage(for: elapsed)
-                    MetabolicStageBadgeView(stage: currentStage) {
-                        showStagesSheet = true
-                    }
-                    .padding(.top, -6)
-                }
-
-                if let fast = fastManager.activeFast {
-                    FastStartedCardView(
-                        fast: fast,
-                        now: now,
-                        onSelectDayOffset: { offset in
-                            updateStartDate(dayOffset: offset, from: fast.startDate ?? now)
-                        },
-                        onSelectTime: {
-                            tempTime = fast.startDate ?? now
-                            showTimePickerSheet = true
-                        }
-                    )
-                    .sheet(isPresented: $showTimePickerSheet) {
-                        timePickerSheet(startDate: fast.startDate ?? now, now: now)
-                    }
-                }
-
-                Spacer()
-
-                actionButton(now: now, progress: progress)
-            }
-            .padding(.bottom, 20)
-            .sheet(isPresented: $showStagesSheet) {
-                let elapsed = fastManager.elapsedTime(at: Date())
-                MetabolicStagesSheetView(
-                    currentStage: fastManager.isFasting ? MetabolicStage.stage(for: elapsed) : nil,
-                    elapsedSeconds: elapsed
-                )
-            }
+            trackerContent(now: context.date)
         }
+        .sheet(isPresented: $showStagesSheet) {
+            let elapsed = fastManager.elapsedTime(at: Date())
+            MetabolicStagesSheetView(
+                currentStage: fastManager.isFasting ? MetabolicStage.stage(for: elapsed) : nil,
+                elapsedSeconds: elapsed
+            )
+        }
+    }
+
+    private func trackerContent(now: Date) -> some View {
+        let progress = calculateProgress(at: now)
+        return VStack(spacing: 20) {
+            headerView(progress: progress)
+            progressSection(now: now, progress: progress)
+
+            if fastManager.isFasting {
+                let elapsed = fastManager.elapsedTime(at: now)
+                let currentStage = MetabolicStage.stage(for: elapsed)
+                MetabolicStageBadgeView(stage: currentStage) {
+                    showStagesSheet = true
+                }
+                .padding(.top, -6)
+            }
+
+            if let fast = fastManager.activeFast {
+                FastStartedCardView(
+                    fast: fast,
+                    now: now,
+                    onSelectDayOffset: { offset in
+                        updateStartDate(dayOffset: offset, from: fast.startDate ?? now)
+                    },
+                    onSelectTime: {
+                        tempTime = fast.startDate ?? now
+                        showTimePickerSheet = true
+                    }
+                )
+                .sheet(isPresented: $showTimePickerSheet) {
+                    timePickerSheet(startDate: fast.startDate ?? now, now: now)
+                }
+            }
+
+            Spacer()
+
+            actionButton(now: now, progress: progress)
+        }
+        .padding(.bottom, 20)
     }
 
     private func headerView(progress: Double) -> some View {
