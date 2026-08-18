@@ -1,6 +1,7 @@
 import XCTest
 import Fasted
 
+@MainActor
 final class FeedbackHelperTests: XCTestCase {
 
     func testFeedbackTypeProperties() throws {
