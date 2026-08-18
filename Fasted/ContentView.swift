@@ -5,7 +5,7 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var fastManager: FastManager
     @State private var selectedTab: Tab = .fast
-    @AppStorage("app_appearance") private var appearanceRaw: String = AppAppearance.system.rawValue
+    @AppStorage("app_appearance") private var appearanceRaw: String = AppAppearance.dark.rawValue
 
     init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
         _fastManager = StateObject(wrappedValue: FastManager(context: context))
