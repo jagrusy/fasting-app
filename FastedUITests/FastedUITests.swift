@@ -149,6 +149,32 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(emptyTitle.waitForExistence(timeout: 3) || currentStreakLabel.waitForExistence(timeout: 3))
     }
 
+    func testHistoryTabMonthNavigation() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let historyTab = app.tabBars.buttons["History"]
+        XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
+        historyTab.tap()
+
+        let monthTitle = app.staticTexts["calendar_month_title"]
+        XCTAssertTrue(monthTitle.waitForExistence(timeout: 3))
+        let initialMonth = monthTitle.label
+
+        let prevButton = app.buttons["calendar_prev_month_button"]
+        XCTAssertTrue(prevButton.waitForExistence(timeout: 2))
+        prevButton.tap()
+
+        let prevMonth = monthTitle.label
+        XCTAssertNotEqual(initialMonth, prevMonth)
+
+        let nextButton = app.buttons["calendar_next_month_button"]
+        XCTAssertTrue(nextButton.waitForExistence(timeout: 2))
+        nextButton.tap()
+
+        XCTAssertEqual(monthTitle.label, initialMonth)
+    }
+
     func testSettingsTabProtocolSelection() throws {
         let app = XCUIApplication()
         app.launch()
