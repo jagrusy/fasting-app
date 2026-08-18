@@ -12,7 +12,7 @@ public struct HistoryListView: View {
     )
     private var completedFasts: FetchedResults<Fast>
 
-    @State private var selectedDate: Date?
+    @State private var currentMonthDate: Date = Date()
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -22,32 +22,18 @@ public struct HistoryListView: View {
         StreakCalculator.calculate(from: Array(completedFasts))
     }
 
-    private var filteredFasts: [Fast] {
-        guard let selected = selectedDate else { return Array(completedFasts) }
+    private var monthFasts: [Fast] {
         let calendar = Calendar.current
         return completedFasts.filter { fast in
             guard let start = fast.startDate else { return false }
-            return calendar.isDate(start, inSameDayAs: selected)
+            return calendar.isDate(start, equalTo: currentMonthDate, toGranularity: .month)
         }
     }
 
-    private var groupedFasts: [(String, [Fast])] {
+    private var monthTitle: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
-
-        var groups: [String: [Fast]] = [:]
-        var order: [String] = []
-
-        for fast in filteredFasts {
-            let key = formatter.string(from: fast.startDate ?? Date())
-            if groups[key] == nil {
-                groups[key] = []
-                order.append(key)
-            }
-            groups[key]?.append(fast)
-        }
-
-        return order.map { ($0, groups[$0] ?? []) }
+        return formatter.string(from: currentMonthDate)
     }
 
     public var body: some View {
@@ -59,22 +45,21 @@ public struct HistoryListView: View {
             Section {
                 VStack(spacing: 16) {
                     StreakSummaryCardsView(streakInfo: streakInfo)
-                    CalendarHeatmapView(fasts: Array(completedFasts), selectedDate: $selectedDate)
+                    CalendarHeatmapView(
+                        fasts: Array(completedFasts),
+                        currentMonthDate: $currentMonthDate
+                    )
                 }
             }
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
 
-            if selectedDate != nil {
-                filterHeaderSection
-            }
-
             if completedFasts.isEmpty {
                 emptyHistorySection
-            } else if filteredFasts.isEmpty && selectedDate != nil {
-                emptyFilterSection
+            } else if monthFasts.isEmpty {
+                emptyMonthSection
             } else {
-                fastGroupsSection
+                monthFastsSection
             }
         }
         .listStyle(.insetGrouped)
@@ -99,10 +84,10 @@ public struct HistoryListView: View {
         }
     }
 
-    private var emptyFilterSection: some View {
-        Section {
+    private var emptyMonthSection: some View {
+        Section(header: Text(monthTitle).font(.subheadline.weight(.semibold))) {
             VStack(spacing: 6) {
-                Text("No fasts recorded on this date.")
+                Text("No fasts recorded in \(monthTitle).")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -111,50 +96,26 @@ public struct HistoryListView: View {
         }
     }
 
-    private var fastGroupsSection: some View {
-        ForEach(groupedFasts, id: \.0) { month, fasts in
-            Section(header: Text(selectedDate != nil ? "Fasts for Selected Day" : month)
-                .font(.subheadline.weight(.semibold))) {
-                ForEach(fasts) { fast in
-                    NavigationLink {
-                        FastDetailView(fastManager: fastManager, fast: fast)
-                    } label: {
-                        FastRowView(fast: fast)
-                    }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            withAnimation {
-                                fastManager.deleteFast(fast)
-                            }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    }
+    private var monthFastsSection: some View {
+        Section(header: Text(monthTitle).font(.subheadline.weight(.semibold))) {
+            ForEach(monthFasts) { fast in
+                NavigationLink {
+                    FastDetailView(fastManager: fastManager, fast: fast)
+                } label: {
+                    FastRowView(fast: fast)
                 }
-                .onDelete { indexSet in
-                    deleteFasts(at: indexSet, from: fasts)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        withAnimation {
+                            fastManager.deleteFast(fast)
+                        }
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
                 }
             }
-        }
-    }
-
-    @ViewBuilder
-    private var filterHeaderSection: some View {
-        if let selected = selectedDate {
-            Section {
-                HStack {
-                    Text("Filtered: \(formattedDate(selected))")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.secondary)
-
-                    Spacer()
-
-                    Button("Show All") {
-                        withAnimation { selectedDate = nil }
-                    }
-                    .font(.subheadline.weight(.semibold))
-                    .accessibilityIdentifier("clear_filter_button")
-                }
+            .onDelete { indexSet in
+                deleteFasts(at: indexSet, from: monthFasts)
             }
         }
     }
@@ -164,11 +125,5 @@ public struct HistoryListView: View {
             let fast = list[index]
             fastManager.deleteFast(fast)
         }
-    }
-
-    private func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
     }
 }
