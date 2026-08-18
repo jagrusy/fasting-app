@@ -7,8 +7,8 @@ public final class FastManager: ObservableObject {
     let viewContext: NSManagedObjectContext
     public let notificationManager: NotificationManager
 
-    @Published public private(set) var activeFast: Fast?
-    @Published public private(set) var userSettings: UserSettings?
+    @Published public internal(set) var activeFast: Fast?
+    @Published public internal(set) var userSettings: UserSettings?
 
     public init(
         context: NSManagedObjectContext = PersistenceController.shared.container.viewContext,
