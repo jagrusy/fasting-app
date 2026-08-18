@@ -37,6 +37,7 @@
 		94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8810ED7037826FE830C9 /* FastedUITests.swift */; };
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
 		9F63DEE6FD9FF3C8741E6000 /* MetabolicStageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */; };
+		A6EA958C9BC9DA1C8A102AD5 /* FastManager+Mocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */; };
 		AAD783B848631089CFCFAEA1 /* MetabolicStagesSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */; };
 		B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */; };
 		B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */; };
@@ -110,6 +111,7 @@
 		E95F8810ED7037826FE830C9 /* FastedUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedUITests.swift; sourceTree = "<group>"; };
 		EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastStartedCardView.swift; sourceTree = "<group>"; };
 		EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStageTests.swift; sourceTree = "<group>"; };
+		EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Mocking.swift"; sourceTree = "<group>"; };
 		F44F4C21FE2197D21744A872 /* FastDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastDetailView.swift; sourceTree = "<group>"; };
 		F47F0F9EAF3379520543128F /* FastedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedTests.swift; sourceTree = "<group>"; };
 		FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyHistoryView.swift; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 				2D4D805535A363DDAF977B89 /* FastingArcShape.swift */,
 				906DF983BABCA66D6350B45A /* FastingProtocol.swift */,
 				0B49461E82EC597415611F11 /* FastManager.swift */,
+				EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */,
 				C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */,
 				E1F3859AA323EFA3BAE7F2B4 /* FastMetricsCenterView.swift */,
 				C8A408558CA277F27154BD5D /* FastRowView.swift */,
@@ -330,6 +333,7 @@
 				0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */,
 				9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */,
 				1A1CEC7520DE250DBA021796 /* FastDetailView.swift in Sources */,
+				A6EA958C9BC9DA1C8A102AD5 /* FastManager+Mocking.swift in Sources */,
 				67F7593024E306184CEB9657 /* FastManager+Validation.swift in Sources */,
 				70A1E82B96E8466B544F780D /* FastManager.swift in Sources */,
 				63DD19E655D1AD38E81DF671 /* FastMetricsCenterView.swift in Sources */,

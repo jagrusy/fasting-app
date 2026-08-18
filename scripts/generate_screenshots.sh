@@ -8,6 +8,7 @@ TMP_DIR="/tmp/SolsticeScreenshots"
 
 echo "📸 Starting Solstice App Store Screenshot Generation..."
 
+rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 rm -rf "$TMP_DIR"
 mkdir -p "$TMP_DIR"
