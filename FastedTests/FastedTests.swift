@@ -229,7 +229,7 @@ final class FastedTests: XCTestCase {
         let manager = try XCTUnwrap(fastManager)
         let ctx = try XCTUnwrap(context)
 
-        let fast = manager.startFast(startDate: Date().addingTimeInterval(-3600))
+        _ = manager.startFast(startDate: Date().addingTimeInterval(-3600))
         manager.endFast(endDate: Date())
         _ = manager.startFast(startDate: Date())
 
