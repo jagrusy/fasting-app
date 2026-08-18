@@ -7,62 +7,62 @@ final class AppStoreScreenshotTests: XCTestCase {
     }
 
     func testCaptureAppStoreScreenshots() throws {
-        let app = XCUIApplication()
-        app.launch()
+        // Part 1: Fast at 80% progress in Dark Mode
+        let app80 = XCUIApplication()
+        app80.launchArguments = ["-forceDarkMode", "-seedScreenshots80"]
+        app80.launch()
 
-        // 1. Fast Timer Hero
-        let fastTab = app.tabBars.buttons["Fast"]
+        // 1. Fast Timer Hero (80% Progress with Solar Gold Glow)
+        let fastTab = app80.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
         fastTab.tap()
-
-        let startButton = app.buttons["start_fast_button"]
-        if startButton.waitForExistence(timeout: 2) {
-            startButton.tap()
-        }
-
-        saveScreenshot(name: "01_FastTimer_Hero", in: app)
+        saveScreenshot(name: "01_FastTimer_80Percent_Hero", in: app80)
 
         // 2. Metabolic Stages Educational Sheet
-        let stageBadge = app.buttons["metabolic_stage_badge"]
+        let stageBadge = app80.buttons["metabolic_stage_badge"]
         if stageBadge.waitForExistence(timeout: 3) {
             stageBadge.tap()
-            let stagesTitle = app.navigationBars["Metabolic Fasting Stages"]
+            let stagesTitle = app80.navigationBars["Metabolic Fasting Stages"]
             XCTAssertTrue(stagesTitle.waitForExistence(timeout: 3))
-            saveScreenshot(name: "02_MetabolicStages_Sheet", in: app)
+            saveScreenshot(name: "03_MetabolicStages_Autophagy", in: app80)
 
-            let doneButton = app.buttons["stages_done_button"]
+            let doneButton = app80.buttons["stages_done_button"]
             if doneButton.waitForExistence(timeout: 2) {
                 doneButton.tap()
             }
         }
 
         // 3. History Tab Heatmap & Streaks
-        let historyTab = app.tabBars.buttons["History"]
+        let historyTab = app80.tabBars.buttons["History"]
         XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
         historyTab.tap()
-        saveScreenshot(name: "03_History_Calendar_Heatmap", in: app)
+        saveScreenshot(name: "04_History_Calendar_Heatmap", in: app80)
 
         // 4. Protocol Picker & 24h Dial
-        let settingsTab = app.tabBars.buttons["Settings"]
+        let settingsTab = app80.tabBars.buttons["Settings"]
         XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
         settingsTab.tap()
 
-        let protocolLink = app.buttons["settings_protocol_navigation_link"]
+        let protocolLink = app80.buttons["settings_protocol_navigation_link"]
         if protocolLink.waitForExistence(timeout: 3) {
             protocolLink.tap()
-            saveScreenshot(name: "04_ProtocolPicker_CustomDial", in: app)
-            app.navigationBars.buttons.element(boundBy: 0).tap()
+            saveScreenshot(name: "05_ProtocolPicker_CustomDial", in: app80)
+            app80.navigationBars.buttons.element(boundBy: 0).tap()
         }
 
-        // 5. Settings & Dark Mode Appearance
-        let appearancePicker = app.segmentedControls["appearance_picker"]
-        if appearancePicker.waitForExistence(timeout: 3) {
-            let darkButton = appearancePicker.buttons["Dark"]
-            if darkButton.waitForExistence(timeout: 2) {
-                darkButton.tap()
-            }
-        }
-        saveScreenshot(name: "05_Settings_DarkMode", in: app)
+        // 5. Settings & Appearance Controls
+        saveScreenshot(name: "06_Settings_DarkMode", in: app80)
+
+        // Part 2: Fast at 100%+ Goal Reached in Dark Mode
+        let app100 = XCUIApplication()
+        app100.launchArguments = ["-forceDarkMode", "-seedScreenshots100"]
+        app100.launch()
+
+        let fastTab100 = app100.tabBars.buttons["Fast"]
+        XCTAssertTrue(fastTab100.waitForExistence(timeout: 5))
+        fastTab100.tap()
+
+        saveScreenshot(name: "02_FastTimer_GoalReached_Glow", in: app100)
     }
 
     private func saveScreenshot(name: String, in app: XCUIApplication) {

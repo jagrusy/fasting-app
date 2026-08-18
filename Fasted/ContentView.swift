@@ -48,6 +48,16 @@ struct ContentView: View {
                 .tag(Tab.settings)
         }
         .preferredColorScheme(AppAppearance(rawValue: appearanceRaw)?.colorScheme)
+        .onAppear {
+            if ProcessInfo.processInfo.arguments.contains("-forceDarkMode") {
+                appearanceRaw = AppAppearance.dark.rawValue
+            }
+            if ProcessInfo.processInfo.arguments.contains("-seedScreenshots80") {
+                fastManager.seedMockDataForScreenshots(progress: 0.80)
+            } else if ProcessInfo.processInfo.arguments.contains("-seedScreenshots100") {
+                fastManager.seedMockDataForScreenshots(progress: 1.05)
+            }
+        }
     }
 }
 
