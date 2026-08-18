@@ -171,8 +171,17 @@ public final class FastManager: ObservableObject {
 
         do {
             try viewContext.save()
+            let completed = fast
             self.activeFast = nil
             notificationManager.cancelGoalNotification()
+
+            let request: NSFetchRequest<Fast> = Fast.fetchRequest()
+            request.predicate = NSPredicate(format: "endDate != nil AND isCompleted == YES")
+            let allCompleted = (try? viewContext.fetch(request)) ?? []
+            ReviewPromptManager.shared.checkAndPromptIfEligible(
+                completedFast: completed,
+                allCompletedFasts: allCompleted
+            )
         } catch {
             NSLog("Error ending fast: \(error)")
         }

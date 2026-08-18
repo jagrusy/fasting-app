@@ -26,7 +26,7 @@ public enum FeedbackType {
 
 @MainActor
 public enum FeedbackHelper {
-    public static let supportEmail = "feedback@solsticefasting.app"
+    public static let supportEmail = "jagrusy+solstice@gmail.com"
 
     public static func sendFeedback(type: FeedbackType, fastManager: FastManager) {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
