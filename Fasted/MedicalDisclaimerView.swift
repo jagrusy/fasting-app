@@ -41,7 +41,7 @@ public struct MedicalDisclaimerView: View {
                 Text("Health & Safety Notice")
                     .font(.headline.weight(.bold))
 
-                Text("Fasted is a habit tracker, not a medical device.")
+                Text("Solstice is a habit tracker, not a medical device.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -59,8 +59,8 @@ public struct MedicalDisclaimerView: View {
                 .foregroundStyle(.primary)
 
             Text(
-                "The content, timers, and metrics provided by Fasted are for informational and "
-                + "habit-tracking purposes only. Fasted does not provide medical advice, diagnosis, "
+                "The content, timers, and metrics provided by Solstice are for informational and "
+                + "habit-tracking purposes only. Solstice does not provide medical advice, diagnosis, "
                 + "or treatment."
             )
             .font(.footnote)
