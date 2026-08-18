@@ -13,6 +13,25 @@ public struct CalendarHeatmapView: View {
         self._selectedDate = selectedDate
     }
 
+    private var canGoForward: Bool {
+        let currentMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: Date())) ?? Date()
+        let displayedMonth = calendar.date(
+            from: calendar.dateComponents([.year, .month], from: currentMonthDate)
+        ) ?? currentMonthDate
+        return displayedMonth < currentMonth
+    }
+
+    private var canGoBackward: Bool {
+        let minMonth = calendar.date(byAdding: .month, value: -24, to: Date()) ?? Date()
+        let minMonthStart = calendar.date(
+            from: calendar.dateComponents([.year, .month], from: minMonth)
+        ) ?? minMonth
+        let displayedMonth = calendar.date(
+            from: calendar.dateComponents([.year, .month], from: currentMonthDate)
+        ) ?? currentMonthDate
+        return displayedMonth > minMonthStart
+    }
+
     public var body: some View {
         VStack(spacing: 12) {
             monthHeader
@@ -43,11 +62,12 @@ public struct CalendarHeatmapView: View {
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.primary)
+                    .foregroundStyle(canGoBackward ? Color.primary : Color.secondary.opacity(0.3))
                     .frame(width: 32, height: 32)
                     .background(Color(.tertiarySystemBackground))
                     .clipShape(Circle())
             }
+            .disabled(!canGoBackward)
             .accessibilityIdentifier("calendar_prev_month_button")
 
             Spacer()
@@ -64,11 +84,12 @@ public struct CalendarHeatmapView: View {
             } label: {
                 Image(systemName: "chevron.right")
                     .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.primary)
+                    .foregroundStyle(canGoForward ? Color.primary : Color.secondary.opacity(0.3))
                     .frame(width: 32, height: 32)
                     .background(Color(.tertiarySystemBackground))
                     .clipShape(Circle())
             }
+            .disabled(!canGoForward)
             .accessibilityIdentifier("calendar_next_month_button")
         }
     }
@@ -182,6 +203,8 @@ public struct CalendarHeatmapView: View {
     }
 
     private func changeMonth(by value: Int) {
+        if value > 0 && !canGoForward { return }
+        if value < 0 && !canGoBackward { return }
         if let newDate = calendar.date(byAdding: .month, value: value, to: currentMonthDate) {
             withAnimation(.easeInOut(duration: 0.2)) {
                 currentMonthDate = newDate
