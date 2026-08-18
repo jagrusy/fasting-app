@@ -36,6 +36,7 @@ public struct ProgressRingView: View {
 
             ZStack {
                 backgroundTrack(radius: radius)
+                ambientSolarGlow(radius: radius)
                 overGoalGlow(radius: radius)
                 progressArc(radius: radius)
                 if isFasting {
@@ -49,10 +50,26 @@ public struct ProgressRingView: View {
     private func backgroundTrack(radius: CGFloat) -> some View {
         Circle()
             .stroke(
-                Color(.systemGray5),
+                Color(.systemGray5).opacity(0.6),
                 style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
             )
             .frame(width: radius * 2, height: radius * 2)
+    }
+
+    @ViewBuilder
+    private func ambientSolarGlow(radius: CGFloat) -> some View {
+        if isFasting {
+            Circle()
+                .trim(from: 0.0, to: CGFloat(clampedProgress))
+                .stroke(
+                    progressGradient,
+                    style: StrokeStyle(lineWidth: ringWidth + 6, lineCap: .round)
+                )
+                .frame(width: radius * 2, height: radius * 2)
+                .rotationEffect(.degrees(-90))
+                .blur(radius: 8)
+                .opacity(0.35)
+        }
     }
 
     @ViewBuilder
@@ -60,11 +77,11 @@ public struct ProgressRingView: View {
         if isFasting && progress > 1.0 {
             Circle()
                 .stroke(
-                    Color.green.opacity(0.35),
-                    style: StrokeStyle(lineWidth: ringWidth + 8, lineCap: .round)
+                    SolsticeColors.emeraldGlow.opacity(0.4),
+                    style: StrokeStyle(lineWidth: ringWidth + 10, lineCap: .round)
                 )
                 .frame(width: radius * 2, height: radius * 2)
-                .blur(radius: 6)
+                .blur(radius: 8)
         }
     }
 
@@ -130,24 +147,12 @@ public struct ProgressRingView: View {
     private var progressGradient: LinearGradient {
         if isFasting {
             if progress >= 1.0 {
-                return LinearGradient(
-                    colors: [Color.green, Color.teal],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+                return SolsticeColors.goalMetGradient
             } else {
-                return LinearGradient(
-                    colors: [Color.orange, Color.red],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+                return SolsticeColors.solarGradient
             }
         } else {
-            return LinearGradient(
-                colors: [Color.gray.opacity(0.4), Color.gray.opacity(0.2)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            return SolsticeColors.idleGradient
         }
     }
 }

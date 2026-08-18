@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct SettingsView: View {
     @ObservedObject var fastManager: FastManager
+    @AppStorage("app_appearance") private var appearanceRaw: String = AppAppearance.system.rawValue
     @State private var notificationsEnabled: Bool = false
     @State private var schedule: NotificationSchedule = .default
     @State private var showEraseConfirmation: Bool = false
@@ -14,6 +15,7 @@ public struct SettingsView: View {
     public var body: some View {
         List {
             protocolSection
+            appearanceSection
             NotificationSettingsSection(
                 isEnabled: $notificationsEnabled,
                 schedule: $schedule,
@@ -66,7 +68,7 @@ public struct SettingsView: View {
 
                             Text("(\(fastManager.currentProtocol.ratioString))")
                                 .font(.subheadline.weight(.bold))
-                                .foregroundStyle(Color.accentColor)
+                                .foregroundStyle(SolsticeColors.solarAmber)
                         }
 
                         Text(fastManager.currentProtocol.description)
@@ -83,6 +85,23 @@ public struct SettingsView: View {
             Text("Fasting Plan")
         } footer: {
             Text("Select your preferred fasting window ratio. Changes apply to future fasts.")
+        }
+    }
+
+    private var appearanceSection: some View {
+        Section {
+            Picker("Appearance", selection: $appearanceRaw) {
+                ForEach(AppAppearance.allCases) { appMode in
+                    Text(appMode.rawValue)
+                        .tag(appMode.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            .accessibilityIdentifier("appearance_picker")
+        } header: {
+            Text("Appearance")
+        } footer: {
+            Text("Choose between light, dark, or matching your iOS system appearance.")
         }
     }
 
