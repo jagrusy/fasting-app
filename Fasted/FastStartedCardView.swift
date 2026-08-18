@@ -22,33 +22,33 @@ public struct FastStartedCardView: View {
         let startDate = fast.startDate ?? now
         let isStartedYesterday = Calendar.current.isDateInYesterday(startDate)
 
-        HStack(spacing: 16) {
+        HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("STARTED")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.secondary)
 
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     dateMenu(isStartedYesterday: isStartedYesterday)
                     timeButton(startDate: startDate)
                 }
             }
 
-            Spacer()
+            Spacer(minLength: 4)
 
             VStack(alignment: .trailing, spacing: 6) {
                 Text("GOAL TARGET")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.secondary)
 
-                goalTargetText(startDate: startDate)
+                goalTargetView(startDate: startDate)
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .padding(.vertical, 14)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
     }
 
     private func dateMenu(isStartedYesterday: Bool) -> some View {
@@ -59,14 +59,16 @@ public struct FastStartedCardView: View {
             HStack(spacing: 4) {
                 Text(isStartedYesterday ? "Yesterday" : "Today")
                     .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
                 Image(systemName: "chevron.down")
                     .font(.system(size: 9, weight: .bold))
             }
             .foregroundStyle(Color.primary)
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 9)
             .padding(.vertical, 6)
             .background(Color(.tertiarySystemBackground))
             .clipShape(Capsule())
+            .fixedSize(horizontal: true, vertical: false)
         }
         .accessibilityIdentifier("start_date_menu")
     }
@@ -76,27 +78,50 @@ public struct FastStartedCardView: View {
             HStack(spacing: 4) {
                 Text(formatTime(startDate))
                     .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
                 Image(systemName: "pencil")
                     .font(.system(size: 10))
             }
             .foregroundStyle(Color.primary)
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 9)
             .padding(.vertical, 6)
             .background(Color(.tertiarySystemBackground))
             .clipShape(Capsule())
+            .fixedSize(horizontal: true, vertical: false)
         }
         .accessibilityIdentifier("start_time_button")
     }
 
-    private func goalTargetText(startDate: Date) -> some View {
+    private func goalTargetView(startDate: Date) -> some View {
         let targetDate = startDate.addingTimeInterval(fast.targetDuration)
-        let isTomorrow = Calendar.current.isDateInTomorrow(targetDate)
-        let dayPrefix = isTomorrow ? "Tom, " : ""
+        let calendar = Calendar.current
 
-        return Text("\(dayPrefix)\(formatTime(targetDate))")
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(Color.primary)
-            .padding(.vertical, 6)
+        let dayLabel: String?
+        if calendar.isDateInTomorrow(targetDate) {
+            dayLabel = "Tomorrow"
+        } else if !calendar.isDate(targetDate, inSameDayAs: startDate) {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "EEE"
+            dayLabel = formatter.string(from: targetDate)
+        } else {
+            dayLabel = nil
+        }
+
+        return VStack(alignment: .trailing, spacing: 2) {
+            if let label = dayLabel {
+                Text(label)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
+            Text(formatTime(targetDate))
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.primary)
+                .lineLimit(1)
+        }
+        .padding(.vertical, dayLabel == nil ? 6 : 0)
+        .fixedSize(horizontal: true, vertical: false)
     }
 
     private func formatTime(_ date: Date) -> String {

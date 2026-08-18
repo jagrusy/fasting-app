@@ -2,15 +2,14 @@ import SwiftUI
 
 public struct CalendarHeatmapView: View {
     public let fasts: [Fast]
-    @Binding public var selectedDate: Date?
-    @State private var currentMonthDate: Date = Date()
+    @Binding public var currentMonthDate: Date
 
     private let calendar = Calendar.current
     private let weekdaySymbols = ["S", "M", "T", "W", "T", "F", "S"]
 
-    public init(fasts: [Fast], selectedDate: Binding<Date?>) {
+    public init(fasts: [Fast], currentMonthDate: Binding<Date>) {
         self.fasts = fasts
-        self._selectedDate = selectedDate
+        self._currentMonthDate = currentMonthDate
     }
 
     private var canGoForward: Bool {
@@ -113,7 +112,7 @@ public struct CalendarHeatmapView: View {
                     dayCell(for: date)
                 } else {
                     Color.clear
-                        .frame(height: 36)
+                        .frame(height: 34)
                 }
             }
         }
@@ -123,41 +122,23 @@ public struct CalendarHeatmapView: View {
         let dayNumber = calendar.component(.day, from: date)
         let status = StreakCalculator.fastStatus(for: date, in: fasts, calendar: calendar)
         let isToday = calendar.isDateInToday(date)
-        let isSelected = selectedDate.map { calendar.isDate($0, inSameDayAs: date) } ?? false
 
-        return Button {
-            if isSelected {
-                selectedDate = nil
-            } else {
-                selectedDate = date
+        return ZStack {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(cellFillColor(status: status))
+
+            Text("\(dayNumber)")
+                .font(.system(size: 13, weight: isToday ? .bold : .medium, design: .rounded))
+                .foregroundStyle(cellTextColor(status: status))
+
+            if isToday {
+                Circle()
+                    .stroke(Color.primary, lineWidth: 1.5)
+                    .padding(2)
             }
-        } label: {
-            ZStack {
-                cellBackground(status: status, isSelected: isSelected)
-
-                Text("\(dayNumber)")
-                    .font(.system(size: 13, weight: isToday || isSelected ? .bold : .medium, design: .rounded))
-                    .foregroundStyle(cellTextColor(status: status, isSelected: isSelected))
-
-                if isToday && !isSelected {
-                    Circle()
-                        .stroke(Color.primary, lineWidth: 1.5)
-                        .padding(2)
-                }
-            }
-            .frame(height: 36)
         }
-        .buttonStyle(.plain)
+        .frame(height: 34)
         .accessibilityIdentifier("calendar_day_\(dayNumber)")
-    }
-
-    private func cellBackground(status: DayFastStatus, isSelected: Bool) -> some View {
-        RoundedRectangle(cornerRadius: 8, style: .continuous)
-            .fill(cellFillColor(status: status))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .stroke(isSelected ? Color.primary : Color.clear, lineWidth: 2)
-            )
     }
 
     private func cellFillColor(status: DayFastStatus) -> Color {
@@ -171,14 +152,14 @@ public struct CalendarHeatmapView: View {
         }
     }
 
-    private func cellTextColor(status: DayFastStatus, isSelected: Bool) -> Color {
+    private func cellTextColor(status: DayFastStatus) -> Color {
         switch status {
         case .goalMet:
             return Color.white
         case .partial:
             return Color.orange
         case .none:
-            return isSelected ? Color.primary : Color.secondary
+            return Color.secondary
         }
     }
 
@@ -224,7 +205,7 @@ public struct CalendarHeatmapView: View {
             return []
         }
 
-        let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth) // 1=Sun
+        let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth)
         let leadingSpaces = firstWeekday - 1
 
         var days: [Date?] = Array(repeating: nil, count: leadingSpaces)
