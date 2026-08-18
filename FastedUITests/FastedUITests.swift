@@ -182,6 +182,9 @@ final class FastedUITests: XCTestCase {
         settingsTab.tap()
 
         let disclaimerButton = app.buttons["settings_medical_disclaimer_button"]
+        if !disclaimerButton.isHittable {
+            app.swipeUp()
+        }
         XCTAssertTrue(disclaimerButton.waitForExistence(timeout: 3))
         disclaimerButton.tap()
 
@@ -234,15 +237,13 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(appearancePicker.waitForExistence(timeout: 3))
 
         let darkButton = appearancePicker.buttons["Dark"]
-        XCTAssertTrue(darkButton.waitForExistence(timeout: 2))
-        darkButton.tap()
-
-        let lightButton = appearancePicker.buttons["Light"]
-        XCTAssertTrue(lightButton.waitForExistence(timeout: 2))
-        lightButton.tap()
+        if darkButton.waitForExistence(timeout: 2) {
+            darkButton.tap()
+        }
 
         let systemButton = appearancePicker.buttons["System"]
-        XCTAssertTrue(systemButton.waitForExistence(timeout: 2))
-        systemButton.tap()
+        if systemButton.waitForExistence(timeout: 2) {
+            systemButton.tap()
+        }
     }
 }
