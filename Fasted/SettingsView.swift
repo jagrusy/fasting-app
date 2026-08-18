@@ -36,7 +36,10 @@ public struct SettingsView: View {
                 Button("Cancel", role: .cancel) {}
             },
             message: {
-                Text("This will permanently delete all completed and active fasts, and reset your streaks. This cannot be undone.")
+                Text(
+                    "This will permanently delete all completed and active fasts, "
+                    + "and reset your streaks. This cannot be undone."
+                )
             }
         )
     }
