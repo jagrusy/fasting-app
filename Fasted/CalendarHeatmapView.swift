@@ -12,23 +12,22 @@ public struct CalendarHeatmapView: View {
         self._currentMonthDate = currentMonthDate
     }
 
+    private func startOfMonth(for date: Date) -> Date {
+        let components = calendar.dateComponents([.year, .month], from: date)
+        return calendar.date(from: components) ?? date
+    }
+
     private var canGoForward: Bool {
-        let currentMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: Date())) ?? Date()
-        let displayedMonth = calendar.date(
-            from: calendar.dateComponents([.year, .month], from: currentMonthDate)
-        ) ?? currentMonthDate
-        return displayedMonth < currentMonth
+        let currentMonthStart = startOfMonth(for: Date())
+        let displayedMonthStart = startOfMonth(for: currentMonthDate)
+        return displayedMonthStart < currentMonthStart
     }
 
     private var canGoBackward: Bool {
-        let minMonth = calendar.date(byAdding: .month, value: -24, to: Date()) ?? Date()
-        let minMonthStart = calendar.date(
-            from: calendar.dateComponents([.year, .month], from: minMonth)
-        ) ?? minMonth
-        let displayedMonth = calendar.date(
-            from: calendar.dateComponents([.year, .month], from: currentMonthDate)
-        ) ?? currentMonthDate
-        return displayedMonth > minMonthStart
+        guard let minMonth = calendar.date(byAdding: .month, value: -24, to: Date()) else { return false }
+        let minMonthStart = startOfMonth(for: minMonth)
+        let displayedMonthStart = startOfMonth(for: currentMonthDate)
+        return displayedMonthStart > minMonthStart
     }
 
     public var body: some View {
@@ -41,16 +40,7 @@ public struct CalendarHeatmapView: View {
         .padding(14)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .gesture(
-            DragGesture(minimumDistance: 30)
-                .onEnded { value in
-                    if value.translation.width < -40 {
-                        changeMonth(by: 1)
-                    } else if value.translation.width > 40 {
-                        changeMonth(by: -1)
-                    }
-                }
-        )
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("calendar_heatmap_view")
     }
 
@@ -66,6 +56,7 @@ public struct CalendarHeatmapView: View {
                     .background(Color(.tertiarySystemBackground))
                     .clipShape(Circle())
             }
+            .buttonStyle(.plain)
             .disabled(!canGoBackward)
             .accessibilityIdentifier("calendar_prev_month_button")
 
@@ -88,6 +79,7 @@ public struct CalendarHeatmapView: View {
                     .background(Color(.tertiarySystemBackground))
                     .clipShape(Circle())
             }
+            .buttonStyle(.plain)
             .disabled(!canGoForward)
             .accessibilityIdentifier("calendar_next_month_button")
         }
@@ -100,20 +92,6 @@ public struct CalendarHeatmapView: View {
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
-            }
-        }
-    }
-
-    private var daysGrid: some View {
-        let days = daysInMonth(for: currentMonthDate)
-        return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 7), spacing: 6) {
-            ForEach(0..<days.count, id: \.self) { index in
-                if let date = days[index] {
-                    dayCell(for: date)
-                } else {
-                    Color.clear
-                        .frame(height: 34)
-                }
             }
         }
     }
@@ -139,6 +117,20 @@ public struct CalendarHeatmapView: View {
         }
         .frame(height: 34)
         .accessibilityIdentifier("calendar_day_\(dayNumber)")
+    }
+
+    private var daysGrid: some View {
+        let days = daysInMonth(for: currentMonthDate)
+        return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 7), spacing: 6) {
+            ForEach(0..<days.count, id: \.self) { index in
+                if let date = days[index] {
+                    dayCell(for: date)
+                } else {
+                    Color.clear
+                        .frame(height: 34)
+                }
+            }
+        }
     }
 
     private func cellFillColor(status: DayFastStatus) -> Color {
@@ -186,7 +178,8 @@ public struct CalendarHeatmapView: View {
     private func changeMonth(by value: Int) {
         if value > 0 && !canGoForward { return }
         if value < 0 && !canGoBackward { return }
-        if let newDate = calendar.date(byAdding: .month, value: value, to: currentMonthDate) {
+        let currentStart = startOfMonth(for: currentMonthDate)
+        if let newDate = calendar.date(byAdding: .month, value: value, to: currentStart) {
             withAnimation(.easeInOut(duration: 0.2)) {
                 currentMonthDate = newDate
             }
