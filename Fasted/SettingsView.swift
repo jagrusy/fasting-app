@@ -5,6 +5,7 @@ public struct SettingsView: View {
     @State private var notificationsEnabled: Bool = false
     @State private var schedule: NotificationSchedule = .default
     @State private var showEraseConfirmation: Bool = false
+    @State private var showDisclaimer: Bool = false
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -20,11 +21,15 @@ public struct SettingsView: View {
                     fastManager.updateNotificationSchedule(enabled: enabled, schedule: newSchedule)
                 }
             )
+            healthAndResourcesSection
             dataManagementSection
             aboutSection
         }
         .navigationTitle("Settings")
         .onAppear(perform: loadSettings)
+        .sheet(isPresented: $showDisclaimer) {
+            MedicalDisclaimerView()
+        }
         .confirmationDialog(
             "Erase All Fasting Data?",
             isPresented: $showEraseConfirmation,
@@ -78,6 +83,60 @@ public struct SettingsView: View {
             Text("Fasting Plan")
         } footer: {
             Text("Select your preferred fasting window ratio. Changes apply to future fasts.")
+        }
+    }
+
+    private var healthAndResourcesSection: some View {
+        Section {
+            Button {
+                showDisclaimer = true
+            } label: {
+                HStack {
+                    Label("Medical Disclaimer & Safety", systemImage: "cross.case.fill")
+                        .foregroundStyle(Color.primary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .accessibilityIdentifier("settings_medical_disclaimer_button")
+
+            let hopkins = "https://www.hopkinsmedicine.org/health/wellness-and-prevention/"
+                + "intermittent-fasting-what-is-it-and-how-does-it-work"
+            if let hopkinsURL = URL(string: hopkins) {
+                Link(destination: hopkinsURL) {
+                    Label("Johns Hopkins: Fasting Guide", systemImage: "arrow.up.right.square")
+                }
+                .accessibilityIdentifier("link_johns_hopkins")
+            }
+
+            let harvard = "https://www.health.harvard.edu/blog/"
+                + "intermittent-fasting-surprising-update-2018062914156"
+            if let harvardURL = URL(string: harvard) {
+                Link(destination: harvardURL) {
+                    Label("Harvard Health: Research Update", systemImage: "arrow.up.right.square")
+                }
+                .accessibilityIdentifier("link_harvard_health")
+            }
+
+            let mayo = "https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/"
+                + "expert-answers/intermittent-fasting/faq-20441303"
+            if let mayoURL = URL(string: mayo) {
+                Link(destination: mayoURL) {
+                    Label("Mayo Clinic: Fasting FAQs", systemImage: "arrow.up.right.square")
+                }
+                .accessibilityIdentifier("link_mayo_clinic")
+            }
+        } header: {
+            Text("Health & Evidence-Based Research")
+        } footer: {
+            Text(
+                "Fasted is for general wellness tracking and does not provide medical advice. "
+                + "Consult a physician before starting any fasting regimen."
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
     }
 

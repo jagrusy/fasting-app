@@ -36,6 +36,7 @@
 		B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */; };
 		B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */; };
 		B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D4D805535A363DDAF977B89 /* FastingArcShape.swift */; };
+		BAC60C4DD062EAB06EA240E2 /* MedicalDisclaimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */; };
 		CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145B081A157492E5B631A378 /* ProtocolCardView.swift */; };
 		DEFA541DB7379B894DDBE400 /* FastStartedCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */; };
 		E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47F0F9EAF3379520543128F /* FastedTests.swift */; };
@@ -74,6 +75,7 @@
 		7BE11165A3D641BFB1B2908C /* DialEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialEditorView.swift; sourceTree = "<group>"; };
 		80ABF2C76FAC79CAD26EEC81 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicalDisclaimerView.swift; sourceTree = "<group>"; };
 		8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialHeaderCardView.swift; sourceTree = "<group>"; };
 		8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedApp.swift; sourceTree = "<group>"; };
 		906DF983BABCA66D6350B45A /* FastingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingProtocol.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 				DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */,
 				9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */,
 				80ABF2C76FAC79CAD26EEC81 /* Info.plist */,
+				852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */,
 				98639EA5CF96432052AC501B /* NotificationManager.swift */,
 				FEFF304C7359306211445686 /* NotificationSchedule.swift */,
 				7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */,
@@ -315,6 +318,7 @@
 				B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */,
 				230E8F5D74F41671E07B1BDE /* FastingProtocol.swift in Sources */,
 				B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */,
+				BAC60C4DD062EAB06EA240E2 /* MedicalDisclaimerView.swift in Sources */,
 				5E28F103B04991B5DC71121C /* NotificationManager.swift in Sources */,
 				2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */,
 				83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */,
