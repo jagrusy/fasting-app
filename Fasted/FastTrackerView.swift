@@ -4,6 +4,7 @@ public struct FastTrackerView: View {
     @ObservedObject var fastManager: FastManager
     @State private var showStopConfirmation: Bool = false
     @State private var showTimePickerSheet: Bool = false
+    @State private var showStagesSheet: Bool = false
     @State private var centerDisplayMode: CenterDisplayMode = .elapsed
     @State private var tempTime: Date = Date()
 
@@ -15,10 +16,18 @@ public struct FastTrackerView: View {
         TimelineView(.animation(minimumInterval: 1.0)) { context in
             let now = context.date
             let progress = calculateProgress(at: now)
-            VStack(spacing: 28) {
+            VStack(spacing: 20) {
                 headerView(progress: progress)
                 progressSection(now: now, progress: progress)
-                    .padding(.vertical, 8)
+
+                if fastManager.isFasting {
+                    let elapsed = fastManager.elapsedTime(at: now)
+                    let currentStage = MetabolicStage.stage(for: elapsed)
+                    MetabolicStageBadgeView(stage: currentStage) {
+                        showStagesSheet = true
+                    }
+                    .padding(.top, -6)
+                }
 
                 if let fast = fastManager.activeFast {
                     FastStartedCardView(
@@ -42,6 +51,13 @@ public struct FastTrackerView: View {
                 actionButton(now: now, progress: progress)
             }
             .padding(.bottom, 20)
+            .sheet(isPresented: $showStagesSheet) {
+                let elapsed = fastManager.elapsedTime(at: Date())
+                MetabolicStagesSheetView(
+                    currentStage: fastManager.isFasting ? MetabolicStage.stage(for: elapsed) : nil,
+                    elapsedSeconds: elapsed
+                )
+            }
         }
     }
 

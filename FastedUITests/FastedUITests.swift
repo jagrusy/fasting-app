@@ -24,7 +24,7 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
         fastTab.tap()
 
-        let navBar = app.navigationBars["Fasted"]
+        let navBar = app.navigationBars["Solstice"]
         XCTAssertTrue(navBar.waitForExistence(timeout: 3))
 
         let startButton = app.buttons["start_fast_button"]
@@ -193,5 +193,32 @@ final class FastedUITests: XCTestCase {
         doneButton.tap()
 
         XCTAssertFalse(disclaimerTitle.exists)
+    }
+
+    func testMetabolicStagesSheetOpensAndDismisses() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let fastTab = app.tabBars.buttons["Fast"]
+        XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
+        fastTab.tap()
+
+        let startButton = app.buttons["start_fast_button"]
+        if startButton.waitForExistence(timeout: 2) {
+            startButton.tap()
+        }
+
+        let stageBadge = app.buttons["metabolic_stage_badge"]
+        XCTAssertTrue(stageBadge.waitForExistence(timeout: 3))
+        stageBadge.tap()
+
+        let stagesTitle = app.navigationBars["Metabolic Fasting Stages"]
+        XCTAssertTrue(stagesTitle.waitForExistence(timeout: 3))
+
+        let doneButton = app.buttons["stages_done_button"]
+        XCTAssertTrue(doneButton.waitForExistence(timeout: 2))
+        doneButton.tap()
+
+        XCTAssertFalse(stagesTitle.exists)
     }
 }

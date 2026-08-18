@@ -23,6 +23,7 @@
 		62B0C00563C611B6973E931E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */; };
 		63DD19E655D1AD38E81DF671 /* FastMetricsCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F3859AA323EFA3BAE7F2B4 /* FastMetricsCenterView.swift */; };
 		65BCCE113DE373261E9D27CF /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97ABFA5E1D53249C053A768E /* PersistenceController.swift */; };
+		67747AFA11317A45528691C1 /* MetabolicStageBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */; };
 		67F7593024E306184CEB9657 /* FastManager+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */; };
 		680301A03BB0BED727DFF532 /* FastedDialMathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */; };
 		70A1E82B96E8466B544F780D /* FastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B49461E82EC597415611F11 /* FastManager.swift */; };
@@ -33,11 +34,13 @@
 		8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */; };
 		94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8810ED7037826FE830C9 /* FastedUITests.swift */; };
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
+		AAD783B848631089CFCFAEA1 /* MetabolicStagesSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */; };
 		B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */; };
 		B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */; };
 		B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D4D805535A363DDAF977B89 /* FastingArcShape.swift */; };
 		BAC60C4DD062EAB06EA240E2 /* MedicalDisclaimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */; };
 		CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145B081A157492E5B631A378 /* ProtocolCardView.swift */; };
+		DCD2C2B878ADA52913A6CDFA /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015C62C37743171065D5B23D /* MetabolicStage.swift */; };
 		DEFA541DB7379B894DDBE400 /* FastStartedCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */; };
 		E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47F0F9EAF3379520543128F /* FastedTests.swift */; };
 		F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1845606048434908EA9499 /* ContentView.swift */; };
@@ -62,8 +65,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		015C62C37743171065D5B23D /* MetabolicStage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStage.swift; sourceTree = "<group>"; };
 		0B49461E82EC597415611F11 /* FastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManager.swift; sourceTree = "<group>"; };
 		145B081A157492E5B631A378 /* ProtocolCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolCardView.swift; sourceTree = "<group>"; };
+		15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStageBadgeView.swift; sourceTree = "<group>"; };
 		21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedDialMathTests.swift; sourceTree = "<group>"; };
 		2D4D805535A363DDAF977B89 /* FastingArcShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingArcShape.swift; sourceTree = "<group>"; };
 		2EA35504122572AB7F1EB512 /* StreakCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalculator.swift; sourceTree = "<group>"; };
@@ -101,6 +106,7 @@
 		F47F0F9EAF3379520543128F /* FastedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedTests.swift; sourceTree = "<group>"; };
 		FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyHistoryView.swift; sourceTree = "<group>"; };
 		FEFF304C7359306211445686 /* NotificationSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSchedule.swift; sourceTree = "<group>"; };
+		FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStagesSheetView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -158,6 +164,9 @@
 				9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */,
 				80ABF2C76FAC79CAD26EEC81 /* Info.plist */,
 				852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */,
+				015C62C37743171065D5B23D /* MetabolicStage.swift */,
+				15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */,
+				FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */,
 				98639EA5CF96432052AC501B /* NotificationManager.swift */,
 				FEFF304C7359306211445686 /* NotificationSchedule.swift */,
 				7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */,
@@ -319,6 +328,9 @@
 				230E8F5D74F41671E07B1BDE /* FastingProtocol.swift in Sources */,
 				B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */,
 				BAC60C4DD062EAB06EA240E2 /* MedicalDisclaimerView.swift in Sources */,
+				DCD2C2B878ADA52913A6CDFA /* MetabolicStage.swift in Sources */,
+				67747AFA11317A45528691C1 /* MetabolicStageBadgeView.swift in Sources */,
+				AAD783B848631089CFCFAEA1 /* MetabolicStagesSheetView.swift in Sources */,
 				5E28F103B04991B5DC71121C /* NotificationManager.swift in Sources */,
 				2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */,
 				83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */,

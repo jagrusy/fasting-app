@@ -132,7 +132,7 @@ public struct SettingsView: View {
             Text("Health & Evidence-Based Research")
         } footer: {
             Text(
-                "Fasted is for general wellness tracking and does not provide medical advice. "
+                "Solstice is for general wellness tracking and does not provide medical advice. "
                 + "Consult a physician before starting any fasting regimen."
             )
             .font(.caption)
@@ -172,9 +172,9 @@ public struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
         } header: {
-            Text("About Fasted")
+            Text("About Solstice")
         } footer: {
-            Text("Fasted is a private, lightweight fasting utility. No account or subscriptions required.")
+            Text("Solstice is a private, lightweight fasting utility. No account or subscriptions required.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

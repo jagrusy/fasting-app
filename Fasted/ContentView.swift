@@ -55,7 +55,7 @@ struct FastTabView: View {
     var body: some View {
         NavigationStack {
             FastTrackerView(fastManager: fastManager)
-                .navigationTitle("Fasted")
+                .navigationTitle("Solstice")
                 .navigationBarTitleDisplayMode(.inline)
         }
     }
