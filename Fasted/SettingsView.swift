@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct SettingsView: View {
     @ObservedObject var fastManager: FastManager
-    @AppStorage("app_appearance") private var appearanceRaw: String = AppAppearance.system.rawValue
+    @AppStorage("app_appearance") private var appearanceRaw: String = AppAppearance.dark.rawValue
     @State private var notificationsEnabled: Bool = false
     @State private var schedule: NotificationSchedule = .default
     @State private var showEraseConfirmation: Bool = false
