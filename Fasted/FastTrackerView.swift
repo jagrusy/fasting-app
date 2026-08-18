@@ -17,7 +17,10 @@ public struct FastTrackerView: View {
             trackerContent(now: context.date)
         }
         .sheet(isPresented: $showStagesSheet) {
-            let elapsed = fastManager.elapsedTime(at: Date())
+            let now = Date()
+            let elapsed: TimeInterval = fastManager.activeFast.map {
+                now.timeIntervalSince($0.startDate ?? now)
+            } ?? 0
             MetabolicStagesSheetView(
                 currentStage: fastManager.isFasting ? MetabolicStage.stage(for: elapsed) : nil,
                 elapsedSeconds: elapsed
@@ -32,7 +35,9 @@ public struct FastTrackerView: View {
             progressSection(now: now, progress: progress)
 
             if fastManager.isFasting {
-                let elapsed = fastManager.elapsedTime(at: now)
+                let elapsed: TimeInterval = fastManager.activeFast.map {
+                    now.timeIntervalSince($0.startDate ?? now)
+                } ?? 0
                 let currentStage = MetabolicStage.stage(for: elapsed)
                 MetabolicStageBadgeView(stage: currentStage) {
                     showStagesSheet = true
