@@ -30,6 +30,7 @@
 		70A1E82B96E8466B544F780D /* FastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B49461E82EC597415611F11 /* FastManager.swift */; };
 		73B5FF9FD0E9363FCC6A241D /* FastTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */; };
 		78B975439882F6B9107E507D /* ProgressRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */; };
+		830AB177EA6601337FCA6524 /* AppStoreScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */; };
 		83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */; };
 		86F8832A8B8687F6245D630B /* DialEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE11165A3D641BFB1B2908C /* DialEditorView.swift */; };
 		8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */; };
@@ -105,6 +106,7 @@
 		C8A408558CA277F27154BD5D /* FastRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastRowView.swift; sourceTree = "<group>"; };
 		DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTrackerView.swift; sourceTree = "<group>"; };
 		E1F3859AA323EFA3BAE7F2B4 /* FastMetricsCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastMetricsCenterView.swift; sourceTree = "<group>"; };
+		E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreScreenshotTests.swift; sourceTree = "<group>"; };
 		E95F8810ED7037826FE830C9 /* FastedUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedUITests.swift; sourceTree = "<group>"; };
 		EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastStartedCardView.swift; sourceTree = "<group>"; };
 		EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStageTests.swift; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 		D69B656B0B03041654851581 /* FastedUITests */ = {
 			isa = PBXGroup;
 			children = (
+				E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */,
 				E95F8810ED7037826FE830C9 /* FastedUITests.swift */,
 			);
 			path = FastedUITests;
@@ -360,6 +363,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				830AB177EA6601337FCA6524 /* AppStoreScreenshotTests.swift in Sources */,
 				94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
