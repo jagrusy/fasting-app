@@ -24,6 +24,7 @@ public enum FeedbackType {
     }
 }
 
+@MainActor
 public enum FeedbackHelper {
     public static let supportEmail = "feedback@solsticefasting.app"
 
