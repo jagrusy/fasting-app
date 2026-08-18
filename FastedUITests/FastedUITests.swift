@@ -89,18 +89,14 @@ final class FastedUITests: XCTestCase {
         let ringButton = app.buttons["progress_ring_button"]
         XCTAssertTrue(ringButton.waitForExistence(timeout: 3))
 
-        // Initial mode: ELAPSED
         XCTAssertTrue(app.staticTexts["ELAPSED"].exists)
 
-        // Tap once -> switches to REMAINING
         ringButton.tap()
         XCTAssertTrue(app.staticTexts["REMAINING"].waitForExistence(timeout: 2))
 
-        // Tap again -> switches to COMPLETED percentage
         ringButton.tap()
         XCTAssertTrue(app.staticTexts["COMPLETED"].waitForExistence(timeout: 2))
 
-        // Tap again -> cycles back to ELAPSED
         ringButton.tap()
         XCTAssertTrue(app.staticTexts["ELAPSED"].waitForExistence(timeout: 2))
     }
@@ -175,5 +171,27 @@ final class FastedUITests: XCTestCase {
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
         XCTAssertTrue(app.staticTexts["Warrior"].waitForExistence(timeout: 3))
+    }
+
+    func testSettingsTabMedicalDisclaimerModal() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let settingsTab = app.tabBars.buttons["Settings"]
+        XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
+        settingsTab.tap()
+
+        let disclaimerButton = app.buttons["settings_medical_disclaimer_button"]
+        XCTAssertTrue(disclaimerButton.waitForExistence(timeout: 3))
+        disclaimerButton.tap()
+
+        let disclaimerTitle = app.navigationBars["Medical Disclaimer"]
+        XCTAssertTrue(disclaimerTitle.waitForExistence(timeout: 3))
+
+        let doneButton = app.buttons["disclaimer_done_button"]
+        XCTAssertTrue(doneButton.waitForExistence(timeout: 2))
+        doneButton.tap()
+
+        XCTAssertFalse(disclaimerTitle.exists)
     }
 }
