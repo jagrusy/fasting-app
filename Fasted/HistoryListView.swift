@@ -51,13 +51,7 @@ public struct HistoryListView: View {
     }
 
     public var body: some View {
-        Group {
-            if completedFasts.isEmpty {
-                EmptyHistoryView()
-            } else {
-                historyContentList
-            }
-        }
+        historyContentList
     }
 
     private var historyContentList: some View {
@@ -75,24 +69,73 @@ public struct HistoryListView: View {
                 filterHeaderSection
             }
 
-            ForEach(groupedFasts, id: \.0) { month, fasts in
-                Section(header: Text(selectedDate != nil ? "Fasts for Selected Day" : month)
-                    .font(.subheadline.weight(.semibold))) {
-                    ForEach(fasts) { fast in
-                        NavigationLink {
-                            FastDetailView(fastManager: fastManager, fast: fast)
-                        } label: {
-                            FastRowView(fast: fast)
-                        }
-                    }
-                    .onDelete { indexSet in
-                        deleteFasts(at: indexSet, from: fasts)
-                    }
-                }
+            if completedFasts.isEmpty {
+                emptyHistorySection
+            } else if filteredFasts.isEmpty && selectedDate != nil {
+                emptyFilterSection
+            } else {
+                fastGroupsSection
             }
         }
         .listStyle(.insetGrouped)
         .accessibilityIdentifier("history_fast_list")
+    }
+
+    private var emptyHistorySection: some View {
+        Section {
+            VStack(spacing: 8) {
+                Image(systemName: "timer")
+                    .font(.system(size: 32))
+                    .foregroundStyle(.secondary)
+                Text("No Completed Fasts Yet")
+                    .font(.headline.weight(.semibold))
+                Text("Start and complete a fast to build your streak and fill your calendar heatmap.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+        }
+    }
+
+    private var emptyFilterSection: some View {
+        Section {
+            VStack(spacing: 6) {
+                Text("No fasts recorded on this date.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+        }
+    }
+
+    private var fastGroupsSection: some View {
+        ForEach(groupedFasts, id: \.0) { month, fasts in
+            Section(header: Text(selectedDate != nil ? "Fasts for Selected Day" : month)
+                .font(.subheadline.weight(.semibold))) {
+                ForEach(fasts) { fast in
+                    NavigationLink {
+                        FastDetailView(fastManager: fastManager, fast: fast)
+                    } label: {
+                        FastRowView(fast: fast)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            withAnimation {
+                                fastManager.deleteFast(fast)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                }
+                .onDelete { indexSet in
+                    deleteFasts(at: indexSet, from: fasts)
+                }
+            }
+        }
     }
 
     @ViewBuilder

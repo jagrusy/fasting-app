@@ -4,6 +4,7 @@ public struct SettingsView: View {
     @ObservedObject var fastManager: FastManager
     @State private var notificationsEnabled: Bool = false
     @State private var schedule: NotificationSchedule = .default
+    @State private var showEraseConfirmation: Bool = false
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -19,10 +20,25 @@ public struct SettingsView: View {
                     fastManager.updateNotificationSchedule(enabled: enabled, schedule: newSchedule)
                 }
             )
+            dataManagementSection
             aboutSection
         }
         .navigationTitle("Settings")
         .onAppear(perform: loadSettings)
+        .confirmationDialog(
+            "Erase All Fasting Data?",
+            isPresented: $showEraseConfirmation,
+            titleVisibility: .visible,
+            actions: {
+                Button("Erase All Data", role: .destructive) {
+                    fastManager.clearAllFastingData()
+                }
+                Button("Cancel", role: .cancel) {}
+            },
+            message: {
+                Text("This will permanently delete all completed and active fasts, and reset your streaks. This cannot be undone.")
+            }
+        )
     }
 
     private var protocolSection: some View {
@@ -59,6 +75,22 @@ public struct SettingsView: View {
             Text("Fasting Plan")
         } footer: {
             Text("Select your preferred fasting window ratio. Changes apply to future fasts.")
+        }
+    }
+
+    private var dataManagementSection: some View {
+        Section {
+            Button(role: .destructive) {
+                showEraseConfirmation = true
+            } label: {
+                Label("Erase All Fasting Data", systemImage: "trash")
+                    .foregroundStyle(.red)
+            }
+            .accessibilityIdentifier("erase_all_data_button")
+        } header: {
+            Text("Data Management")
+        } footer: {
+            Text("Permanently delete all historical fast records and reset your fasting streaks.")
         }
     }
 

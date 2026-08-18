@@ -147,7 +147,7 @@ final class FastedUITests: XCTestCase {
         let navBar = app.navigationBars["History"]
         XCTAssertTrue(navBar.waitForExistence(timeout: 3))
 
-        let emptyTitle = app.staticTexts["No Fasts Yet"]
+        let emptyTitle = app.staticTexts["No Completed Fasts Yet"]
         let currentStreakLabel = app.staticTexts["current_streak_label"]
 
         XCTAssertTrue(emptyTitle.waitForExistence(timeout: 3) || currentStreakLabel.waitForExistence(timeout: 3))
