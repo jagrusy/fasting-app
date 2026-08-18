@@ -263,4 +263,25 @@ final class FastedUITests: XCTestCase {
             systemButton.tap()
         }
     }
+
+    func testSettingsTabFeedbackButtonsExist() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let settingsTab = app.tabBars.buttons["Settings"]
+        XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
+        settingsTab.tap()
+
+        let featureButton = app.buttons["settings_suggest_feature_button"]
+        let reportButton = app.buttons["settings_report_issue_button"]
+        let rateButton = app.buttons["settings_rate_app_button"]
+
+        if !featureButton.isHittable {
+            app.swipeUp()
+        }
+
+        XCTAssertTrue(featureButton.waitForExistence(timeout: 3))
+        XCTAssertTrue(reportButton.waitForExistence(timeout: 3))
+        XCTAssertTrue(rateButton.waitForExistence(timeout: 3))
+    }
 }

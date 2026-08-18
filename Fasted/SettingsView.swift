@@ -23,6 +23,7 @@ public struct SettingsView: View {
                     fastManager.updateNotificationSchedule(enabled: enabled, schedule: newSchedule)
                 }
             )
+            feedbackSection
             healthAndResourcesSection
             dataManagementSection
             aboutSection
@@ -102,6 +103,38 @@ public struct SettingsView: View {
             Text("Appearance")
         } footer: {
             Text("Choose between light, dark, or matching your iOS system appearance.")
+        }
+    }
+
+    private var feedbackSection: some View {
+        Section {
+            Button {
+                FeedbackHelper.sendFeedback(type: .featureRequest, fastManager: fastManager)
+            } label: {
+                Label("Suggest a Feature", systemImage: "lightbulb.fill")
+                    .foregroundStyle(Color.primary)
+            }
+            .accessibilityIdentifier("settings_suggest_feature_button")
+
+            Button {
+                FeedbackHelper.sendFeedback(type: .bugReport, fastManager: fastManager)
+            } label: {
+                Label("Report an Issue", systemImage: "ant.fill")
+                    .foregroundStyle(Color.primary)
+            }
+            .accessibilityIdentifier("settings_report_issue_button")
+
+            Button {
+                FeedbackHelper.requestAppStoreReview()
+            } label: {
+                Label("Rate Solstice", systemImage: "star.fill")
+                    .foregroundStyle(Color.primary)
+            }
+            .accessibilityIdentifier("settings_rate_app_button")
+        } header: {
+            Text("Feedback & Support")
+        } footer: {
+            Text("Have an idea to improve Solstice or found a bug? We'd love to hear from you.")
         }
     }
 

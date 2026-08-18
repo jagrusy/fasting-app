@@ -15,6 +15,7 @@
 		2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFF304C7359306211445686 /* NotificationSchedule.swift */; };
 		230E8F5D74F41671E07B1BDE /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906DF983BABCA66D6350B45A /* FastingProtocol.swift */; };
 		3D385853457F9BE5FE7B2073 /* DialHeaderCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */; };
+		415B59ABB94BB486947A64A6 /* FeedbackHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */; };
 		42B7EDBE72C5CBDF62F4E7EF /* FastRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A408558CA277F27154BD5D /* FastRowView.swift */; };
 		48744890067ECB53BA38115A /* ProtocolPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978196104603395EF5659F9F /* ProtocolPickerView.swift */; };
 		48FB0D427459DB6A18EF8ADB /* DialFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */; };
@@ -38,6 +39,7 @@
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
 		9F63DEE6FD9FF3C8741E6000 /* MetabolicStageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */; };
 		A6EA958C9BC9DA1C8A102AD5 /* FastManager+Mocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */; };
+		A9705B0AB96ABFFC991D8437 /* FeedbackHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */; };
 		AAD783B848631089CFCFAEA1 /* MetabolicStagesSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */; };
 		B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */; };
 		B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */; };
@@ -79,6 +81,7 @@
 		2D4D805535A363DDAF977B89 /* FastingArcShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingArcShape.swift; sourceTree = "<group>"; };
 		2EA35504122572AB7F1EB512 /* StreakCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalculator.swift; sourceTree = "<group>"; };
 		37F15CA34B550C7DFC463680 /* FastedTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackHelper.swift; sourceTree = "<group>"; };
 		3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterDisplayMode.swift; sourceTree = "<group>"; };
 		49AFD758FFD1AFB86BE41633 /* Fasted.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Fasted.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRingView.swift; sourceTree = "<group>"; };
@@ -99,6 +102,7 @@
 		9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListView.swift; sourceTree = "<group>"; };
 		A71CDC6BEC973FA849ACE8BB /* DialMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialMath.swift; sourceTree = "<group>"; };
 		A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackHelperTests.swift; sourceTree = "<group>"; };
 		B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialFaceView.swift; sourceTree = "<group>"; };
 		B7160CB9DE9689FEF2EFEC10 /* FastedUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C410780F466CF5987E506477 /* CalendarHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeatmapView.swift; sourceTree = "<group>"; };
@@ -173,6 +177,7 @@
 				C8A408558CA277F27154BD5D /* FastRowView.swift */,
 				EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */,
 				DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */,
+				3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */,
 				9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */,
 				80ABF2C76FAC79CAD26EEC81 /* Info.plist */,
 				852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */,
@@ -199,6 +204,7 @@
 			children = (
 				21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */,
 				F47F0F9EAF3379520543128F /* FastedTests.swift */,
+				B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */,
 				EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */,
 				23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */,
 			);
@@ -315,6 +321,7 @@
 			files = (
 				680301A03BB0BED727DFF532 /* FastedDialMathTests.swift in Sources */,
 				E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */,
+				415B59ABB94BB486947A64A6 /* FeedbackHelperTests.swift in Sources */,
 				9F63DEE6FD9FF3C8741E6000 /* MetabolicStageTests.swift in Sources */,
 				FCDDC5D7524F3419E7D9A55E /* SolsticeThemeTests.swift in Sources */,
 			);
@@ -344,6 +351,7 @@
 				8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */,
 				B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */,
 				230E8F5D74F41671E07B1BDE /* FastingProtocol.swift in Sources */,
+				A9705B0AB96ABFFC991D8437 /* FeedbackHelper.swift in Sources */,
 				B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */,
 				BAC60C4DD062EAB06EA240E2 /* MedicalDisclaimerView.swift in Sources */,
 				DCD2C2B878ADA52913A6CDFA /* MetabolicStage.swift in Sources */,
