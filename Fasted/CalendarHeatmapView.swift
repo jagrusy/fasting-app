@@ -40,6 +40,7 @@ public struct CalendarHeatmapView: View {
         .padding(14)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("calendar_heatmap_view")
     }
 
