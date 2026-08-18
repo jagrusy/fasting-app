@@ -102,21 +102,27 @@ public struct SettingsView: View {
             }
             .accessibilityIdentifier("settings_medical_disclaimer_button")
 
-            if let hopkinsURL = URL(string: "https://www.hopkinsmedicine.org/health/wellness-and-prevention/intermittent-fasting-what-is-it-and-how-does-it-work") {
+            let hopkins = "https://www.hopkinsmedicine.org/health/wellness-and-prevention/"
+                + "intermittent-fasting-what-is-it-and-how-does-it-work"
+            if let hopkinsURL = URL(string: hopkins) {
                 Link(destination: hopkinsURL) {
                     Label("Johns Hopkins: Fasting Guide", systemImage: "arrow.up.right.square")
                 }
                 .accessibilityIdentifier("link_johns_hopkins")
             }
 
-            if let harvardURL = URL(string: "https://www.health.harvard.edu/blog/intermittent-fasting-surprising-update-2018062914156") {
+            let harvard = "https://www.health.harvard.edu/blog/"
+                + "intermittent-fasting-surprising-update-2018062914156"
+            if let harvardURL = URL(string: harvard) {
                 Link(destination: harvardURL) {
                     Label("Harvard Health: Research Update", systemImage: "arrow.up.right.square")
                 }
                 .accessibilityIdentifier("link_harvard_health")
             }
 
-            if let mayoURL = URL(string: "https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/expert-answers/intermittent-fasting/faq-20441303") {
+            let mayo = "https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/"
+                + "expert-answers/intermittent-fasting/faq-20441303"
+            if let mayoURL = URL(string: mayo) {
                 Link(destination: mayoURL) {
                     Label("Mayo Clinic: Fasting FAQs", systemImage: "arrow.up.right.square")
                 }
