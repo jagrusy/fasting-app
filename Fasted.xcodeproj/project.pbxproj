@@ -14,6 +14,7 @@
 		1A1CEC7520DE250DBA021796 /* FastDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44F4C21FE2197D21744A872 /* FastDetailView.swift */; };
 		2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFF304C7359306211445686 /* NotificationSchedule.swift */; };
 		230E8F5D74F41671E07B1BDE /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906DF983BABCA66D6350B45A /* FastingProtocol.swift */; };
+		2E7345733FC4B4875CFAC161 /* ReviewPromptManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B3B10BBD804653FFAD01A9 /* ReviewPromptManager.swift */; };
 		3D385853457F9BE5FE7B2073 /* DialHeaderCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */; };
 		415B59ABB94BB486947A64A6 /* FeedbackHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */; };
 		42B7EDBE72C5CBDF62F4E7EF /* FastRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A408558CA277F27154BD5D /* FastRowView.swift */; };
@@ -38,6 +39,7 @@
 		94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8810ED7037826FE830C9 /* FastedUITests.swift */; };
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
 		9F63DEE6FD9FF3C8741E6000 /* MetabolicStageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */; };
+		A0B3A591793493FB73C04BD5 /* ReviewPromptManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */; };
 		A6EA958C9BC9DA1C8A102AD5 /* FastManager+Mocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */; };
 		A9705B0AB96ABFFC991D8437 /* FeedbackHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */; };
 		AAD783B848631089CFCFAEA1 /* MetabolicStagesSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */; };
@@ -86,6 +88,7 @@
 		49AFD758FFD1AFB86BE41633 /* Fasted.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Fasted.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRingView.swift; sourceTree = "<group>"; };
 		7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsSection.swift; sourceTree = "<group>"; };
+		780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptManagerTests.swift; sourceTree = "<group>"; };
 		7BE11165A3D641BFB1B2908C /* DialEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialEditorView.swift; sourceTree = "<group>"; };
 		7E30FCE9FA6750C6C0ABBF8C /* SolsticeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolsticeTheme.swift; sourceTree = "<group>"; };
 		80ABF2C76FAC79CAD26EEC81 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -109,6 +112,7 @@
 		C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSummaryCardsView.swift; sourceTree = "<group>"; };
 		C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Validation.swift"; sourceTree = "<group>"; };
 		C8A408558CA277F27154BD5D /* FastRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastRowView.swift; sourceTree = "<group>"; };
+		D1B3B10BBD804653FFAD01A9 /* ReviewPromptManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptManager.swift; sourceTree = "<group>"; };
 		DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTrackerView.swift; sourceTree = "<group>"; };
 		E1F3859AA323EFA3BAE7F2B4 /* FastMetricsCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastMetricsCenterView.swift; sourceTree = "<group>"; };
 		E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreScreenshotTests.swift; sourceTree = "<group>"; };
@@ -191,6 +195,7 @@
 				6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */,
 				145B081A157492E5B631A378 /* ProtocolCardView.swift */,
 				978196104603395EF5659F9F /* ProtocolPickerView.swift */,
+				D1B3B10BBD804653FFAD01A9 /* ReviewPromptManager.swift */,
 				8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */,
 				7E30FCE9FA6750C6C0ABBF8C /* SolsticeTheme.swift */,
 				2EA35504122572AB7F1EB512 /* StreakCalculator.swift */,
@@ -206,6 +211,7 @@
 				F47F0F9EAF3379520543128F /* FastedTests.swift */,
 				B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */,
 				EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */,
+				780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */,
 				23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */,
 			);
 			path = FastedTests;
@@ -323,6 +329,7 @@
 				E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */,
 				415B59ABB94BB486947A64A6 /* FeedbackHelperTests.swift in Sources */,
 				9F63DEE6FD9FF3C8741E6000 /* MetabolicStageTests.swift in Sources */,
+				A0B3A591793493FB73C04BD5 /* ReviewPromptManagerTests.swift in Sources */,
 				FCDDC5D7524F3419E7D9A55E /* SolsticeThemeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -364,6 +371,7 @@
 				78B975439882F6B9107E507D /* ProgressRingView.swift in Sources */,
 				CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */,
 				48744890067ECB53BA38115A /* ProtocolPickerView.swift in Sources */,
+				2E7345733FC4B4875CFAC161 /* ReviewPromptManager.swift in Sources */,
 				0DA5795F7E3BF7899CCB21F3 /* SettingsView.swift in Sources */,
 				501D23BDD8E4408B4F1FA38A /* SolsticeTheme.swift in Sources */,
 				F501504029E2FF98114B915E /* StreakCalculator.swift in Sources */,
