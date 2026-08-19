@@ -25,11 +25,24 @@ platform :ios do
       is_key_content_base64: true
     )
 
+    team_id = ENV["APPLE_TEAM_ID"]
+
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      path: "Fasted.xcodeproj",
+      team_id: team_id
+    )
+
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
-      export_method: "app-store"
+      export_method: "app-store",
+      export_options: {
+        signingStyle: "automatic",
+        teamID: team_id
+      },
+      xcargs: "DEVELOPMENT_TEAM=#{team_id}"
     )
 
     upload_to_testflight(
@@ -45,6 +58,26 @@ platform :ios do
       issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
       key_content: ENV["APP_STORE_CONNECT_KEY_CONTENT"],
       is_key_content_base64: true
+    )
+
+    team_id = ENV["APPLE_TEAM_ID"]
+
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      path: "Fasted.xcodeproj",
+      team_id: team_id
+    )
+
+    build_app(
+      project: "Fasted.xcodeproj",
+      scheme: "Fasted",
+      clean: true,
+      export_method: "app-store",
+      export_options: {
+        signingStyle: "automatic",
+        teamID: team_id
+      },
+      xcargs: "DEVELOPMENT_TEAM=#{team_id}"
     )
 
     deliver(
