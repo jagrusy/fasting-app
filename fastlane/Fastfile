@@ -77,7 +77,7 @@ platform :ios do
     deliver(
       api_key: api_key,
       force: true,
-      screenshots_path: "./AppStoreScreenshots",
+      screenshots_path: "./fastlane/screenshots",
       metadata_path: "./fastlane/metadata",
       skip_metadata: false,
       skip_screenshots: false,
