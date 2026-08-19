@@ -36,6 +36,7 @@ Package.resolved
 ehthumbs.db
 Thumbs.db
 
-# Git Worktrees
-.worktrees/
+# Bundler & Fastlane
+vendor/
+.bundle/
 
