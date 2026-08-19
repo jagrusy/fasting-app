@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solstice — Intermittent Fasting Tracker & Circadian Rhythm</title>
+  <meta name="description" content="A private, battery-efficient intermittent fasting tracker with 5 metabolic stages, custom protocols, and zero subscriptions.">
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <style>
+    :root {
+      --bg: #0B0F19;
+      --card-bg: #131B2E;
+      --card-border: #1E293B;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --solar-gold: #F59E0B;
+      --solar-amber: #D97706;
+      --solar-flame: #EF4444;
+      --emerald: #10B981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.5px;
+    }
+
+    .brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .hero {
+      max-width: 1100px;
+      margin: 40px auto 80px;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--solar-gold);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #FFFFFF 40%, #FBBF24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 36px;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--solar-gold), var(--solar-amber));
+      color: #0B0F19;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 16px 32px;
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.5);
+    }
+
+    .screenshots-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      scrollbar-width: none;
+    }
+
+    .screenshots-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .screenshot-card {
+      flex: 0 0 260px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--card-border);
+      transition: transform 0.3s;
+    }
+
+    .screenshot-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .screenshot-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .section {
+      max-width: 1100px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin-bottom: 48px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 30px;
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .stages-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .stage-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .stage-badge {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+    }
+
+    .support-box {
+      background: linear-gradient(180deg, var(--card-bg), #0E1626);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 48px 30px;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .btn-support {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      margin: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-support:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--solar-gold);
+      text-decoration: none;
+      margin: 0 10px;
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 2.3rem; }
+      .hero p { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#" class="brand">
+      <img src="assets/icon.png" alt="Solstice Icon">
+      <span>Solstice</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#stages">Stages</a>
+      <a href="support.html">Support</a>
+      <a href="privacy.html">Privacy</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="badge">☀️ 100% Free & Private</div>
+    <h1>Circadian Fasting &<br>Metabolic Rhythm</h1>
+    <p>Track your intermittent fasts with elegance, biological precision, and zero clutter. Understand what happens in your body at every hour.</p>
+    <a href="https://apps.apple.com" class="btn-download">
+      <span>📲 Download on the App Store</span>
+    </a>
+  </header>
+
+  <section class="screenshots-row">
+    <div class="screenshot-card">
+      <img src="assets/screenshots/01_FastTimer_80Percent_Hero.png" alt="Solstice Fasting Timer">
+    </div>
+    <div class="screenshot-card">
+      <img src="assets/screenshots/02_FastTimer_GoalReached_Glow.png" alt="Goal Reached Glow">
+    </div>
+    <div class="screenshot-card">
+      <img src="assets/screenshots/03_MetabolicStages_Autophagy.png" alt="Metabolic Fasting Stages">
+    </div>
+    <div class="screenshot-card">
+      <img src="assets/screenshots/04_History_Calendar_Heatmap.png" alt="Calendar Streak Heatmap">
+    </div>
+    <div class="screenshot-card">
+      <img src="assets/screenshots/05_ProtocolPicker_CustomDial.png" alt="24 Hour Protocol Dial">
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <h2 class="section-title">Built for Mindfulness & Discipline</h2>
+    <p class="section-subtitle">Everything you need to master your fasting window, and nothing you don't.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">☀️</div>
+        <h3>5 Metabolic Stages</h3>
+        <p>Real-time biological timeline tracking when your body reaches Blood Sugar Reset, Glycogen Depletion, Fat Burning, Autophagy, and Deep Ketosis.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h3>100% On-Device & Private</h3>
+        <p>No accounts, no sign-in, and zero analytics tracking. Your health and fasting records stay strictly on your device.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">⏱️</div>
+        <h3>Adaptive Dial Wheel</h3>
+        <p>Choose standard presets (16:8, 18:6, 20:4, OMAD) or adjust your target with an interactive 24-hour dial.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>Streak & Calendar Heatmap</h3>
+        <p>Glanceable monthly heatmap to celebrate consecutive daily milestones and build permanent wellness habits.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🌙</div>
+        <h3>OLED Dark Theme</h3>
+        <p>Engineered with deep midnight tones and radiant solar gradients that feel effortless to check morning and night.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🚫</div>
+        <h3>No Paywalls or Subscriptions</h3>
+        <p>Enjoy a clean, undisturbed fasting experience without popup advertisements or locked feature walls.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="stages" class="section">
+    <h2 class="section-title">The Science of Your Fast</h2>
+    <p class="section-subtitle">Solstice calculates your body's biological transitions in real time.</p>
+
+    <div class="stages-list">
+      <div class="stage-item">
+        <span class="stage-badge" style="color: #38BDF8;">0 – 4 Hours</span>
+        <div>
+          <h4>🩸 Blood Sugar Reset</h4>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Insulin levels fall, digestion completes, and blood glucose stabilizes.</p>
+        </div>
+      </div>
+
+      <div class="stage-item">
+        <span class="stage-badge" style="color: #FBBF24;">4 – 12 Hours</span>
+        <div>
+          <h4>⚡️ Glycogen Depletion</h4>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Liver stores are consumed as energy sources shift toward fat stores.</p>
+        </div>
+      </div>
+
+      <div class="stage-item">
+        <span class="stage-badge" style="color: #F97316;">12 – 18 Hours</span>
+        <div>
+          <h4>🔥 Fat Burning & Ketosis</h4>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Fatty acids are broken down into ketones for clean mental and physical fuel.</p>
+        </div>
+      </div>
+
+      <div class="stage-item">
+        <span class="stage-badge" style="color: #10B981;">18 – 24 Hours</span>
+        <div>
+          <h4>🧬 Autophagy & Renewal</h4>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Cellular cleanup initiates, recycling damaged proteins and organelles.</p>
+        </div>
+      </div>
+
+      <div class="stage-item">
+        <span class="stage-badge" style="color: #A855F7;">24+ Hours</span>
+        <div>
+          <h4>🧠 Deep Ketosis & HGH</h4>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Growth hormone surges and systemic inflammation markers drop.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="support" class="section">
+    <div class="support-box">
+      <h2 style="margin-bottom: 12px;">Need Help or Have an Idea?</h2>
+      <p style="color: var(--text-muted); margin-bottom: 24px;">We build Solstice for the community. Let us know how we can make your fasting journey even better.</p>
+      <div>
+        <a href="mailto:jagrusy+solstice@gmail.com?subject=[Solstice%20Feature%20Request]" class="btn-support">💡 Suggest a Feature</a>
+        <a href="mailto:jagrusy+solstice@gmail.com?subject=[Solstice%20Bug%20Report]" class="btn-support">🐛 Report a Bug</a>
+        <a href="support.html" class="btn-support">📖 FAQ & Help Center</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Solstice Fasting. All rights reserved.</p>
+    <div style="margin-top: 10px;">
+      <a href="privacy.html">Privacy Policy</a> •
+      <a href="support.html">Support</a> •
+      <a href="mailto:jagrusy+solstice@gmail.com">Contact Developer</a>
+    </div>
+  </footer>
+
+</body>
+</html>
