@@ -26,7 +26,7 @@ targets:
     settings:
       base:
         INFOPLIST_FILE: Fasted/Info.plist
-        PRODUCT_BUNDLE_IDENTIFIER: com.grusy.Fasted
+        PRODUCT_BUNDLE_IDENTIFIER: com.grusy.SolsticeFast
         GENERATE_INFOPLIST_FILE: "NO"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SDKROOT: iphoneos
@@ -43,7 +43,7 @@ targets:
       - target: Fasted
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.grusy.FastedTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.grusy.SolsticeFastTests
         GENERATE_INFOPLIST_FILE: "YES"
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
@@ -59,7 +59,7 @@ targets:
       - target: Fasted
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.grusy.FastedUITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.grusy.SolsticeFastUITests
         GENERATE_INFOPLIST_FILE: "YES"
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
