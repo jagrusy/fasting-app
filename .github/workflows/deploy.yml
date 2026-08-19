@@ -1,0 +1,63 @@
+name: Deploy to TestFlight & App Store
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: 'Fastlane lane to execute'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - beta
+          - release
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Fastlane Deploy
+    runs-on: macos-15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Discover iOS Simulator
+        id: sim
+        run: |
+          SIM_NAME=$(xcrun simctl list devices available -j | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
+          if [ -z "$SIM_NAME" ]; then
+            SIM_NAME="iPhone 15"
+          fi
+          echo "Found available iOS Simulator: $SIM_NAME"
+          echo "name=$SIM_NAME" >> $GITHUB_OUTPUT
+
+      - name: Run Tests Before Deploy
+        run: |
+          xcodebuild test \
+            -project Fasted.xcodeproj \
+            -scheme FastedTests \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -quiet
+
+      - name: Run Fastlane Deployment
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+        run: |
+          LANE="${{ github.event.inputs.lane || 'beta' }}"
+          bundle exec fastlane $LANE

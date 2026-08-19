@@ -1,0 +1,14 @@
+Track your fasts with elegance, biological precision, and zero clutter.
+
+Solstice is an intermittent fasting tracker built with a clean, battery-efficient design. Track your circadian rhythms, monitor real-time metabolic stages (fat burning, autophagy, deep ketosis), and build consistent fasting habits without subscriptions or paywalls.
+
+KEY FEATURES:
+• Elegant Circular Timer: Real-time progress with tactile dial adjustments.
+• 5 Metabolic Fasting Stages: Understand when your body enters Blood Sugar Reset, Glycogen Depletion, Fat Burning, Autophagy, and Deep Ketosis.
+• Flexible Fasting Protocols: Choose 16:8, 18:6, 20:4 (Warrior), 14:10, 23:1 (OMAD), or customize your own.
+• Visual Calendar Heatmap: Glanceable monthly consistency view with active streak counters.
+• Solar & Dark Mode Themes: Deep midnight OLED dark mode and radiant solar accents.
+• 100% Private & On-Device: No account required, no ads, no trackers. Your health data stays on your device.
+
+DISCLAIMER:
+Solstice provides general wellness tracking and is not a substitute for professional medical advice. Always consult a healthcare provider before beginning any fasting routine.
