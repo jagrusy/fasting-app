@@ -25,7 +25,6 @@ targets:
       - path: Fasted
     settings:
       base:
-        PRODUCT_NAME: Solstice
         INFOPLIST_FILE: Fasted/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.grusy.SolsticeFast
         GENERATE_INFOPLIST_FILE: "NO"
