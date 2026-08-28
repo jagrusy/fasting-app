@@ -78,7 +78,7 @@ public struct FastDetailView: View {
                 .foregroundStyle(Color.primary)
 
             HStack(spacing: 8) {
-                Text(fast.protocolType ?? "16:8")
+                Text(FastingProtocol.label(forTargetDuration: fast.targetDuration, protocolType: fast.protocolType))
                     .font(.caption.weight(.bold))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)

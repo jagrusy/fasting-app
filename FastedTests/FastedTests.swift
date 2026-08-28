@@ -8,20 +8,31 @@ final class FastedTests: XCTestCase {
     var persistenceController: PersistenceController?
     var context: NSManagedObjectContext?
     var fastManager: FastManager?
+    var testDefaults: UserDefaults?
+    var testDefaultsSuiteName: String?
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         let controller = PersistenceController(inMemory: true)
         let ctx = controller.container.viewContext
+        let suiteName = "FastedTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName) ?? .standard
         self.persistenceController = controller
         self.context = ctx
-        self.fastManager = FastManager(context: ctx)
+        self.testDefaultsSuiteName = suiteName
+        self.testDefaults = defaults
+        self.fastManager = FastManager(context: ctx, defaults: defaults)
     }
 
     override func tearDownWithError() throws {
         fastManager = nil
         persistenceController = nil
         context = nil
+        if let suiteName = testDefaultsSuiteName {
+            UserDefaults.standard.removePersistentDomain(forName: suiteName)
+        }
+        testDefaults = nil
+        testDefaultsSuiteName = nil
         try super.tearDownWithError()
     }
 
@@ -89,13 +100,22 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(results.count, 0)
     }
 
-    func testFastManagerSnoozesFast() throws {
+    func testFastManagerSnoozeDoesNotRewriteGoal() throws {
+        // Regression test: snoozing used to add the extension directly onto targetDuration, which
+        // desynced a fast's stored goal from its protocolType (e.g. a 16:8 fast with a 1h snooze would
+        // read "101% of 17h goal" in history instead of "108% of 16h goal"). Snoozing should only delay
+        // when the goal notification re-fires, never change what the goal itself is.
         let manager = try XCTUnwrap(fastManager)
-        let fast = manager.startFast(startDate: Date(), targetDuration: 57600)
+        let fast = manager.startFast(startDate: Date(), targetDuration: 57600, protocolType: "16:8")
         XCTAssertEqual(fast.targetDuration, 57600)
 
         manager.snoozeFast(by: 1800)
-        XCTAssertEqual(fast.targetDuration, 57600 + 1800)
+        XCTAssertEqual(fast.targetDuration, 57600)
+        XCTAssertEqual(fast.protocolType, "16:8")
+
+        manager.snoozeFast(by: 3600)
+        XCTAssertEqual(fast.targetDuration, 57600)
+        XCTAssertEqual(fast.protocolType, "16:8")
     }
 
     func testFastManagerUpdatesCompletedFast() throws {
@@ -114,6 +134,50 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(fast.startDate, newStart)
         XCTAssertEqual(fast.endDate, newEnd)
         XCTAssertTrue(fast.isCompleted)
+    }
+
+    func testDiscardActiveFastRemovesItFromHistory() throws {
+        let manager = try XCTUnwrap(fastManager)
+        let ctx = try XCTUnwrap(context)
+
+        _ = manager.startFast(startDate: Date().addingTimeInterval(-3600))
+        XCTAssertTrue(manager.isFasting)
+
+        manager.discardActiveFast()
+
+        XCTAssertFalse(manager.isFasting)
+        XCTAssertNil(manager.activeFast)
+
+        let request: NSFetchRequest<Fast> = Fast.fetchRequest()
+        let count = try ctx.count(for: request)
+        XCTAssertEqual(count, 0)
+    }
+
+    func testDeleteFastWithDuplicateIdDoesNotClearUnrelatedActiveFast() throws {
+        // Regression test: deleteFast used to compare `activeFast?.id == fast.id` by value. If an
+        // unrelated fast ever ends up sharing the active fast's UUID (e.g. a future import/sync bug —
+        // `id` has no uniqueness constraint in the Core Data model), that value comparison would wrongly
+        // report a match and clear the real active fast out from under the user. Comparing object
+        // identity instead means only the record actually being deleted can ever do that.
+        let manager = try XCTUnwrap(fastManager)
+        let ctx = try XCTUnwrap(context)
+
+        let active = manager.startFast(startDate: Date())
+        let sharedId = try XCTUnwrap(active.id)
+
+        let unrelated = Fast(context: ctx)
+        unrelated.id = sharedId
+        unrelated.startDate = Date().addingTimeInterval(-86400)
+        unrelated.endDate = Date().addingTimeInterval(-70000)
+        unrelated.targetDuration = 16 * 3600
+        unrelated.createdAt = Date()
+        unrelated.updatedAt = Date()
+        try ctx.save()
+
+        manager.deleteFast(unrelated)
+
+        XCTAssertTrue(manager.isFasting)
+        XCTAssertEqual(manager.activeFast, active)
     }
 
     func testFastManagerPreventsDuplicateActiveFasts() throws {
@@ -153,6 +217,56 @@ final class FastedTests: XCTestCase {
         let fast = manager.startFast(startDate: Date())
         XCTAssertEqual(fast.protocolType, "18:6")
         XCTAssertEqual(fast.targetDuration, 18 * 3600)
+    }
+
+    func testUpdateSelectedProtocolAloneLeavesActiveFastUntouched() throws {
+        let manager = try XCTUnwrap(fastManager)
+        let fast = manager.startFast(startDate: Date(), targetDuration: 16 * 3600, protocolType: "16:8")
+
+        manager.updateSelectedProtocol("18:6")
+
+        XCTAssertEqual(fast.protocolType, "16:8")
+        XCTAssertEqual(fast.targetDuration, 16 * 3600)
+    }
+
+    func testUpdateActiveFastCanRetargetRunningFastToNewProtocol() throws {
+        let manager = try XCTUnwrap(fastManager)
+        let start = Date().addingTimeInterval(-3600)
+        let fast = manager.startFast(startDate: start, targetDuration: 16 * 3600, protocolType: "16:8")
+
+        manager.updateActiveFast(startDate: start, targetDuration: 18 * 3600, protocolType: "18:6")
+
+        XCTAssertEqual(fast.protocolType, "18:6")
+        XCTAssertEqual(fast.targetDuration, 18 * 3600)
+        XCTAssertEqual(fast.startDate, start)
+    }
+
+    func testFastingProtocolLabelDetectsDivergedGoal() {
+        // A fast whose targetDuration still matches its protocol's preset shows the ratio...
+        XCTAssertEqual(
+            FastingProtocol.label(forTargetDuration: 16 * 3600, protocolType: "16:8"),
+            "16:8"
+        )
+        // ...but one that has drifted (e.g. via a snoozed pre-fix history entry) reads as Custom
+        // rather than silently showing a ratio that contradicts the stored goal.
+        XCTAssertEqual(
+            FastingProtocol.label(forTargetDuration: 17 * 3600, protocolType: "16:8"),
+            "Custom"
+        )
+        XCTAssertEqual(
+            FastingProtocol.label(forTargetDuration: 16 * 3600, protocolType: nil),
+            "Custom"
+        )
+    }
+
+    func testNotificationScheduleDefaultUsesTodaysDate() {
+        let schedule = NotificationSchedule.default
+        let calendar = Calendar.current
+
+        XCTAssertTrue(calendar.isDateInToday(schedule.startReminderTime))
+        XCTAssertEqual(calendar.component(.hour, from: schedule.startReminderTime), 20)
+        XCTAssertEqual(calendar.component(.minute, from: schedule.startReminderTime), 0)
+        XCTAssertTrue(calendar.isDateInToday(schedule.endReminderTime))
     }
 
     func testNotificationScheduleEncodingAndUpdating() throws {

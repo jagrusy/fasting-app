@@ -58,8 +58,9 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         UNUserNotificationCenter.current().setNotificationCategories([category])
     }
 
-    public func scheduleGoalNotification(targetEndDate: Date, protocolName: String) {
+    public func scheduleGoalNotification(targetEndDate: Date, protocolName: String, enabled: Bool = true) {
         cancelGoalNotification()
+        guard enabled else { return }
 
         let timeInterval = targetEndDate.timeIntervalSinceNow
         guard timeInterval > 0 else { return }
@@ -91,7 +92,6 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
 
         let calendar = Calendar.current
         let startComponents = calendar.dateComponents([.hour, .minute], from: schedule.startReminderTime)
-        let endComponents = calendar.dateComponents([.hour, .minute], from: schedule.endReminderTime)
 
         for day in schedule.selectedDays {
             scheduleDayReminder(
@@ -100,14 +100,6 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
                 title: "Time to Start Fasting ⏱️",
                 body: "Your fasting window starts now. Have a great fast!",
                 identifier: "recurring_start_day_\(day)"
-            )
-
-            scheduleDayReminder(
-                weekday: day,
-                time: (endComponents.hour ?? 12, endComponents.minute ?? 0),
-                title: "Eating Window Open 🍽️",
-                body: "Your eating window is now open. Time to nourish your body!",
-                identifier: "recurring_end_day_\(day)"
             )
         }
     }

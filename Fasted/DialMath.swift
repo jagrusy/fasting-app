@@ -49,6 +49,16 @@ public struct DialMath {
         return startOfDay.addingTimeInterval(roundedElapsed)
     }
 
+    /// Snaps a duration (in seconds) to the nearest interval of minutes.
+    ///
+    /// Unlike `snap(date:intervalMinutes:)`, which snaps a wall-clock time against the start of its day,
+    /// this rounds an elapsed duration on its own axis. Never returns a negative value.
+    public static func snapInterval(_ seconds: TimeInterval, toMinutes minutes: Int = 5) -> TimeInterval {
+        guard minutes > 0 else { return max(0, seconds) }
+        let intervalSeconds = TimeInterval(minutes * 60)
+        return max(0, (seconds / intervalSeconds).rounded() * intervalSeconds)
+    }
+
     /// Converts a CGPoint relative to center into an angle in degrees [0, 360) where 0 is at top (12 o'clock).
     public static func touchAngle(point: CGPoint, center: CGPoint) -> Double {
         let deltaX = Double(point.x - center.x)

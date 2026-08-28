@@ -2,6 +2,9 @@ import Foundation
 
 public struct NotificationSchedule: Codable, Equatable {
     public var startReminderTime: Date
+    /// No longer surfaced in the UI (the "Eating Window Open" reminder was removed — it fired on a
+    /// fixed wall-clock schedule unrelated to any actual fast). Kept so existing persisted
+    /// `NotificationSchedule` blobs continue to decode without resetting the rest of the schedule.
     public var endReminderTime: Date
     public var selectedDays: Set<Int> // 1=Sunday, 2=Monday, ..., 7=Saturday
     public var notifyOnGoalReached: Bool
@@ -20,17 +23,9 @@ public struct NotificationSchedule: Codable, Equatable {
 
     public static var `default`: NotificationSchedule {
         let calendar = Calendar.current
-        var startComponents = DateComponents()
-        startComponents.hour = 20 // 8:00 PM
-        startComponents.minute = 0
-
-        var endComponents = DateComponents()
-        endComponents.hour = 12 // 12:00 PM
-        endComponents.minute = 0
-
         let now = Date()
-        let startTime = calendar.date(from: startComponents) ?? now
-        let endTime = calendar.date(from: endComponents) ?? now
+        let startTime = calendar.date(bySettingHour: 20, minute: 0, second: 0, of: now) ?? now // 8:00 PM
+        let endTime = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: now) ?? now // 12:00 PM
 
         return NotificationSchedule(
             startReminderTime: startTime,
