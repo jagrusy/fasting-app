@@ -185,7 +185,13 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(warriorCard.waitForExistence(timeout: 3))
         warriorCard.tap()
 
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        // Scoped to this screen's own navigation bar rather than `app.navigationBars` (which can
+        // return a stale/transitional bar mid-push-animation and intermittently fail with
+        // "Failed to scroll to visible" on CI, since `element(boundBy: 0)` across the whole app's
+        // navigation bars is ambiguous about which one is actually on-screen).
+        let protocolNavBar = app.navigationBars["Fasting Protocol"]
+        XCTAssertTrue(protocolNavBar.waitForExistence(timeout: 3))
+        protocolNavBar.buttons.element(boundBy: 0).tap()
 
         XCTAssertTrue(app.staticTexts["Warrior"].waitForExistence(timeout: 3))
     }
