@@ -5,7 +5,6 @@ import UIKit
 
 public struct FastTrackerView: View {
     @ObservedObject var fastManager: FastManager
-    @State private var showStopConfirmation: Bool = false
     @State private var showTimePickerSheet: Bool = false
     @State private var showStagesSheet: Bool = false
     @State private var centerDisplayMode: CenterDisplayMode = .elapsed
@@ -69,7 +68,14 @@ public struct FastTrackerView: View {
                     }
                 )
                 .sheet(isPresented: $showTimePickerSheet) {
-                    timePickerSheet(startDate: fast.startDate ?? now, now: now)
+                    FastTimePickerSheetView(
+                        tempTime: $tempTime,
+                        onCancel: { showTimePickerSheet = false },
+                        onSave: { newTime in
+                            applyTimeChange(newTime: newTime, originalDate: fast.startDate ?? now, now: now)
+                            showTimePickerSheet = false
+                        }
+                    )
                 }
             }
 
@@ -138,38 +144,6 @@ public struct FastTrackerView: View {
         }
     }
 
-    private func timePickerSheet(startDate: Date, now: Date) -> some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                DatePicker(
-                    "Start Time",
-                    selection: $tempTime,
-                    displayedComponents: [.hourAndMinute]
-                )
-                .datePickerStyle(.wheel)
-                .labelsHidden()
-                .padding()
-
-                Spacer()
-            }
-            .navigationTitle("Adjust Start Time")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showTimePickerSheet = false }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        applyTimeChange(newTime: tempTime, originalDate: startDate, now: now)
-                        showTimePickerSheet = false
-                    }
-                    .fontWeight(.semibold)
-                }
-            }
-        }
-        .presentationDetents([.height(300)])
-    }
-
     private func applyTimeChange(newTime: Date, originalDate: Date, now: Date) {
         guard let fast = fastManager.activeFast else { return }
         let calendar = Calendar.current
@@ -214,47 +188,16 @@ public struct FastTrackerView: View {
     private func actionButton(now: Date, progress: Double) -> some View {
         Group {
             if fastManager.isFasting {
-                endFastButton(now: now, goalReached: progress >= 1.0)
+                EndFastButtonView(
+                    goalReached: progress >= 1.0,
+                    onComplete: { fastManager.endFast(endDate: now) },
+                    onSave: { fastManager.endFast(endDate: now) },
+                    onDiscard: { fastManager.discardActiveFast() }
+                )
             } else {
                 startFastButton(now: now)
             }
         }
-    }
-
-    private func endFastButton(now: Date, goalReached: Bool) -> some View {
-        let buttonTitle = goalReached ? "Complete Fast" : "End Fast"
-
-        return Button {
-            if goalReached {
-                fastManager.endFast(endDate: now)
-            } else {
-                showStopConfirmation = true
-            }
-        } label: {
-            Text(buttonTitle)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(goalReached ? Color.green : Color.red)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        }
-        .accessibilityIdentifier("end_fast_button")
-        .padding(.horizontal, 24)
-        .confirmationDialog(
-            "End Fast Early?",
-            isPresented: $showStopConfirmation,
-            titleVisibility: .visible,
-            actions: {
-                Button("Save Fast") { fastManager.endFast(endDate: now) }
-                Button("Discard Fast", role: .destructive) { fastManager.discardActiveFast() }
-                Button("Cancel", role: .cancel) {}
-            },
-            message: {
-                Text("You haven't reached your goal yet. Save this as a shorter fast in your history," +
-                     " or discard it as if it never happened.")
-            }
-        )
     }
 
     private func startFastButton(now: Date) -> some View {

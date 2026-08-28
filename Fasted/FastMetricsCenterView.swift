@@ -57,7 +57,11 @@ public struct FastMetricsCenterView: View {
         }
     }
 
-    private func elapsedContent(elapsed: TimeInterval, targetDuration: TimeInterval, protocolType: String?) -> some View {
+    private func elapsedContent(
+        elapsed: TimeInterval,
+        targetDuration: TimeInterval,
+        protocolType: String?
+    ) -> some View {
         VStack(spacing: 4) {
             Text(formatDuration(elapsed))
                 .font(.system(size: 36, weight: .bold, design: .monospaced))
