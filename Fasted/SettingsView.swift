@@ -85,7 +85,8 @@ public struct SettingsView: View {
         } header: {
             Text("Fasting Plan")
         } footer: {
-            Text("Select your preferred fasting window ratio. Changes apply to future fasts.")
+            Text("Select your preferred fasting window ratio. If a fast is in progress, you'll be asked" +
+                 " whether to apply the change to it or only to future fasts.")
         }
     }
 

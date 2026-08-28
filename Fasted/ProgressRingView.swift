@@ -4,11 +4,15 @@ public struct ProgressRingView: View {
     public let progress: Double
     public let isFasting: Bool
     public var ringWidth: CGFloat = 22
+    /// Fires per drag frame with a small incremental fraction of a full revolution (not an absolute
+    /// position), so the caller can accumulate elapsed time continuously across the 12-o'clock wrap
+    /// point and past 100% without the knob's angle ever needing to represent more than one lap.
     public var onProgressDragged: ((Double) -> Void)?
     public var onProgressDragEnded: (() -> Void)?
 
     @State private var isDragging: Bool = false
     @State private var dragStartKnobPosition: CGPoint = .zero
+    @State private var lastTouchAngle: Double = 0
 
     public init(
         progress: Double,
@@ -118,13 +122,20 @@ public struct ProgressRingView: View {
                         if !isDragging {
                             isDragging = true
                             dragStartKnobPosition = CGPoint(x: knobX, y: knobY)
+                            lastTouchAngle = computeTouchAngle(point: dragStartKnobPosition, center: center)
                         }
                         let currentPoint = CGPoint(
                             x: dragStartKnobPosition.x + value.translation.width,
                             y: dragStartKnobPosition.y + value.translation.height
                         )
                         let touchAngle = computeTouchAngle(point: currentPoint, center: center)
-                        onProgressDragged?(touchAngle / 360.0)
+
+                        var delta = touchAngle - lastTouchAngle
+                        if delta > 180 { delta -= 360 }
+                        if delta < -180 { delta += 360 }
+                        lastTouchAngle = touchAngle
+
+                        onProgressDragged?(delta / 360.0)
                     }
                     .onEnded { _ in
                         isDragging = false

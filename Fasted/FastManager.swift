@@ -6,16 +6,19 @@ import SwiftUI
 public final class FastManager: ObservableObject {
     let viewContext: NSManagedObjectContext
     public let notificationManager: NotificationManager
+    let defaults: UserDefaults
 
     @Published public internal(set) var activeFast: Fast?
     @Published public internal(set) var userSettings: UserSettings?
 
     public init(
         context: NSManagedObjectContext = PersistenceController.shared.container.viewContext,
-        notificationManager: NotificationManager = .shared
+        notificationManager: NotificationManager = .shared,
+        defaults: UserDefaults = .standard
     ) {
         self.viewContext = context
         self.notificationManager = notificationManager
+        self.defaults = defaults
         self.setupNotificationCallbacks()
         self.refresh()
     }
@@ -82,6 +85,14 @@ public final class FastManager: ObservableObject {
         FastingProtocol.from(protocolType: userSettings?.selectedProtocol)
     }
 
+    /// The active fast's own protocol, independent of the current settings selection.
+    /// Use this (not `currentProtocol`) anywhere an in-progress or completed fast is displayed,
+    /// since `currentProtocol` reflects Settings and can diverge from what a specific fast is tracking.
+    public func protocolForActiveFast() -> FastingProtocol? {
+        guard let fast = activeFast else { return nil }
+        return FastingProtocol.from(protocolType: fast.protocolType)
+    }
+
     public var isFasting: Bool {
         activeFast != nil
     }
@@ -103,24 +114,6 @@ public final class FastManager: ObservableObject {
             self.objectWillChange.send()
         } catch {
             NSLog("Error saving protocol setting: \(error)")
-        }
-    }
-
-    public func updateNotificationSchedule(enabled: Bool, schedule: NotificationSchedule) {
-        guard let settings = userSettings else { return }
-        settings.notificationsEnabled = enabled
-
-        if let encoded = try? JSONEncoder().encode(schedule) {
-            settings.notificationSchedule = encoded
-        }
-
-        do {
-            try viewContext.save()
-            self.objectWillChange.send()
-
-            notificationManager.scheduleRecurringReminders(schedule: schedule, enabled: enabled)
-        } catch {
-            NSLog("Error updating notification settings: \(error)")
         }
     }
 
@@ -151,7 +144,11 @@ public final class FastManager: ObservableObject {
             self.activeFast = fast
 
             let targetEnd = startDate.addingTimeInterval(duration)
-            notificationManager.scheduleGoalNotification(targetEndDate: targetEnd, protocolName: proto)
+            notificationManager.scheduleGoalNotification(
+                targetEndDate: targetEnd,
+                protocolName: proto,
+                enabled: notificationSchedule.notifyOnGoalReached
+            )
         } catch {
             NSLog("Error starting fast: \(error)")
         }
@@ -174,6 +171,7 @@ public final class FastManager: ObservableObject {
             let completed = fast
             self.activeFast = nil
             notificationManager.cancelGoalNotification()
+            clearSnoozeOffset(for: fast)
 
             let request: NSFetchRequest<Fast> = Fast.fetchRequest()
             request.predicate = NSPredicate(format: "endDate != nil AND isCompleted == YES")
@@ -187,11 +185,25 @@ public final class FastManager: ObservableObject {
         }
     }
 
-    public func updateActiveFast(startDate: Date, targetDuration: TimeInterval? = nil) {
+    /// Ends the current fast without saving it to history — used when the user explicitly discards
+    /// an early end rather than saving a partial fast.
+    public func discardActiveFast() {
+        guard let fast = activeFast else { return }
+        deleteFast(fast)
+    }
+
+    public func updateActiveFast(
+        startDate: Date,
+        targetDuration: TimeInterval? = nil,
+        protocolType: String? = nil
+    ) {
         guard let fast = activeFast else { return }
         fast.startDate = startDate
         if let duration = targetDuration {
             fast.targetDuration = duration
+        }
+        if let proto = protocolType {
+            fast.protocolType = proto
         }
         fast.updatedAt = Date()
 
@@ -199,30 +211,31 @@ public final class FastManager: ObservableObject {
             try viewContext.save()
             self.objectWillChange.send()
 
-            let targetEnd = startDate.addingTimeInterval(fast.targetDuration)
-            let proto = fast.protocolType ?? "16:8"
-            notificationManager.scheduleGoalNotification(targetEndDate: targetEnd, protocolName: proto)
+            let targetEnd = startDate.addingTimeInterval(fast.targetDuration + snoozeOffset(for: fast))
+            let proto = fast.protocolType ?? FastingProtocol.default.ratioString
+            notificationManager.scheduleGoalNotification(
+                targetEndDate: targetEnd,
+                protocolName: proto,
+                enabled: notificationSchedule.notifyOnGoalReached
+            )
         } catch {
             NSLog("Error updating active fast: \(error)")
         }
     }
 
     public func snoozeFast(by extensionSeconds: TimeInterval) {
-        guard let fast = activeFast else { return }
-        fast.targetDuration += extensionSeconds
-        fast.updatedAt = Date()
+        guard let fast = activeFast, let id = fast.id else { return }
+        let newOffset = defaults.double(forKey: snoozeOffsetKey(for: id)) + extensionSeconds
+        defaults.set(newOffset, forKey: snoozeOffsetKey(for: id))
 
-        do {
-            try viewContext.save()
-            self.objectWillChange.send()
-
-            let start = fast.startDate ?? Date()
-            let targetEnd = start.addingTimeInterval(fast.targetDuration)
-            let proto = fast.protocolType ?? "16:8"
-            notificationManager.scheduleGoalNotification(targetEndDate: targetEnd, protocolName: proto)
-        } catch {
-            NSLog("Error snoozing fast: \(error)")
-        }
+        let start = fast.startDate ?? Date()
+        let targetEnd = start.addingTimeInterval(fast.targetDuration + newOffset)
+        let proto = fast.protocolType ?? FastingProtocol.default.ratioString
+        notificationManager.scheduleGoalNotification(
+            targetEndDate: targetEnd,
+            protocolName: proto,
+            enabled: notificationSchedule.notifyOnGoalReached
+        )
     }
 
     public func updateCompletedFast(
@@ -245,10 +258,11 @@ public final class FastManager: ObservableObject {
     }
 
     public func deleteFast(_ fast: Fast) {
-        if activeFast?.id == fast.id {
+        if let active = activeFast, active === fast {
             activeFast = nil
             notificationManager.cancelGoalNotification()
         }
+        clearSnoozeOffset(for: fast)
         viewContext.delete(fast)
 
         do {

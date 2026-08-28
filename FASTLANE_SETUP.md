@@ -56,3 +56,19 @@ Pushing any git tag starting with `v` (e.g. `v1.0.0`) automatically triggers the
 git tag v1.0.0
 git push --tags
 ```
+
+### Option C: Build Locally (no CI secrets required)
+Both options above run in GitHub Actions and need the CI secrets in step 2 configured with a
+valid **distribution certificate** — `get_provisioning_profile` can bind an existing certificate
+to a profile, but it can't create one from nothing on a bare CI runner. If that hasn't been set
+up yet (or you just want a quick TestFlight build without waiting on CI), build and upload from
+your own Mac instead. This uses the Apple ID already signed in to Xcode (Xcode → Settings →
+Accounts) to sign and upload, so no App Store Connect API key or CI secrets are involved:
+
+```bash
+APPLE_TEAM_ID=ABCDE12345 make beta-local
+```
+
+(Find your team ID at [developer.apple.com/account](https://developer.apple.com/account) under
+Membership.) The first run will prompt for your Apple ID and 2FA code; after that, fastlane
+reuses your local session. This is the `beta_local` lane in `fastlane/Fastfile`.

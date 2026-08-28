@@ -79,4 +79,16 @@ final class FastedDialMathTests: XCTestCase {
         XCTAssertTrue(DialMath.isAngle(90.0, between: 300.0, and: 180.0))
         XCTAssertFalse(DialMath.isAngle(240.0, between: 300.0, and: 180.0))
     }
+
+    func testSnapIntervalRoundsToNearestFiveMinutes() {
+        XCTAssertEqual(DialMath.snapInterval(0, toMinutes: 5), 0)
+        XCTAssertEqual(DialMath.snapInterval(60, toMinutes: 5), 0) // rounds down to nearest 5 min
+        XCTAssertEqual(DialMath.snapInterval(150, toMinutes: 5), 300) // 2:30 rounds up
+        XCTAssertEqual(DialMath.snapInterval(299, toMinutes: 5), 300)
+        XCTAssertEqual(DialMath.snapInterval(301, toMinutes: 5), 300)
+        XCTAssertEqual(DialMath.snapInterval(16 * 3600 + 61, toMinutes: 5), 16 * 3600, accuracy: 0.1)
+
+        // Never returns a negative duration
+        XCTAssertEqual(DialMath.snapInterval(-100, toMinutes: 5), 0)
+    }
 }

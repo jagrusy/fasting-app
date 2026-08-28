@@ -48,6 +48,36 @@ platform :ios do
     )
   end
 
+  desc "Build and upload to TestFlight using your local Xcode signing (no CI secrets needed)"
+  lane :beta_local do
+    team_id = ENV["APPLE_TEAM_ID"]
+    UI.user_error!(
+      "Set APPLE_TEAM_ID first, e.g. `APPLE_TEAM_ID=ABCDE12345 bundle exec fastlane beta_local`. " \
+      "Find your team ID at https://developer.apple.com/account under Membership."
+    ) if team_id.nil? || team_id.empty?
+
+    # No app_store_connect_api_key and no get_provisioning_profile step: this relies entirely on
+    # the Apple ID already signed in to Xcode (Xcode > Settings > Accounts) on this machine, with
+    # -allowProvisioningUpdates letting xcodebuild create/renew the distribution certificate and
+    # App Store provisioning profile itself. That's the CI deploy workflow's actual blocker — it
+    # has no certificate and nothing signed in to create one. upload_to_testflight below will
+    # prompt interactively for your Apple ID / 2FA the first time; after that it reuses your
+    # local fastlane session.
+    build_app(
+      project: "Fasted.xcodeproj",
+      scheme: "Fasted",
+      clean: true,
+      export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates -allowProvisioningDeviceRegistration " \
+              "CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=#{team_id}",
+      export_xcargs: "-allowProvisioningUpdates"
+    )
+
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+
   desc "Upload metadata, screenshots, and submit build to App Store for review"
   lane :release do
     api_key = app_store_connect_api_key(

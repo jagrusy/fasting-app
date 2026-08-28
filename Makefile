@@ -13,7 +13,7 @@ endif
 DESTINATION_IOS = 'platform=iOS Simulator,name=$(SIM_NAME)'
 DESTINATION_WATCH = 'platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)'
 
-.PHONY: all build build-ios build-watch test uitest lint hooks clean
+.PHONY: all build build-ios build-watch test uitest lint hooks clean beta-local
 
 all: lint build test
 
@@ -65,3 +65,9 @@ lint:
 
 clean:
 	rm -rf build DerivedData *.xcresult
+
+# Builds and uploads to TestFlight using YOUR local Xcode signing (Xcode > Settings > Accounts),
+# instead of the GitHub Actions deploy workflow, which currently has no distribution certificate
+# configured. Requires APPLE_TEAM_ID, e.g.: APPLE_TEAM_ID=ABCDE12345 make beta-local
+beta-local:
+	bundle exec fastlane beta_local

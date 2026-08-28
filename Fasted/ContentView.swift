@@ -3,6 +3,7 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var fastManager: FastManager
     @State private var selectedTab: Tab = .fast
     @AppStorage("app_appearance") private var appearanceRaw: String = AppAppearance.dark.rawValue
@@ -56,6 +57,12 @@ struct ContentView: View {
                 fastManager.seedMockDataForScreenshots(progress: 0.80)
             } else if ProcessInfo.processInfo.arguments.contains("-seedScreenshots100") {
                 fastManager.seedMockDataForScreenshots(progress: 1.05)
+            }
+            fastManager.syncNotifications()
+        }
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active {
+                fastManager.syncNotifications()
             }
         }
     }

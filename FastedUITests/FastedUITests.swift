@@ -1,4 +1,5 @@
 import XCTest
+import CoreGraphics
 
 final class FastedUITests: XCTestCase {
 
@@ -185,7 +186,17 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(warriorCard.waitForExistence(timeout: 3))
         warriorCard.tap()
 
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        let protocolNavBar = app.navigationBars["Fasting Protocol"]
+        XCTAssertTrue(protocolNavBar.waitForExistence(timeout: 3))
+        let backButton = protocolNavBar.buttons.element(boundBy: 0)
+        XCTAssertTrue(backButton.waitForExistence(timeout: 3))
+        // A plain `.tap()` here reliably fails on GitHub's macOS runners with "Failed to scroll
+        // to visible (by AX action)" even though the button is already fully on-screen and not
+        // inside any scroll view — `.tap()` still routes through an AX-driven
+        // is-this-hittable/scroll-into-view check before synthesizing the touch, and that check
+        // itself is what's failing in CI's headless accessibility server. Tapping a raw
+        // coordinate on the button skips that check and goes straight to a synthetic touch.
+        backButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
         XCTAssertTrue(app.staticTexts["Warrior"].waitForExistence(timeout: 3))
     }

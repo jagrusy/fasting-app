@@ -1,12 +1,17 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 public struct FastTrackerView: View {
     @ObservedObject var fastManager: FastManager
-    @State private var showStopConfirmation: Bool = false
     @State private var showTimePickerSheet: Bool = false
     @State private var showStagesSheet: Bool = false
     @State private var centerDisplayMode: CenterDisplayMode = .elapsed
     @State private var tempTime: Date = Date()
+    @State private var draggingElapsed: TimeInterval?
+    @State private var showValidationAlert: Bool = false
+    @State private var validationMessage: String?
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -26,10 +31,15 @@ public struct FastTrackerView: View {
                 elapsedSeconds: elapsed
             )
         }
+        .alert("Can't Move Fast There", isPresented: $showValidationAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(validationMessage ?? "That time overlaps with another fast.")
+        }
     }
 
     private func trackerContent(now: Date) -> some View {
-        let progress = calculateProgress(at: now)
+        let progress = displayedProgress(now: now)
         return VStack(spacing: 20) {
             headerView(progress: progress)
             progressSection(now: now, progress: progress)
@@ -58,7 +68,14 @@ public struct FastTrackerView: View {
                     }
                 )
                 .sheet(isPresented: $showTimePickerSheet) {
-                    timePickerSheet(startDate: fast.startDate ?? now, now: now)
+                    FastTimePickerSheetView(
+                        tempTime: $tempTime,
+                        onCancel: { showTimePickerSheet = false },
+                        onSave: { newTime in
+                            applyTimeChange(newTime: newTime, originalDate: fast.startDate ?? now, now: now)
+                            showTimePickerSheet = false
+                        }
+                    )
                 }
             }
 
@@ -97,8 +114,11 @@ public struct FastTrackerView: View {
                 progress: progress,
                 isFasting: fastManager.isFasting,
                 ringWidth: 24,
-                onProgressDragged: { newProgress in
-                    handleProgressDragged(newProgress: newProgress, now: now)
+                onProgressDragged: { deltaProgress in
+                    handleProgressDragDelta(deltaProgress: deltaProgress, now: now)
+                },
+                onProgressDragEnded: {
+                    commitProgressDrag(now: now)
                 }
             )
             .frame(width: 280, height: 280)
@@ -124,39 +144,8 @@ public struct FastTrackerView: View {
         }
     }
 
-    private func timePickerSheet(startDate: Date, now: Date) -> some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                DatePicker(
-                    "Start Time",
-                    selection: $tempTime,
-                    displayedComponents: [.hourAndMinute]
-                )
-                .datePickerStyle(.wheel)
-                .labelsHidden()
-                .padding()
-
-                Spacer()
-            }
-            .navigationTitle("Adjust Start Time")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showTimePickerSheet = false }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        applyTimeChange(newTime: tempTime, originalDate: startDate, now: now)
-                        showTimePickerSheet = false
-                    }
-                    .fontWeight(.semibold)
-                }
-            }
-        }
-        .presentationDetents([.height(300)])
-    }
-
     private func applyTimeChange(newTime: Date, originalDate: Date, now: Date) {
+        guard let fast = fastManager.activeFast else { return }
         let calendar = Calendar.current
         let timeComponents = calendar.dateComponents([.hour, .minute], from: newTime)
         var dateComponents = calendar.dateComponents([.year, .month, .day], from: originalDate)
@@ -166,11 +155,12 @@ public struct FastTrackerView: View {
 
         if let combinedDate = calendar.date(from: dateComponents) {
             let finalDate = min(combinedDate, now)
-            fastManager.updateActiveFast(startDate: finalDate)
+            applyValidatedStartDate(finalDate, excludingFastId: fast.id)
         }
     }
 
     private func updateStartDate(dayOffset: Int, from currentDate: Date) {
+        guard let fast = fastManager.activeFast else { return }
         let calendar = Calendar.current
         let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: currentDate)
         let targetDay = calendar.date(byAdding: .day, value: dayOffset, to: calendar.startOfDay(for: Date())) ?? Date()
@@ -181,60 +171,44 @@ public struct FastTrackerView: View {
         combinedComponents.second = timeComponents.second
 
         if let newStartDate = calendar.date(from: combinedComponents) {
-            fastManager.updateActiveFast(startDate: min(newStartDate, Date()))
+            applyValidatedStartDate(min(newStartDate, Date()), excludingFastId: fast.id)
         }
+    }
+
+    private func applyValidatedStartDate(_ startDate: Date, excludingFastId: UUID?) {
+        let validation = fastManager.validateInterval(startDate: startDate, excludingFastId: excludingFastId)
+        guard validation.isValid else {
+            validationMessage = validation.message
+            showValidationAlert = true
+            return
+        }
+        fastManager.updateActiveFast(startDate: startDate)
     }
 
     private func actionButton(now: Date, progress: Double) -> some View {
         Group {
             if fastManager.isFasting {
-                endFastButton(now: now, goalReached: progress >= 1.0)
+                EndFastButtonView(
+                    goalReached: progress >= 1.0,
+                    onComplete: { fastManager.endFast(endDate: now) },
+                    onSave: { fastManager.endFast(endDate: now) },
+                    onDiscard: { fastManager.discardActiveFast() }
+                )
             } else {
                 startFastButton(now: now)
             }
         }
     }
 
-    private func endFastButton(now: Date, goalReached: Bool) -> some View {
-        let buttonTitle = goalReached ? "Complete Fast" : "End Fast"
-        let dialogTitle = goalReached ? "Complete Fast" : "End Fast Early?"
-        let dialogMessage = goalReached
-            ? "Great work! You've reached your fasting goal."
-            : "Are you sure you want to end your current fast?"
-
-        return Button {
-            if goalReached {
-                fastManager.endFast(endDate: now)
-            } else {
-                showStopConfirmation = true
-            }
-        } label: {
-            Text(buttonTitle)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(goalReached ? Color.green : Color.red)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        }
-        .accessibilityIdentifier("end_fast_button")
-        .padding(.horizontal, 24)
-        .confirmationDialog(
-            dialogTitle,
-            isPresented: $showStopConfirmation,
-            titleVisibility: .visible,
-            actions: {
-                Button("End Fast", role: .destructive) { fastManager.endFast(endDate: now) }
-                Button("Cancel", role: .cancel) {}
-            },
-            message: { Text(dialogMessage) }
-        )
-    }
-
     private func startFastButton(now: Date) -> some View {
         Button {
-            NotificationManager.shared.requestAuthorization()
-            fastManager.startFast(startDate: now)
+            let tapDate = Date()
+            fastManager.startFast(startDate: tapDate)
+            NotificationManager.shared.requestAuthorization { granted in
+                if granted {
+                    fastManager.syncNotifications()
+                }
+            }
         } label: {
             Text("Start Fast")
                 .font(.headline.weight(.semibold))
@@ -248,13 +222,42 @@ public struct FastTrackerView: View {
         .padding(.horizontal, 24)
     }
 
-    private func handleProgressDragged(newProgress: Double, now: Date) {
-        guard let fast = fastManager.activeFast else { return }
-        let clamped = min(max(newProgress, 0.0), 1.0)
-        let elapsedSeconds = clamped * fast.targetDuration
-        let adjustedStart = now.addingTimeInterval(-elapsedSeconds)
+    /// `deltaProgress` is a small incremental fraction of a full revolution, not an absolute position —
+    /// this keeps the drag continuous across the 12-o'clock wrap point and lets a fast that's already
+    /// past its goal (>100%) be nudged further without snapping back down to wherever the touch angle
+    /// happens to land.
+    private func handleProgressDragDelta(deltaProgress: Double, now: Date) {
+        guard let fast = fastManager.activeFast, fast.targetDuration > 0 else { return }
+        let baseline = draggingElapsed ?? now.timeIntervalSince(fast.startDate ?? now)
+        let updatedElapsed = max(0, baseline + deltaProgress * fast.targetDuration)
+        let snappedElapsed = DialMath.snapInterval(updatedElapsed, toMinutes: 5)
 
+        if let previous = draggingElapsed, previous != snappedElapsed {
+            #if canImport(UIKit)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            #endif
+        }
+        draggingElapsed = snappedElapsed
+    }
+
+    private func commitProgressDrag(now: Date) {
+        defer { draggingElapsed = nil }
+        guard let fast = fastManager.activeFast, let elapsed = draggingElapsed else { return }
+        let adjustedStart = now.addingTimeInterval(-elapsed)
+        let validation = fastManager.validateInterval(startDate: adjustedStart, excludingFastId: fast.id)
+        guard validation.isValid else {
+            validationMessage = validation.message
+            showValidationAlert = true
+            return
+        }
         fastManager.updateActiveFast(startDate: adjustedStart, targetDuration: fast.targetDuration)
+    }
+
+    private func displayedProgress(now: Date) -> Double {
+        if let dragging = draggingElapsed, let fast = fastManager.activeFast, fast.targetDuration > 0 {
+            return max(0.0, dragging / fast.targetDuration)
+        }
+        return calculateProgress(at: now)
     }
 
     private func calculateProgress(at date: Date) -> Double {

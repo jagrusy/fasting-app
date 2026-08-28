@@ -43,7 +43,7 @@ public struct FastRowView: View {
                     Text(formatDuration(elapsedSeconds))
                         .font(.headline.weight(.bold))
 
-                    Text(fast.protocolType ?? "16:8")
+                    Text(FastingProtocol.label(forTargetDuration: fast.targetDuration, protocolType: fast.protocolType))
                         .font(.caption2.weight(.bold))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
@@ -60,14 +60,13 @@ public struct FastRowView: View {
 
             // Completion percentage / target
             VStack(alignment: .trailing, spacing: 4) {
-                let targetHours = Int((fast.targetDuration) / 3600)
                 let pct = Int((elapsedSeconds / max(1, fast.targetDuration)) * 100)
 
                 Text("\(pct)%")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(isCompletedGoal ? Color.green : Color.primary)
 
-                Text("of \(targetHours)h goal")
+                Text("of \(formatGoal(fast.targetDuration)) goal")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -88,6 +87,10 @@ public struct FastRowView: View {
         } else {
             return "\(hours)h \(minutes)m"
         }
+    }
+
+    private func formatGoal(_ interval: TimeInterval) -> String {
+        formatDuration(interval)
     }
 
     private func formatDateRange(start: Date, end: Date) -> String {

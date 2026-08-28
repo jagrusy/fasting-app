@@ -72,4 +72,18 @@ public struct FastingProtocol: Identifiable, Hashable {
         guard let type = protocolType else { return .default }
         return presets.first { $0.ratioString == type || $0.id == type } ?? .default
     }
+
+    /// Label to display for a fast, given both of the values it stores.
+    ///
+    /// `from(protocolType:)` silently falls back to 16:8 for any unrecognized string, so a fast whose
+    /// `targetDuration` no longer matches its `protocolType` would otherwise render a ratio that
+    /// contradicts its own goal. Returns the ratio only when the two genuinely agree.
+    public static func label(forTargetDuration duration: TimeInterval, protocolType: String?) -> String {
+        guard let type = protocolType,
+              let preset = presets.first(where: { $0.ratioString == type || $0.id == type }),
+              abs(preset.fastingSeconds - duration) < 1 else {
+            return "Custom"
+        }
+        return preset.ratioString
+    }
 }

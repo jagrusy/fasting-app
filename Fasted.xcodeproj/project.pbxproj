@@ -34,7 +34,6 @@
 		78B975439882F6B9107E507D /* ProgressRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */; };
 		830AB177EA6601337FCA6524 /* AppStoreScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */; };
 		83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */; };
-		86F8832A8B8687F6245D630B /* DialEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE11165A3D641BFB1B2908C /* DialEditorView.swift */; };
 		8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */; };
 		94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8810ED7037826FE830C9 /* FastedUITests.swift */; };
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
@@ -54,6 +53,11 @@
 		F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1845606048434908EA9499 /* ContentView.swift */; };
 		F501504029E2FF98114B915E /* StreakCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA35504122572AB7F1EB512 /* StreakCalculator.swift */; };
 		FCDDC5D7524F3419E7D9A55E /* SolsticeThemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */; };
+		D34E0C647708F83C33CF0DC3 /* EndFastButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80771F75130AEDBA2CE552BA /* EndFastButtonView.swift */; };
+		8EEFEE6FEA5F8FBDD8669541 /* FastManager+Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB73938D6F11C3E4F4CFF3D /* FastManager+Notifications.swift */; };
+		4F1DA862E05BEF445BB8A6BB /* FastTimePickerSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DB0B703836E5E90A0C0FA8 /* FastTimePickerSheetView.swift */; };
+		EF59E52260F6FF2DA6BED7EB /* FastManagerValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E339F0C2BC68F6EA74EAB8F0 /* FastManagerValidationTests.swift */; };
+		8838768781086C52FEF7CD48 /* StreakCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E975013F8059E05BF638E08 /* StreakCalculatorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,7 +93,6 @@
 		6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRingView.swift; sourceTree = "<group>"; };
 		7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsSection.swift; sourceTree = "<group>"; };
 		780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptManagerTests.swift; sourceTree = "<group>"; };
-		7BE11165A3D641BFB1B2908C /* DialEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialEditorView.swift; sourceTree = "<group>"; };
 		7E30FCE9FA6750C6C0ABBF8C /* SolsticeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolsticeTheme.swift; sourceTree = "<group>"; };
 		80ABF2C76FAC79CAD26EEC81 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -125,6 +128,11 @@
 		FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyHistoryView.swift; sourceTree = "<group>"; };
 		FEFF304C7359306211445686 /* NotificationSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSchedule.swift; sourceTree = "<group>"; };
 		FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStagesSheetView.swift; sourceTree = "<group>"; };
+		80771F75130AEDBA2CE552BA /* EndFastButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndFastButtonView.swift; sourceTree = "<group>"; };
+		3FB73938D6F11C3E4F4CFF3D /* FastManager+Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Notifications.swift"; sourceTree = "<group>"; };
+		91DB0B703836E5E90A0C0FA8 /* FastTimePickerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTimePickerSheetView.swift; sourceTree = "<group>"; };
+		E339F0C2BC68F6EA74EAB8F0 /* FastManagerValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManagerValidationTests.swift; sourceTree = "<group>"; };
+		6E975013F8059E05BF638E08 /* StreakCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalculatorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -160,11 +168,13 @@
 		FA2CF958379392EFE41B27EF /* Fasted */ = {
 			isa = PBXGroup;
 			children = (
+				80771F75130AEDBA2CE552BA /* EndFastButtonView.swift */,
+				3FB73938D6F11C3E4F4CFF3D /* FastManager+Notifications.swift */,
+				91DB0B703836E5E90A0C0FA8 /* FastTimePickerSheetView.swift */,
 				A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */,
 				C410780F466CF5987E506477 /* CalendarHeatmapView.swift */,
 				3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */,
 				9C1845606048434908EA9499 /* ContentView.swift */,
-				7BE11165A3D641BFB1B2908C /* DialEditorView.swift */,
 				B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */,
 				8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */,
 				A71CDC6BEC973FA849ACE8BB /* DialMath.swift */,
@@ -207,6 +217,8 @@
 		FF13538E02A928EAD0AA52A2 /* FastedTests */ = {
 			isa = PBXGroup;
 			children = (
+				E339F0C2BC68F6EA74EAB8F0 /* FastManagerValidationTests.swift */,
+				6E975013F8059E05BF638E08 /* StreakCalculatorTests.swift */,
 				21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */,
 				F47F0F9EAF3379520543128F /* FastedTests.swift */,
 				B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */,
@@ -328,6 +340,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF59E52260F6FF2DA6BED7EB /* FastManagerValidationTests.swift in Sources */,
+				8838768781086C52FEF7CD48 /* StreakCalculatorTests.swift in Sources */,
 				680301A03BB0BED727DFF532 /* FastedDialMathTests.swift in Sources */,
 				E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */,
 				415B59ABB94BB486947A64A6 /* FeedbackHelperTests.swift in Sources */,
@@ -341,10 +355,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D34E0C647708F83C33CF0DC3 /* EndFastButtonView.swift in Sources */,
+				8EEFEE6FEA5F8FBDD8669541 /* FastManager+Notifications.swift in Sources */,
+				4F1DA862E05BEF445BB8A6BB /* FastTimePickerSheetView.swift in Sources */,
 				0B2AD02224339FDBB03BCC7B /* CalendarHeatmapView.swift in Sources */,
 				043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */,
 				F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */,
-				86F8832A8B8687F6245D630B /* DialEditorView.swift in Sources */,
 				48FB0D427459DB6A18EF8ADB /* DialFaceView.swift in Sources */,
 				3D385853457F9BE5FE7B2073 /* DialHeaderCardView.swift in Sources */,
 				0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */,

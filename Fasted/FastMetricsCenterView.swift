@@ -43,11 +43,11 @@ public struct FastMetricsCenterView: View {
 
             switch centerDisplayMode {
             case .elapsed:
-                elapsedContent(elapsed: elapsed)
+                elapsedContent(elapsed: elapsed, targetDuration: fast.targetDuration, protocolType: fast.protocolType)
             case .remaining:
                 remainingContent(startDate: startDate, duration: fast.targetDuration, remaining: remaining)
             case .percentage:
-                percentageContent(elapsed: elapsed, targetHours: Int(fast.targetDuration / 3600))
+                percentageContent(elapsed: elapsed, targetDuration: fast.targetDuration)
             }
 
             Text("Tap to switch metric")
@@ -57,14 +57,19 @@ public struct FastMetricsCenterView: View {
         }
     }
 
-    private func elapsedContent(elapsed: TimeInterval) -> some View {
+    private func elapsedContent(
+        elapsed: TimeInterval,
+        targetDuration: TimeInterval,
+        protocolType: String?
+    ) -> some View {
         VStack(spacing: 4) {
             Text(formatDuration(elapsed))
                 .font(.system(size: 36, weight: .bold, design: .monospaced))
                 .foregroundStyle(Color.primary)
                 .accessibilityIdentifier("elapsed_time_text")
 
-            Text("\(Int(progress * 100))% · \(currentProtocol.ratioString)")
+            let ratioLabel = FastingProtocol.label(forTargetDuration: targetDuration, protocolType: protocolType)
+            Text("\(Int(progress * 100))% · \(ratioLabel)")
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(progress >= 1.0 ? .green : .secondary)
                 .accessibilityIdentifier("progress_percentage_text")
@@ -86,14 +91,14 @@ public struct FastMetricsCenterView: View {
         }
     }
 
-    private func percentageContent(elapsed: TimeInterval, targetHours: Int) -> some View {
+    private func percentageContent(elapsed: TimeInterval, targetDuration: TimeInterval) -> some View {
         VStack(spacing: 4) {
             Text("\(Int(progress * 100))%")
                 .font(.system(size: 42, weight: .bold, design: .rounded))
                 .foregroundStyle(progress >= 1.0 ? Color.green : Color.primary)
                 .accessibilityIdentifier("percentage_display_text")
 
-            Text("\(formatDuration(elapsed)) of \(targetHours)h")
+            Text("\(formatDuration(elapsed)) of \(formatGoal(targetDuration))")
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
         }
@@ -130,5 +135,12 @@ public struct FastMetricsCenterView: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+
+    private func formatGoal(_ duration: TimeInterval) -> String {
+        let totalMinutes = Int(max(0, duration) / 60)
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
+        return minutes == 0 ? "\(hours)h" : "\(hours)h \(minutes)m"
     }
 }

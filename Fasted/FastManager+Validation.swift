@@ -57,6 +57,7 @@ extension FastManager {
             activeFast = nil
             notificationManager.cancelGoalNotification()
             notificationManager.cancelRecurringReminders()
+            clearAllSnoozeOffsets()
             self.objectWillChange.send()
         } catch {
             NSLog("Error clearing all fasting data: \(error)")

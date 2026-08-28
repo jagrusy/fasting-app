@@ -45,15 +45,11 @@ public struct NotificationSettingsSection: View {
                 }
                 .accessibilityIdentifier("start_reminder_picker")
 
-                DatePicker(
-                    "Eating Window Reminder",
-                    selection: $schedule.endReminderTime,
-                    displayedComponents: .hourAndMinute
-                )
-                .onChange(of: schedule.endReminderTime) { _ in
-                    onSave(isEnabled, schedule)
-                }
-                .accessibilityIdentifier("end_reminder_picker")
+                Toggle("Goal Reached Alert", isOn: $schedule.notifyOnGoalReached)
+                    .onChange(of: schedule.notifyOnGoalReached) { _ in
+                        onSave(isEnabled, schedule)
+                    }
+                    .accessibilityIdentifier("goal_reached_toggle")
 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("ACTIVE DAYS")
@@ -85,7 +81,7 @@ public struct NotificationSettingsSection: View {
             Text("Reminders")
         } footer: {
             if isEnabled {
-                Text("Receive reminders to start and break your fast at scheduled times.")
+                Text("Get a reminder to start fasting, plus an alert exactly when your fast timer completes.")
             }
         }
     }
