@@ -9,7 +9,7 @@ if command -v swiftlint >/dev/null 2>&1; then
     swiftlint lint --strict --quiet
     echo "✅ [pre-commit] SwiftLint passed (0 violations)"
 else
-    echo "⚠️  [pre-commit] SwiftLint not found locally (will run in CI)"
+    echo "⚠️  [pre-commit] SwiftLint not found locally (pre-push will install it and enforce --strict)"
 fi
 
 # Ensure project generation is up to date if project.yml changed
