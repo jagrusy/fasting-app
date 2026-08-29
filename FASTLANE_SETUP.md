@@ -21,34 +21,27 @@ Apple provides official API Keys for CI/CD authentication without 2FA SMS prompt
 
 ---
 
-## 2. Set Up Code Signing (match)
+## 2. Set Up Code Signing (certificate secret)
 
 This is the step that was missing before: CI has an App Store Connect API key (step 1), but no
 **distribution certificate**. `get_provisioning_profile`/`sigh` can bind an existing certificate
 to a profile, but can't create one from nothing on a brand-new, empty CI runner — that's why
-every automated deploy has failed so far. [`fastlane match`](https://docs.fastlane.tools/actions/match/)
-fixes this by generating the certificate and profile **once, from your own Mac**, encrypting
-them, and storing them in a private git repo that CI reads from (read-only — CI never creates or
-revokes certificates).
+every automated deploy has failed so far. The certificate has to be generated once by a human
+with Apple Developer access (no way around that part), but from there it's just a file: export
+it, base64-encode it, and drop it straight into a GitHub secret. CI decodes it into a keychain
+that exists only for that one job run and is destroyed with the runner afterward.
 
-1. **Create a new private GitHub repository** to hold the encrypted certificates, e.g.
-   `jagrusy/fasting-app-certificates`. Nothing needs to go in it — `match` initializes it.
-2. **Point the project at it.** Open `fastlane/Matchfile` and replace the placeholder URL with
-   that repo's URL (or just export `MATCH_GIT_URL` before running the commands below instead of
-   editing the file).
-3. **Generate the certificate and profile**, from your own Mac (this needs your interactive
-   Apple ID / 2FA — it can't be scripted or done by an agent):
+1. **Create the certificate**, if you don't already have one: Xcode → Settings → Accounts →
+   select your team → **Manage Certificates** → **+** → **Apple Distribution**. (Skip if
+   `security find-identity -v -p codesigning` already shows an Apple Distribution identity.)
+2. **Export it as a `.p12`**: open Keychain Access → **My Certificates** → find the
+   "Apple Distribution: ..." entry → right-click → **Export** → save as `Certificates.p12` →
+   set a password when prompted. **Save that password**, you'll need it again in step 4.
+3. **Base64-encode it**:
    ```bash
-   bundle exec fastlane match appstore
+   base64 -i Certificates.p12 | pbcopy
    ```
-   You'll be asked to set a passphrase — this encrypts everything stored in the certs repo.
-   **Save that passphrase**, you'll need it again in step 4.
-4. **Create a GitHub Personal Access Token** so CI can read the private certs repo: on GitHub,
-   **Settings → Developer settings → Personal access tokens → Tokens (classic)**, scope: `repo`.
-   Then base64-encode `username:token` for match's basic-auth format:
-   ```bash
-   echo -n "jagrusy:ghp_yourTokenHere" | base64
-   ```
+   That's now on your clipboard, ready to paste into a GitHub secret.
 
 ---
 
@@ -64,8 +57,8 @@ In your GitHub repository ([jagrusy/fasting-app](https://github.com/jagrusy/fast
 | `APP_STORE_CONNECT_ISSUER_ID` | Your Issuer ID UUID |
 | `APP_STORE_CONNECT_KEY_CONTENT` | The Base64-encoded `.p8` key or direct text contents |
 | `APPLE_TEAM_ID` | Your Apple Developer Team ID (10-character alphanumeric) |
-| `MATCH_PASSWORD` | The passphrase you chose in step 2.3 |
-| `MATCH_GIT_BASIC_AUTHORIZATION` | The base64 string from step 2.4 |
+| `BUILD_CERTIFICATE_BASE64` | The base64 string from step 2.3 |
+| `P12_PASSWORD` | The password you set exporting the `.p12` in step 2.2 |
 
 > [!TIP]
 > To Base64-encode your `.p8` key on Mac terminal, run:
@@ -100,7 +93,7 @@ git push --tags
 All three options above run in GitHub Actions and need steps 1–3 done first. If that hasn't
 happened yet, or you just want a quick TestFlight build without waiting on CI, build and upload
 from your own Mac instead. This uses the Apple ID already signed in to Xcode (Xcode → Settings →
-Accounts) to sign and upload, so no App Store Connect API key, match, or CI secrets are involved:
+Accounts) to sign and upload, so no App Store Connect API key or CI secrets are involved:
 
 ```bash
 APPLE_TEAM_ID=ABCDE12345 make beta-local

@@ -25,23 +25,25 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # `readonly: true` means match only ever fetches the certificate/profile that already exist
-    # in the private match git repo — it never creates or revokes anything from CI. The
-    # certificate itself is created once, locally, via `fastlane match appstore` (see
-    # FASTLANE_SETUP.md). This is what `get_provisioning_profile` couldn't do: bind a profile to
-    # a certificate that doesn't exist yet on a brand-new CI runner.
-    match(
-      type: "appstore",
-      readonly: true,
+    team_id = ENV["APPLE_TEAM_ID"]
+
+    # get_provisioning_profile (sigh) can bind a profile to an *existing* certificate via the API
+    # key above, but it can't create the certificate itself. The certificate is imported into a
+    # temporary CI keychain by the "Import Code-Signing Certificate" workflow step before this
+    # lane runs (see .github/workflows/deploy.yml and FASTLANE_SETUP.md).
+    get_provisioning_profile(
       api_key: api_key,
-      app_identifier: "com.grusy.SolsticeFast"
+      app_identifier: "com.grusy.SolsticeFast",
+      team_id: team_id
     )
 
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
-      export_method: "app-store"
+      export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=#{team_id}",
+      export_xcargs: "-allowProvisioningUpdates"
     )
 
     upload_to_testflight(
@@ -89,18 +91,21 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    match(
-      type: "appstore",
-      readonly: true,
+    team_id = ENV["APPLE_TEAM_ID"]
+
+    get_provisioning_profile(
       api_key: api_key,
-      app_identifier: "com.grusy.SolsticeFast"
+      app_identifier: "com.grusy.SolsticeFast",
+      team_id: team_id
     )
 
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
-      export_method: "app-store"
+      export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=#{team_id}",
+      export_xcargs: "-allowProvisioningUpdates"
     )
 
     deliver(
