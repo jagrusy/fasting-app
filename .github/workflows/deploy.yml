@@ -40,12 +40,19 @@ jobs:
         run: |
           SIM_NAME=$(xcrun simctl list devices available -j | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
           if [ -z "$SIM_NAME" ]; then
-            SIM_NAME="iPhone 15"
+            SIM_NAME="iPhone 16"
           fi
           echo "Found available iOS Simulator: $SIM_NAME"
           echo "name=$SIM_NAME" >> $GITHUB_OUTPUT
 
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
       - name: Run Tests Before Deploy
+
         run: |
           xcodebuild test \
             -project Fasted.xcodeproj \

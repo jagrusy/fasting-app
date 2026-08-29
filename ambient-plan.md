@@ -5,9 +5,10 @@
 This is built by a single agent working through the workstreams below in order, across as many sessions as it takes. **Start here every time:** check the boxes below to find the first unchecked workstream, read its section, and implement it completely — code, tests, commit, push — before moving to the next.
 
 - [x] W-A — Notification quick wins
-- [ ] W0 — Build foundation
+- [x] W0 — Build foundation
 - [ ] W1 — Shared state layer
 - [ ] W2 — Target skeletons
+
 
 - [ ] W3 — App Intents layer
 - [ ] W4 — Home Screen / Lock Screen / StandBy widget

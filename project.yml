@@ -2,28 +2,26 @@ name: Fasted
 options:
   bundleIdPrefix: com.grusy
   deploymentTarget:
-    iOS: "16.0"
+    iOS: "18.0"
+    watchOS: "11.0"
   xcodeVersion: "16.0"
   createIntermediateGroups: true
 
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
     SWIFT_TREAT_WARNINGS_AS_ERRORS: "YES"
     ENABLE_PREVIEWS: "YES"
-    SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
-    SUPPORTS_MACCATALYST: "NO"
-    TARGETED_DEVICE_FAMILY: "1"
     DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
 
 targets:
   Fasted:
     type: application
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "18.0"
     sources:
       - path: Fasted
+      - path: Shared
     settings:
       base:
         INFOPLIST_FILE: Fasted/Info.plist
@@ -33,12 +31,13 @@ targets:
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         TARGETED_DEVICE_FAMILY: "1"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
 
   FastedTests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "18.0"
     sources:
       - path: FastedTests
     dependencies:
@@ -50,12 +49,13 @@ targets:
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         TARGETED_DEVICE_FAMILY: "1"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
 
   FastedUITests:
     type: bundle.ui-testing
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "18.0"
     sources:
       - path: FastedUITests
     dependencies:
@@ -67,4 +67,41 @@ targets:
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         TARGETED_DEVICE_FAMILY: "1"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+
+schemes:
+  Fasted:
+    build:
+      targets:
+        Fasted: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - FastedTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
+  FastedTests:
+    build:
+      targets:
+        FastedTests: all
+    test:
+      config: Debug
+      targets:
+        - FastedTests
+
+  FastedUITests:
+    build:
+      targets:
+        FastedUITests: all
+    test:
+      config: Debug
+      targets:
+        - FastedUITests
