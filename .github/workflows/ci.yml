@@ -55,7 +55,32 @@ jobs:
             -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
             SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 
+      - name: Build iOS Widget Extension
+        run: |
+          xcodebuild build \
+            -project Fasted.xcodeproj \
+            -scheme FastedWidgets \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+
+      - name: Build watchOS Application
+        run: |
+          xcodebuild build \
+            -project Fasted.xcodeproj \
+            -scheme FastedWatch \
+            -destination "generic/platform=watchOS Simulator" \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+
+      - name: Build watchOS Widget Extension
+        run: |
+          xcodebuild build \
+            -project Fasted.xcodeproj \
+            -scheme FastedWatchWidgets \
+            -destination "generic/platform=watchOS Simulator" \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+
       - name: Run Unit Tests
+
         run: |
           xcodebuild test \
             -project Fasted.xcodeproj \

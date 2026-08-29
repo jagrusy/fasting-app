@@ -16,8 +16,10 @@ included:
   - Shared
   - FastedTests
   - FastedUITests
+  - FastedWidgets
   - FastedWatch
-  - FastedWatchTests
+  - FastedWatchWidgets
+
 
 excluded:
   - Fasted.xcodeproj
