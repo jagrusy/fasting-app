@@ -1,5 +1,22 @@
 # Companion Surfaces: Widgets, StandBy, Control Center, Watch
 
+## How to resume this plan
+
+This is built by a single agent working through the workstreams below in order, across as many sessions as it takes. **Start here every time:** check the boxes below to find the first unchecked workstream, read its section, and implement it completely — code, tests, commit, push — before moving to the next.
+
+- [ ] W-A — Notification quick wins
+- [ ] W0 — Build foundation
+- [ ] W1 — Shared state layer
+- [ ] W2 — Target skeletons
+- [ ] W3 — App Intents layer
+- [ ] W4 — Home Screen / Lock Screen / StandBy widget
+- [ ] W5 — Control Center control
+- [ ] W6 — watchOS companion
+- [ ] W7 — Watch complications
+- [ ] W8 — Release plumbing and doc reconciliation
+
+Only check a box once that workstream's commit is actually pushed to `feat/companion-surfaces`. A resumed session trusts this checklist completely, so a box checked too early causes a workstream to be silently skipped, and a box left unchecked after the work is done causes it to be silently redone.
+
 ## Context
 
 Solstice ("Fasted") today is a single iOS app target. To see or change your fast you must open the app, navigate to the Fast tab, and tap. Everything the app knows is locked behind that launch.
@@ -28,7 +45,7 @@ An `.accessoryRectangular` Lock Screen widget gives a permanent Lock Screen pres
 
 Every surface here is permanent. Nothing in this plan can visibly die mid-fast.
 
-**AlarmKit was considered and deferred.** iOS 26 opened up the system-level alarm/timer treatment that was previously first-party-only (Apple's Clock app never used ActivityKit, which is why its timers hold the Dynamic Island indefinitely). AlarmKit grants third parties the Dynamic Island, Lock Screen, StandBy and Watch, with alerts that break through silent mode and Focus. It was rejected for four reasons: it requires an **iOS 26 floor** (a much steeper adoption cut than iOS 18); its alerts are **loud and breakthrough by design**, which is right for a cooking timer and wrong for "your fast is complete" — Apple's own guidance says alarms are not replacements for time-sensitive notifications; it needs a **second authorization prompt** (`NSAlarmKitUsageDescription`); and, decisively, **AlarmKit still renders its countdown through a Live Activity**, and whether that activity is exempt from the 12-hour cap is not stated in Apple's documentation — so it may not solve the original problem at all. Do not reach for AlarmKit in any workstream. If it is ever revisited, the prerequisite is a device spike answering that one question first.
+**AlarmKit was considered and deferred.** iOS 26 opened up the system-level alarm/timer treatment that was previously first-party-only (Apple's Clock app never used ActivityKit, which is why its timers hold the Dynamic Island indefinitely). AlarmKit grants third parties the Dynamic Island, Lock Screen, StandBy and Watch, with alerts that break through silent mode and Focus. It was rejected for four reasons: it requires an **iOS 26 floor** (a much steeper adoption cut than iOS 18); its alerts are **loud and breakthrough by design**, which is right for a cooking timer and wrong for "your fast is complete" — Apple's own guidance says alarms are not replacements for time-sensitive notifications; it needs a **second authorization prompt** (`NSAlarmKitUsageDescription`); and, decisively, **AlarmKit still renders its countdown through a Live Activity**, and whether that activity is exempt from the 12-hour cap is not stated in Apple's documentation — so it may not solve the original problem at all. Do not reach for AlarmKit in this build. If it is ever revisited, the prerequisite is a device spike answering that one question first.
 
 ### Decisions already made
 
@@ -36,7 +53,7 @@ Every surface here is permanent. Nothing in this plan can visibly die mid-fast.
 - **No ActivityKit anywhere.** No `NSSupportsLiveActivities`, no `ActivityAttributes`, no `LiveActivityIntent`.
 - **Watch app is complication-first and thin** — one screen (progress + start/end), not a port of `FastTrackerView`. With Live Activities gone there is no free Smart Stack mirroring, so **the watch complication is now the only wrist surface** and rises in priority accordingly.
 - **Ending a fast from a widget is state-aware** — goal met: one tap completes in place; goal not met: opens the app to the existing Save/Discard confirmation in `Fasted/EndFastButtonView.swift`.
-- **Build agents are Sonnet**, driven from a shared project agent definition (see "Agent setup"), one session per workstream.
+- **Build is a single Sonnet agent** (see "Agent setup") working through the checklist above sequentially, resuming across sessions as needed — not a fleet of parallel agents. The workstreams below still describe disjoint file sets per surface; that's kept because it makes each workstream's diff reviewable on its own, not because anything runs in parallel anymore.
 
 ### Design intent worth preserving
 
@@ -44,57 +61,41 @@ Every surface here is permanent. Nothing in this plan can visibly die mid-fast.
 
 ---
 
-## Non-negotiables for every agent
+## Non-negotiables
 
 1. **Never hand-edit `Fasted.xcodeproj/project.pbxproj`.** After W0, CI regenerates it. It is 41KB of UUID-keyed plist; blind edits will break the repo.
-2. **Never claim a build passed.** No agent can run `xcodebuild`, `xcodegen`, `swift`, or `swiftlint` — none are installed and the platform is Linux. The only verification is a pushed branch's CI run. Each PR body must list what still needs device verification.
-3. **All workstream PRs target the integration branch `feat/companion-surfaces`, never `main`.** `.github/workflows/deploy.yml` ships every push to `main` straight to TestFlight. Merge to `main` once at the end, after the portal work in W8.
+2. **Never claim a build passed.** No agent can run `xcodebuild`, `xcodegen`, `swift`, or `swiftlint` — none are installed and the platform is Linux. The only verification is a pushed branch's CI run. Each workstream's commit message must state what CI proves and list anything that still needs device verification; add the device-only items to this plan's Verification section too, so they aren't lost between sessions.
+3. **All work happens on the integration branch `feat/companion-surfaces`, never `main`.** Commit after each workstream and push immediately — nothing should sit unpushed between sessions. `.github/workflows/deploy.yml` ships every push to `main` straight to TestFlight, so never push there, and do not open a pull request unless explicitly asked to — the branch itself is the deliverable until the human says otherwise.
 4. **Lint is `swiftlint lint --strict`** — the 120-column `line_length` *warning* is a hard failure, and `force_unwrapping` + `implicitly_unwrapped_optional` are enabled. WidgetKit type names are long; use `typealias`.
 5. **`SWIFT_TREAT_WARNINGS_AS_ERRORS: YES` is project-wide.** With a uniform iOS 18 floor, **no `#available` check for WidgetKit, App Intents, or ControlWidget is needed anywhere** — and an always-true one is a *build failure*. Do not add availability gating for these APIs.
 6. **`Shared/` must compile for iOS 18.0 *and* watchOS 11.0.** No unguarded `import UIKit`, and **never** reference `Fast`, `UserSettings`, `NSManagedObject`, or `PersistenceController` — those Core Data codegen classes exist only in the `Fasted` target.
-7. **No ActivityKit.** If a workstream seems to want a Live Activity, it is out of scope by decision, not oversight.
+7. **No ActivityKit.** If it's tempting to reach for a Live Activity, it's out of scope by decision, not oversight.
 
 ---
 
-## Agent setup (do this before W0)
+## Agent setup (do this once, before W0)
 
-Create `.claude/agents/solstice-builder.md` with `model: sonnet` in frontmatter and a body carrying: the seven non-negotiables above, the repo's toolchain facts (XcodeGen is the source of truth; CI is the only verification), and the SwiftLint constraints. Then run each workstream as its own session against that agent, so the guardrails are enforced structurally rather than re-pasted into every prompt.
+Create `.claude/agents/solstice-builder.md` with `model: sonnet` in frontmatter and a body carrying the non-negotiables above, the repo's toolchain facts, and the SwiftLint constraints. Then invoke that agent — it reads this plan, resumes from the checklist at the top, and works through the workstreams in order. Invoke it again any time (a fresh session or a continued one both work identically) to pick up exactly where it left off; there's no need to specify which workstream, since the checklist determines that.
 
-This matters because the top failure modes are *process* failures, not coding failures: hand-editing the pbxproj, adding always-true `#available` checks, and claiming a build passed in an environment with no compiler.
-
----
-
-## Dependency graph
-
-```
-W-A  Notification quick wins ───── (independent, ship first, no new targets)
-
-W0  Build foundation  ──┐   (SEQUENTIAL, blocks all)
-                        ▼
-W1  Shared state layer ─┐   (SEQUENTIAL — the correctness core)
-                        ▼
-W2  Target skeletons ───┐   (SEQUENTIAL — declares ALL targets + placeholders)
-                        ▼
-W3  App Intents layer ──┐   (SEQUENTIAL)
-                        ▼
-        ┌───────────────┬───────────────┬───────────────┐
-        ▼               ▼               ▼
-       W4              W5              W6          (PARALLEL — 3 agents)
-  Widget+StandBy    Control        watchOS app
-        └───────────────┴───────────────┴───────────────┘
-                        ▼
-              W7  Watch complications
-                        ▼
-              W8  Release plumbing + docs
-```
-
-W0–W3 are four small, strictly sequential PRs whose entire purpose is to let W4–W6 run as parallel agents on **disjoint file sets that never touch `project.yml`**.
+This matters because the top failure modes are *process* failures, not coding failures: hand-editing the pbxproj, adding always-true `#available` checks, claiming a build passed in an environment with no compiler, or losing track of progress across a build long enough to span several context windows.
 
 ---
 
-## W-A — Notification quick wins (independent, ship first)
+## Build order
 
-Highest value per line of code in the plan, and zero build risk — no new targets, no entitlements. Ship it while W0–W3 grind through plumbing.
+Work through the workstreams strictly in the order given by the checklist. The reasoning:
+
+- **W-A** has no dependencies on anything else here — do it whenever, first is fine, since it ships real value immediately with zero build risk.
+- **W0 → W1 → W2 → W3 are hard, sequential prerequisites.** W0 makes `project.yml` and CI agree with each other, so nothing declared afterward is trustworthy until it lands. W1 is the correctness core — the shared snapshot and command queue — and deliberately introduces no new build targets, so it's worth getting right before any extension exists to consume it. W2 declares every new target (widgets, watch app, watch widget extension) as compiling placeholders in one step; it's the highest build-risk workstream in the project, which is exactly why it's isolated to its own commit rather than mixed into W4–W6. W3 builds the App Intents that W4–W6 wire buttons to.
+- **W4 → W5 → W6** each build one surface — widget/StandBy, Control Center, watchOS app — on top of W3's intents. They touch disjoint files, so this exact order is a preference, not a hard requirement: W6 (watch) is placed after W4 because it reuses `Shared/FastProgressViews.swift`, which W4 writes.
+- **W7** (watch complications) needs W6's watch app target and reuses W4's view code, so it comes after both.
+- **W8** is release plumbing and only makes sense once everything else compiles.
+
+---
+
+## W-A — Notification quick wins
+
+Do this one first — it's independent of everything else, ships real value immediately, and carries zero build risk (no new targets, no entitlements) while W0–W3 handle the more involved plumbing.
 
 **Goal:** one-tap start from a Lock Screen banner, and stage transitions as the ambient reminder.
 
@@ -108,9 +109,9 @@ Highest value per line of code in the plan, and zero build risk — no new targe
 
 ---
 
-## W0 — Build foundation (SEQUENTIAL, blocks everything)
+## W0 — Build foundation
 
-**This is the critical finding.** `.github/workflows/ci.yml` builds the committed `.pbxproj` and **never runs XcodeGen**. `scripts/pre-commit.sh` regenerates it only on a developer machine that has xcodegen installed. So today, an agent adding a target to `project.yml` produces a **green CI run that built the old project** — the target silently does not exist. Nothing else can proceed until this is fixed.
+**This is the critical finding.** `.github/workflows/ci.yml` builds the committed `.pbxproj` and **never runs XcodeGen**. `scripts/pre-commit.sh` regenerates it only on a developer machine that has xcodegen installed. So today, a `project.yml` edit produces a **green CI run that built the old project** — the target silently does not exist. Nothing else can proceed until this is fixed.
 
 **Files:** `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`, `project.yml`, `.swiftlint.yml`, plus `git mv` into a new `Shared/`.
 
@@ -130,9 +131,9 @@ Note: `README.md` and `CONTRIBUTING.md` currently claim a watchOS companion and 
 
 ---
 
-## W1 — Shared state layer (SEQUENTIAL)
+## W1 — Shared state layer
 
-The correctness core, and now more load-bearing than in any earlier draft. Ships **no new build targets**, so it is low build-risk and high test-coverage.
+The correctness core, and the most load-bearing workstream in the plan. Ships **no new build targets**, so it is low build-risk and high test-coverage.
 
 ### Why we do NOT move Core Data into the App Group
 
@@ -140,9 +141,9 @@ The correctness core, and now more load-bearing than in any earlier draft. Ships
 
 Instead: **a read-only snapshot out, a durable command queue in.**
 
-### Why the queue is now mandatory
+### Why the queue is mandatory
 
-With Live Activities dropped, there is no `LiveActivityIntent`, and **process placement is no longer guaranteed**: an `AppIntent` fired from a widget button runs in the app's process only if the app happens to be running, and in the **widget extension process otherwise** — where Core Data is unreachable. A `ControlWidget`'s `SetValueIntent` is in the same position.
+With Live Activities dropped, there is no `LiveActivityIntent`, and **process placement is not guaranteed**: an `AppIntent` fired from a widget button runs in the app's process only if the app happens to be running, and in the **widget extension process otherwise** — where Core Data is unreachable. A `ControlWidget`'s `SetValueIntent` is in the same position.
 
 So the queue is not a fallback or an optimization. It is **the only durable channel from an extension to the app**, and every intent must be written assuming it will run somewhere that cannot see Core Data.
 
@@ -203,9 +204,9 @@ New `Fasted/Fasted.entitlements` with `com.apple.security.application-groups = [
 
 ---
 
-## W2 — Target skeletons (SEQUENTIAL)
+## W2 — Target skeletons
 
-Declares **every** new target and **every** new source file with compiling placeholders, so W4–W6 never touch `project.yml` and never collide. **Highest build-risk PR in the project** — deliberately isolated so its failure mode is one small PR.
+Declares **every** new target and **every** new source file with compiling placeholders, so every workstream after this one only ever adds code inside already-declared targets and never needs to touch `project.yml` again. **Highest build-risk workstream in the project** — deliberately isolated to its own commit so a failure here is easy to isolate and revert without losing the W0/W1 work underneath it.
 
 **`FastedWidgets`** — `type: app-extension`, platform iOS, deployment 18.0, sources `[FastedWidgets, Shared]`, bundle id `com.grusy.SolsticeFast.Widgets`, own entitlements with the same App Group, `SKIP_INSTALL: YES`, hand-written `Info.plist` with `NSExtensionPointIdentifier = com.apple.widgetkit-extension` (no principal class — SwiftUI `WidgetBundle` uses `@main`).
 
@@ -215,9 +216,9 @@ Declares **every** new target and **every** new source file with compiling place
 
 Add all three as `dependencies` of `Fasted` so they're embedded, add matching schemes, add them to `.swiftlint.yml`, and add a watch `AppIcon` asset set (App Store Connect rejects a watch app without one).
 
-**Placeholder files created here, each later replaced by exactly one workstream:**
+**Placeholder files created here, each filled in by exactly one later workstream** (this keeps each workstream's diff small and focused, even though one agent does all of them):
 
-| File | Owner |
+| File | Filled in by |
 |---|---|
 | `FastedWidgets/FastedWidgetsBundle.swift` (the `@main WidgetBundle`) | **finished in W2, touched by nobody after** |
 | `FastedWidgets/FastStatusWidget.swift` | W4 |
@@ -230,7 +231,7 @@ Add all three as `dependencies` of `Fasted` so they're embedded, add matching sc
 
 ---
 
-## W3 — App Intents layer (SEQUENTIAL)
+## W3 — App Intents layer
 
 Four intents in `Shared/Intents/`, compiled into both the app and the widget extension, each doing nothing but enqueue a `FastCommand` and refresh surfaces.
 
@@ -245,9 +246,9 @@ The **state-aware end** decision lives here: `EndFastIntent` checks the snapshot
 
 ---
 
-## The parallel wave — W4–W6
+## W4–W6 — Widget, Control, Watch
 
-Three agents, three disjoint file sets, **zero `project.yml` edits, zero shared-file edits**.
+Three surfaces, each in its own files. Nothing about this is parallel anymore, but the file boundaries below are kept clean anyway — it makes each workstream's commit reviewable on its own even when one agent writes all three back to back.
 
 ### W4 — Home Screen / Lock Screen / StandBy widget
 
@@ -271,7 +272,7 @@ Put the shared ring/stage view code in `Shared/FastProgressViews.swift` — W6 a
 
 A `ControlWidget` with a `ControlWidgetToggle` bound to a `ControlValueProvider` reading `SharedStore.shared.readSnapshot()?.isFasting`, driven by `SetFastingIntent` from W3. Lands in Control Center, the Lock Screen control slot, and the Action Button. The provider must handle a `nil` snapshot (first install, app never run) by rendering "not fasting" and letting the toggle start one.
 
-**Verify:** compilation only. A control cannot be unit-tested and CI's simulator won't exercise it — this is almost entirely device verification, and the PR must say so plainly.
+**Verify:** compilation only. A control cannot be unit-tested and CI's simulator won't exercise it — this is almost entirely device verification, and the commit message must say so plainly.
 
 ### W6 — watchOS companion
 
@@ -318,30 +319,33 @@ Reads the snapshot from the watch-side App Group written by `FastedWatch` on rec
 
 ---
 
-## Risks most likely to make an agent fail
+## Risks most likely to make the agent fail
 
-1. **Silent no-op `project.yml` edits** — highest-probability failure. Without W0, an agent adds a target, CI goes green against the *old* project, and nobody notices the extension doesn't exist. Mitigated by W0 first + W2's explicit per-scheme build steps.
-2. **Hand-editing `project.pbxproj`** — tempting for an agent that can't run xcodegen. Prohibited in the agent definition; after W0 there's no reason to.
+1. **Silent no-op `project.yml` edits** — highest-probability failure. Without W0, a `project.yml` edit goes green in CI against the *old* project, and nobody notices the extension doesn't exist. Mitigated by W0 first + W2's explicit per-scheme build steps.
+2. **Hand-editing `project.pbxproj`** — tempting when xcodegen isn't available locally. Prohibited in the agent definition; after W0 there's no reason to.
 3. **Always-true `#available` under warnings-as-errors** — with a uniform iOS 18 floor, availability gating for these APIs is a *build failure*, not a safety net.
-4. **`Shared/` referencing Core Data** — `Fast`/`UserSettings` are codegen classes existing only in the `Fasted` target. An agent writing `FastSnapshot(from: Fast)` in `Shared/` breaks the widget and watch builds. All conversion lives in `Fasted/FastManager+SharedState.swift`.
+4. **`Shared/` referencing Core Data** — `Fast`/`UserSettings` are codegen classes existing only in the `Fasted` target. Writing `FastSnapshot(from: Fast)` in `Shared/` breaks the widget and watch builds. All conversion lives in `Fasted/FastManager+SharedState.swift`.
 5. **An intent writing Core Data directly** — it will appear to work in the simulator when the app happens to be running, then silently fail in the field when it runs in the extension. This is the single most dangerous mistake available, because it is *intermittently* correct. The rule: intents only ever enqueue.
-6. **Optimistic snapshot treated as durable** — an agent may skip the queue and write only the snapshot from an extension, losing the write forever. The invariant, stated everywhere: *the queue is the only durable channel; the snapshot is cosmetic and always overwritten by the app.*
+6. **Optimistic snapshot treated as durable** — skipping the queue and writing only the snapshot from an extension loses the write forever. The invariant, stated everywhere: *the queue is the only durable channel; the snapshot is cosmetic and always overwritten by the app.*
 7. **Non-atomic queue appends** — using an App Group `UserDefaults` array instead of `NSFileCoordinator` produces a rare, unreproducible lost-command bug.
 8. **SwiftLint `--strict` at 120 columns** — WidgetKit generic signatures blow past it immediately. Use `typealias`; treat the lint job as the first CI signal.
 9. **`force_unwrapping`** — widget sample code is full of `URL(string:)!` and `UserDefaults(suiteName:)!`. Use `??` fallbacks.
-10. **Watch target inheriting iOS `SUPPORTED_PLATFORMS`** — produces a confusing "does not support the platform iOS" error an agent will misdiagnose as a source problem. W0 removes the keys before any watch target exists.
-11. **A watch compile error blocking everyone** — once `Fasted` depends on `FastedWatch`, it fails `-scheme Fasted`. W2's watch placeholder is deliberately trivial; only W6 may touch `FastedWatch/`.
-12. **Reintroducing Live Activities** — an agent that knows ActivityKit will reach for it, especially in W4. Out of scope by decision.
+10. **Watch target inheriting iOS `SUPPORTED_PLATFORMS`** — produces a confusing "does not support the platform iOS" error that's easy to misdiagnose as a source problem. W0 removes the keys before any watch target exists.
+11. **A watch compile error blocking all further work** — once `Fasted` depends on `FastedWatch`, it fails `-scheme Fasted` entirely. W2's watch placeholder is deliberately trivial, so this risk is front-loaded into one easy-to-fix commit rather than discovered later inside W6.
+12. **Reintroducing Live Activities** — knowing ActivityKit exists is a pull, especially in W4. Out of scope by decision.
 13. **Shipping half-built targets to TestFlight** — `deploy.yml` fires on every push to `main`. Hence the `feat/companion-surfaces` integration branch.
-14. **Overclaiming verification** — no agent here can compile Swift. Every PR body must carry an explicit "requires device verification" list.
+14. **Overclaiming verification** — no compiler exists in this environment. Every commit message must say what CI does and doesn't prove, and any newly-discovered device-only check must be added to the Verification section below, not left unrecorded.
+15. **Losing track of progress across sessions** — a build this size will likely span more than one context window. Mitigated entirely by the checklist at the top of this file: check a workstream's box only once its commit is pushed, never before, so a resumed session can trust the checklist completely and never has to reconstruct state by reading git log.
 
 ---
 
 ## Verification
 
+This section is cumulative — as each workstream is implemented, add any new device-only checks it introduces here rather than tracking them separately per commit.
+
 **What CI proves** (after W0 adds xcodegen + per-scheme builds): SwiftLint `--strict` passes; `Fasted`, `FastedWidgets`, `FastedWatch`, and `FastedWatchWidgets` all compile warning-free; `FastedTests` and `FastedUITests` pass.
 
-**Genuinely self-verifiable by an agent** — all of W1 (snapshot codable + schema guard, enqueue/drain/dedupe/cap, **end-timestamp == tap time**, idempotency, mismatched `targetFastID`, ordering, queue cap), W-A's scheduling logic, and the pure-logic halves of W3/W4/W6 (`FastCommandFactory`, `WidgetTimelineBuilder`, `WatchPayload`).
+**Genuinely self-verifiable in this environment** — all of W1 (snapshot codable + schema guard, enqueue/drain/dedupe/cap, **end-timestamp == tap time**, idempotency, mismatched `targetFastID`, ordering, queue cap), W-A's scheduling logic, and the pure-logic halves of W3/W4/W6 (`FastCommandFactory`, `WidgetTimelineBuilder`, `WatchPayload`).
 
 **Device verification required, by a human** — widget rendering across all families; StandBy legibility at night; Lock Screen accessory placement; the Control Center toggle and Action Button; watch pairing and `transferUserInfo` after relaunch; complication rendering on real faces; and every signing/provisioning outcome.
 
