@@ -59,6 +59,7 @@ In your GitHub repository ([jagrusy/fasting-app](https://github.com/jagrusy/fast
 | `APPLE_TEAM_ID` | Your Apple Developer Team ID (10-character alphanumeric) |
 | `BUILD_CERTIFICATE_BASE64` | The base64 string from step 2.3 |
 | `P12_PASSWORD` | The password you set exporting the `.p12` in step 2.2 |
+| `APP_REVIEW_PHONE` | A phone number Apple's App Review team can reach you at (e.g. `+15551234567`) — only needed for the `release` lane, not `beta` |
 
 > [!TIP]
 > To Base64-encode your `.p8` key on Mac terminal, run:
@@ -69,7 +70,41 @@ In your GitHub repository ([jagrusy/fasting-app](https://github.com/jagrusy/fast
 
 ---
 
-## 4. How to Deploy
+## 4. One-Time App Store Connect Setup (before the first `release`)
+
+Solstice has only ever gone through TestFlight, never a real App Store review — TestFlight
+doesn't enforce a few things that App Store review does. These are one-time, per-app settings
+that live in the App Store Connect **web UI only**; there's no fastlane action or metadata file
+that can set them, so no amount of CI automation can skip this part. Do these once, before the
+first `release` run (a tag push), at [appstoreconnect.apple.com](https://appstoreconnect.apple.com)
+→ your app:
+
+- [ ] **Age Rating** — App Store Connect will prompt for the age-rating questionnaire the first
+  time you touch the app's version page.
+- [ ] **App Privacy ("Nutrition Label")** — under the **App Privacy** section, declare what data
+  the app collects. For Solstice this should be straightforward: it's 100% on-device with no
+  accounts, no analytics, and no network calls, so the honest answer is "we don't collect data."
+- [ ] **Pricing and Availability** — set a price tier (or Free) and which territories it's
+  available in.
+
+`deliver` (the `release` lane) will fail with a clear error pointing at whichever of these is
+still missing — it's safe to just try the lane and let the error tell you what's left.
+
+Two things that are *already* handled and won't ask you anything:
+- **Export compliance** — `Fasted/Info.plist` already declares
+  `ITSAppUsesNonExemptEncryption = false`, so Apple won't prompt for this per-submission.
+- **App Review contact info** — set automatically by the `release` lane from
+  `APP_REVIEW_PHONE`/`APP_REVIEW_EMAIL`/etc. above; Solstice has no accounts, so there's no demo
+  login to provide either.
+- **Privacy Manifest** — `Fasted/PrivacyInfo.xcprivacy` declares the app's `UserDefaults` usage
+  (used only for the appearance setting and a fast's snooze delay, never shared). This is a
+  separate, newer Apple requirement from the App Privacy page above — it's a file in the app
+  binary that Apple's automated binary validation checks, catching apps that skip it before a
+  human ever reviews the submission.
+
+---
+
+## 5. How to Deploy
 
 ### Automatic: on every merge to `main`
 Every push to `main` now runs the `beta` lane automatically — build, sign, and upload to
