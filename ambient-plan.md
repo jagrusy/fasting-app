@@ -14,8 +14,9 @@ This is built by a single agent working through the workstreams below in order, 
 
 - [x] W3 — App Intents layer
 - [x] W4 — Home Screen / Lock Screen / StandBy widget
-- [ ] W5 — Control Center control
+- [x] W5 — Control Center control
 - [ ] W6 — watchOS companion
+
 
 
 - [ ] W7 — Watch complications
