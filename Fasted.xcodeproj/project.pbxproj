@@ -58,6 +58,7 @@
 		4F1DA862E05BEF445BB8A6BB /* FastTimePickerSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DB0B703836E5E90A0C0FA8 /* FastTimePickerSheetView.swift */; };
 		EF59E52260F6FF2DA6BED7EB /* FastManagerValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E339F0C2BC68F6EA74EAB8F0 /* FastManagerValidationTests.swift */; };
 		8838768781086C52FEF7CD48 /* StreakCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E975013F8059E05BF638E08 /* StreakCalculatorTests.swift */; };
+		FA7D91EABA02B5C61511A9C4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 402D877014F060F6EE9525FB /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -133,6 +134,7 @@
 		91DB0B703836E5E90A0C0FA8 /* FastTimePickerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTimePickerSheetView.swift; sourceTree = "<group>"; };
 		E339F0C2BC68F6EA74EAB8F0 /* FastManagerValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManagerValidationTests.swift; sourceTree = "<group>"; };
 		6E975013F8059E05BF638E08 /* StreakCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalculatorTests.swift; sourceTree = "<group>"; };
+		402D877014F060F6EE9525FB /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -168,6 +170,7 @@
 		FA2CF958379392EFE41B27EF /* Fasted */ = {
 			isa = PBXGroup;
 			children = (
+				402D877014F060F6EE9525FB /* PrivacyInfo.xcprivacy */,
 				80771F75130AEDBA2CE552BA /* EndFastButtonView.swift */,
 				3FB73938D6F11C3E4F4CFF3D /* FastManager+Notifications.swift */,
 				91DB0B703836E5E90A0C0FA8 /* FastTimePickerSheetView.swift */,
@@ -329,6 +332,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA7D91EABA02B5C61511A9C4 /* PrivacyInfo.xcprivacy in Resources */,
 				62B0C00563C611B6973E931E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

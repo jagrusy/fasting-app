@@ -108,6 +108,14 @@ platform :ios do
       export_xcargs: "-allowProvisioningUpdates"
     )
 
+    # Apple requires review-contact info before a submission is accepted. Solstice has no
+    # accounts/login, so sign_in_required is false and there's nothing to demo-log-in with.
+    review_phone = ENV["APP_REVIEW_PHONE"]
+    UI.user_error!(
+      "Set APP_REVIEW_PHONE (App Review contact phone number, e.g. +15551234567) before " \
+      "running the release lane — Apple requires it to accept a submission."
+    ) if review_phone.nil? || review_phone.empty?
+
     deliver(
       api_key: api_key,
       force: true,
@@ -116,7 +124,15 @@ platform :ios do
       skip_metadata: false,
       skip_screenshots: false,
       submit_for_review: true,
-      automatic_release: true
+      automatic_release: true,
+      app_review_information: {
+        first_name: ENV["APP_REVIEW_FIRST_NAME"] || "Alan",
+        last_name: ENV["APP_REVIEW_LAST_NAME"] || "Grusy",
+        phone_number: review_phone,
+        email_address: ENV["APP_REVIEW_EMAIL"] || "jagrusy@gmail.com",
+        notes: "Solstice has no accounts or sign-in — every feature is reachable immediately."
+        # No demo_user/demo_password: nothing to log into (no accounts in the app at all).
+      }
     )
   end
 end
