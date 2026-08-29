@@ -21,7 +21,38 @@ Apple provides official API Keys for CI/CD authentication without 2FA SMS prompt
 
 ---
 
-## 2. Add Secrets to GitHub Repository
+## 2. Set Up Code Signing (match)
+
+This is the step that was missing before: CI has an App Store Connect API key (step 1), but no
+**distribution certificate**. `get_provisioning_profile`/`sigh` can bind an existing certificate
+to a profile, but can't create one from nothing on a brand-new, empty CI runner — that's why
+every automated deploy has failed so far. [`fastlane match`](https://docs.fastlane.tools/actions/match/)
+fixes this by generating the certificate and profile **once, from your own Mac**, encrypting
+them, and storing them in a private git repo that CI reads from (read-only — CI never creates or
+revokes certificates).
+
+1. **Create a new private GitHub repository** to hold the encrypted certificates, e.g.
+   `jagrusy/fasting-app-certificates`. Nothing needs to go in it — `match` initializes it.
+2. **Point the project at it.** Open `fastlane/Matchfile` and replace the placeholder URL with
+   that repo's URL (or just export `MATCH_GIT_URL` before running the commands below instead of
+   editing the file).
+3. **Generate the certificate and profile**, from your own Mac (this needs your interactive
+   Apple ID / 2FA — it can't be scripted or done by an agent):
+   ```bash
+   bundle exec fastlane match appstore
+   ```
+   You'll be asked to set a passphrase — this encrypts everything stored in the certs repo.
+   **Save that passphrase**, you'll need it again in step 4.
+4. **Create a GitHub Personal Access Token** so CI can read the private certs repo: on GitHub,
+   **Settings → Developer settings → Personal access tokens → Tokens (classic)**, scope: `repo`.
+   Then base64-encode `username:token` for match's basic-auth format:
+   ```bash
+   echo -n "jagrusy:ghp_yourTokenHere" | base64
+   ```
+
+---
+
+## 3. Add Secrets to GitHub Repository
 
 In your GitHub repository ([jagrusy/fasting-app](https://github.com/jagrusy/fasting-app)):
 1. Go to **Settings** $\rightarrow$ **Secrets and variables** $\rightarrow$ **Actions**.
@@ -33,6 +64,8 @@ In your GitHub repository ([jagrusy/fasting-app](https://github.com/jagrusy/fast
 | `APP_STORE_CONNECT_ISSUER_ID` | Your Issuer ID UUID |
 | `APP_STORE_CONNECT_KEY_CONTENT` | The Base64-encoded `.p8` key or direct text contents |
 | `APPLE_TEAM_ID` | Your Apple Developer Team ID (10-character alphanumeric) |
+| `MATCH_PASSWORD` | The passphrase you chose in step 2.3 |
+| `MATCH_GIT_BASIC_AUTHORIZATION` | The base64 string from step 2.4 |
 
 > [!TIP]
 > To Base64-encode your `.p8` key on Mac terminal, run:
@@ -43,27 +76,31 @@ In your GitHub repository ([jagrusy/fasting-app](https://github.com/jagrusy/fast
 
 ---
 
-## 3. How to Deploy
+## 4. How to Deploy
 
-### Option A: Manual Trigger via GitHub Actions UI
-1. Go to the **Actions** tab in GitHub.
-2. Select **Deploy to TestFlight & App Store**.
-3. Click **Run workflow**, choose `beta` (for TestFlight) or `release` (for App Store Review), and click **Run**.
+### Automatic: on every merge to `main`
+Every push to `main` now runs the `beta` lane automatically — build, sign, and upload to
+TestFlight. No action needed once steps 1–3 above are done.
 
-### Option B: Push a Git Release Tag
-Pushing any git tag starting with `v` (e.g. `v1.0.0`) automatically triggers the build and uploads it to TestFlight:
+### Automatic: on a release tag
+Pushing any git tag starting with `v` (e.g. `v1.0.0`) runs the `release` lane — uploads metadata,
+screenshots, and submits the build for App Store review:
 ```bash
 git tag v1.0.0
 git push --tags
 ```
 
-### Option C: Build Locally (no CI secrets required)
-Both options above run in GitHub Actions and need the CI secrets in step 2 configured with a
-valid **distribution certificate** — `get_provisioning_profile` can bind an existing certificate
-to a profile, but it can't create one from nothing on a bare CI runner. If that hasn't been set
-up yet (or you just want a quick TestFlight build without waiting on CI), build and upload from
-your own Mac instead. This uses the Apple ID already signed in to Xcode (Xcode → Settings →
-Accounts) to sign and upload, so no App Store Connect API key or CI secrets are involved:
+### Manual Trigger via GitHub Actions UI
+1. Go to the **Actions** tab in GitHub.
+2. Select **Deploy to TestFlight & App Store**.
+3. Click **Run workflow**. Leave the lane blank to let it auto-select (same rule as above), or
+   force `beta` / `release` explicitly.
+
+### Build Locally (no CI secrets required)
+All three options above run in GitHub Actions and need steps 1–3 done first. If that hasn't
+happened yet, or you just want a quick TestFlight build without waiting on CI, build and upload
+from your own Mac instead. This uses the Apple ID already signed in to Xcode (Xcode → Settings →
+Accounts) to sign and upload, so no App Store Connect API key, match, or CI secrets are involved:
 
 ```bash
 APPLE_TEAM_ID=ABCDE12345 make beta-local

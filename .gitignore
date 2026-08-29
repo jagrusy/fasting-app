@@ -39,4 +39,8 @@ Thumbs.db
 # Bundler & Fastlane
 vendor/
 .bundle/
+fastlane/report.xml
+fastlane/README.md
+*.ipa
+*.dSYM.zip
 
