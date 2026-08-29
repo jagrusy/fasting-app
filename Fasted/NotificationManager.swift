@@ -9,10 +9,15 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     public static let snooze30MinActionId = "SNOOZE_30MIN_ACTION"
     public static let snooze1HourActionId = "SNOOZE_1HOUR_ACTION"
 
-    public var onEndFastRequested: (() -> Void)?
-    public var onSnoozeRequested: ((TimeInterval) -> Void)?
+    public static let startFastCategoryId = "START_FAST_CATEGORY"
+    public static let startFastActionId = "START_FAST_ACTION"
+
+    public var onStartFastRequested: (@MainActor () -> Void)?
+    public var onEndFastRequested: (@MainActor () -> Void)?
+    public var onSnoozeRequested: (@MainActor (TimeInterval) -> Void)?
 
     private override init() {
+
         super.init()
         UNUserNotificationCenter.current().delegate = self
         registerCategories()
@@ -48,17 +53,31 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
             options: []
         )
 
-        let category = UNNotificationCategory(
+        let goalCategory = UNNotificationCategory(
             identifier: NotificationManager.goalReachedCategoryId,
             actions: [endAction, snooze30, snooze1h],
             intentIdentifiers: [],
             options: []
         )
 
-        UNUserNotificationCenter.current().setNotificationCategories([category])
+        let startAction = UNNotificationAction(
+            identifier: NotificationManager.startFastActionId,
+            title: "Start Fast",
+            options: [.authenticationRequired]
+        )
+
+        let startCategory = UNNotificationCategory(
+            identifier: NotificationManager.startFastCategoryId,
+            actions: [startAction],
+            intentIdentifiers: [],
+            options: []
+        )
+
+        UNUserNotificationCenter.current().setNotificationCategories([goalCategory, startCategory])
     }
 
     public func scheduleGoalNotification(targetEndDate: Date, protocolName: String, enabled: Bool = true) {
+
         cancelGoalNotification()
         guard enabled else { return }
 
@@ -99,7 +118,8 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
                 time: (startComponents.hour ?? 20, startComponents.minute ?? 0),
                 title: "Time to Start Fasting ⏱️",
                 body: "Your fasting window starts now. Have a great fast!",
-                identifier: "recurring_start_day_\(day)"
+                identifier: "recurring_start_day_\(day)",
+                categoryIdentifier: NotificationManager.startFastCategoryId
             )
         }
     }
@@ -109,7 +129,8 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         time: (hour: Int, minute: Int),
         title: String,
         body: String,
-        identifier: String
+        identifier: String,
+        categoryIdentifier: String? = nil
     ) {
         var dateComponents = DateComponents()
         dateComponents.weekday = weekday
@@ -120,6 +141,9 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         content.title = title
         content.body = body
         content.sound = .default
+        if let category = categoryIdentifier {
+            content.categoryIdentifier = category
+        }
 
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
@@ -132,10 +156,71 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     }
 
     public func cancelRecurringReminders() {
-        let identifiers = (1...7).flatMap { [
-            "recurring_start_day_\($0)",
-            "recurring_end_day_\($0)"
-        ] }
+        let identifiers = (1...7).map { "recurring_start_day_\($0)" }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+    }
+
+    // MARK: - Stage Transition Notifications
+
+    public struct StageBoundary: Equatable {
+        public let stage: MetabolicStage
+        public let fireDate: Date
+        public let timeInterval: TimeInterval
+
+        public init(stage: MetabolicStage, fireDate: Date, timeInterval: TimeInterval) {
+            self.stage = stage
+            self.fireDate = fireDate
+            self.timeInterval = timeInterval
+        }
+    }
+
+    public static func stageNotificationIdentifier(for stage: MetabolicStage) -> String {
+        "fast_stage_\(stage.rawValue)"
+    }
+
+    public static func futureStageBoundaries(
+        startDate: Date,
+        now: Date = Date()
+    ) -> [StageBoundary] {
+        MetabolicStage.allCases
+            .filter { $0.startSeconds > 0 }
+            .compactMap { stage in
+                let fireDate = startDate.addingTimeInterval(stage.startSeconds)
+                let interval = fireDate.timeIntervalSince(now)
+                guard interval > 0 else { return nil }
+                return StageBoundary(stage: stage, fireDate: fireDate, timeInterval: interval)
+            }
+    }
+
+    public func scheduleStageTransitionNotifications(
+        startDate: Date,
+        enabled: Bool = true,
+        now: Date = Date()
+    ) {
+        cancelStageTransitionNotifications()
+        guard enabled else { return }
+
+        let boundaries = Self.futureStageBoundaries(startDate: startDate, now: now)
+        for item in boundaries {
+            let content = UNMutableNotificationContent()
+            content.title = item.stage.title
+            content.body = item.stage.summary
+            content.sound = .default
+
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: item.timeInterval, repeats: false)
+            let identifier = Self.stageNotificationIdentifier(for: item.stage)
+            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    NSLog("Failed to schedule stage notification \(identifier): \(error)")
+                }
+            }
+        }
+    }
+
+    public func cancelStageTransitionNotifications() {
+        let identifiers = MetabolicStage.allCases.map { Self.stageNotificationIdentifier(for: $0) }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
@@ -146,6 +231,10 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         switch response.actionIdentifier {
+        case NotificationManager.startFastActionId:
+            DispatchQueue.main.async { [weak self] in
+                self?.onStartFastRequested?()
+            }
         case NotificationManager.endFastActionId:
             DispatchQueue.main.async { [weak self] in
                 self?.onEndFastRequested?()

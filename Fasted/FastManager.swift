@@ -24,15 +24,14 @@ public final class FastManager: ObservableObject {
     }
 
     private func setupNotificationCallbacks() {
+        notificationManager.onStartFastRequested = { [weak self] in
+            self?.startFast()
+        }
         notificationManager.onEndFastRequested = { [weak self] in
-            Task { @MainActor [weak self] in
-                self?.endFast()
-            }
+            self?.endFast()
         }
         notificationManager.onSnoozeRequested = { [weak self] snoozeSeconds in
-            Task { @MainActor [weak self] in
-                self?.snoozeFast(by: snoozeSeconds)
-            }
+            self?.snoozeFast(by: snoozeSeconds)
         }
     }
 
@@ -42,6 +41,7 @@ public final class FastManager: ObservableObject {
     }
 
     public func fetchActiveFast() {
+
         let request: NSFetchRequest<Fast> = Fast.fetchRequest()
         request.predicate = NSPredicate(format: "endDate == nil")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \Fast.startDate, ascending: false)]
@@ -149,6 +149,10 @@ public final class FastManager: ObservableObject {
                 protocolName: proto,
                 enabled: notificationSchedule.notifyOnGoalReached
             )
+            notificationManager.scheduleStageTransitionNotifications(
+                startDate: startDate,
+                enabled: notificationSchedule.notifyOnStageChange
+            )
         } catch {
             NSLog("Error starting fast: \(error)")
         }
@@ -171,6 +175,7 @@ public final class FastManager: ObservableObject {
             let completed = fast
             self.activeFast = nil
             notificationManager.cancelGoalNotification()
+            notificationManager.cancelStageTransitionNotifications()
             clearSnoozeOffset(for: fast)
 
             let request: NSFetchRequest<Fast> = Fast.fetchRequest()
@@ -218,6 +223,10 @@ public final class FastManager: ObservableObject {
                 protocolName: proto,
                 enabled: notificationSchedule.notifyOnGoalReached
             )
+            notificationManager.scheduleStageTransitionNotifications(
+                startDate: startDate,
+                enabled: notificationSchedule.notifyOnStageChange
+            )
         } catch {
             NSLog("Error updating active fast: \(error)")
         }
@@ -261,6 +270,7 @@ public final class FastManager: ObservableObject {
         if let active = activeFast, active === fast {
             activeFast = nil
             notificationManager.cancelGoalNotification()
+            notificationManager.cancelStageTransitionNotifications()
         }
         clearSnoozeOffset(for: fast)
         viewContext.delete(fast)

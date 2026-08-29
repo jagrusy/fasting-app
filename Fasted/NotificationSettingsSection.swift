@@ -51,6 +51,12 @@ public struct NotificationSettingsSection: View {
                     }
                     .accessibilityIdentifier("goal_reached_toggle")
 
+                Toggle("Stage Transitions", isOn: $schedule.notifyOnStageChange)
+                    .onChange(of: schedule.notifyOnStageChange) { _ in
+                        onSave(isEnabled, schedule)
+                    }
+                    .accessibilityIdentifier("stage_transitions_toggle")
+
                 VStack(alignment: .leading, spacing: 10) {
                     Text("ACTIVE DAYS")
                         .font(.caption2.weight(.bold))
@@ -81,9 +87,13 @@ public struct NotificationSettingsSection: View {
             Text("Reminders")
         } footer: {
             if isEnabled {
-                Text("Get a reminder to start fasting, plus an alert exactly when your fast timer completes.")
+                Text(
+                    "Get a reminder to start fasting, stage transition alerts, " +
+                    "and an alert when your fast timer completes."
+                )
             }
         }
+
     }
 
     private func toggleDay(_ day: Int) {

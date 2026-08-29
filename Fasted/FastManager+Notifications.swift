@@ -15,6 +15,7 @@ extension FastManager {
 
             notificationManager.scheduleRecurringReminders(schedule: schedule, enabled: enabled)
             rescheduleGoalNotificationForActiveFast(notifyOnGoalReached: schedule.notifyOnGoalReached)
+            rescheduleStageNotificationsForActiveFast(notifyOnStageChange: schedule.notifyOnStageChange)
         } catch {
             NSLog("Error updating notification settings: \(error)")
         }
@@ -30,6 +31,7 @@ extension FastManager {
             enabled: userSettings?.notificationsEnabled ?? false
         )
         rescheduleGoalNotificationForActiveFast(notifyOnGoalReached: schedule.notifyOnGoalReached)
+        rescheduleStageNotificationsForActiveFast(notifyOnStageChange: schedule.notifyOnStageChange)
     }
 
     func rescheduleGoalNotificationForActiveFast(notifyOnGoalReached: Bool) {
@@ -40,6 +42,14 @@ extension FastManager {
             targetEndDate: targetEnd,
             protocolName: proto,
             enabled: notifyOnGoalReached
+        )
+    }
+
+    func rescheduleStageNotificationsForActiveFast(notifyOnStageChange: Bool) {
+        guard let fast = activeFast, let start = fast.startDate else { return }
+        notificationManager.scheduleStageTransitionNotifications(
+            startDate: start,
+            enabled: notifyOnStageChange
         )
     }
 

@@ -8,17 +8,37 @@ public struct NotificationSchedule: Codable, Equatable {
     public var endReminderTime: Date
     public var selectedDays: Set<Int> // 1=Sunday, 2=Monday, ..., 7=Saturday
     public var notifyOnGoalReached: Bool
+    public var notifyOnStageChange: Bool
 
     public init(
         startReminderTime: Date,
         endReminderTime: Date,
         selectedDays: Set<Int>,
-        notifyOnGoalReached: Bool = true
+        notifyOnGoalReached: Bool = true,
+        notifyOnStageChange: Bool = true
     ) {
         self.startReminderTime = startReminderTime
         self.endReminderTime = endReminderTime
         self.selectedDays = selectedDays
         self.notifyOnGoalReached = notifyOnGoalReached
+        self.notifyOnStageChange = notifyOnStageChange
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case startReminderTime
+        case endReminderTime
+        case selectedDays
+        case notifyOnGoalReached
+        case notifyOnStageChange
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        startReminderTime = try container.decode(Date.self, forKey: .startReminderTime)
+        endReminderTime = try container.decode(Date.self, forKey: .endReminderTime)
+        selectedDays = try container.decode(Set<Int>.self, forKey: .selectedDays)
+        notifyOnGoalReached = try container.decodeIfPresent(Bool.self, forKey: .notifyOnGoalReached) ?? true
+        notifyOnStageChange = try container.decodeIfPresent(Bool.self, forKey: .notifyOnStageChange) ?? true
     }
 
     public static var `default`: NotificationSchedule {
@@ -31,7 +51,8 @@ public struct NotificationSchedule: Codable, Equatable {
             startReminderTime: startTime,
             endReminderTime: endTime,
             selectedDays: Set(1...7),
-            notifyOnGoalReached: true
+            notifyOnGoalReached: true,
+            notifyOnStageChange: true
         )
     }
 }
