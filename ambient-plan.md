@@ -15,11 +15,9 @@ This is built by a single agent working through the workstreams below in order, 
 - [x] W3 — App Intents layer
 - [x] W4 — Home Screen / Lock Screen / StandBy widget
 - [x] W5 — Control Center control
-- [ ] W6 — watchOS companion
-
-
-
+- [x] W6 — watchOS companion
 - [ ] W7 — Watch complications
+
 - [ ] W8 — Release plumbing and doc reconciliation
 
 Only check a box once that workstream's commit is actually pushed to `feat/companion-surfaces`. A resumed session trusts this checklist completely, so a box checked too early causes a workstream to be silently skipped, and a box left unchecked after the work is done causes it to be silently redone.

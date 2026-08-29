@@ -37,9 +37,11 @@ extension FastManager {
         }
 
         coordinator.writeSnapshot(snapshot)
+        WatchSessionManager.shared.syncSnapshotToWatch(snapshot)
     }
 
     public func processPendingCommands() {
+
         let pending = coordinator.drainPendingCommands()
         guard !pending.isEmpty else { return }
 

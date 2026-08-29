@@ -11,6 +11,7 @@
 		02E2B44BF8D1A49309056806 /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
 		03F3712F2C298E85F4192E68 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D0EE0A457EFF011B0258010B /* README.md */; };
 		043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */; };
+		084F697FBF35CB11AABC725E /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		089D9A852E6784E04D5691EF /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
 		0B2AD02224339FDBB03BCC7B /* CalendarHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C410780F466CF5987E506477 /* CalendarHeatmapView.swift */; };
 		0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71CDC6BEC973FA849ACE8BB /* DialMath.swift */; };
@@ -31,6 +32,7 @@
 		281063BCF8438C5CECA4B923 /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
 		290EB23E7C0C6FB242F90E6F /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
 		2AEB2AFC805215E2DE91E60D /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
+		2B5CB84B8C663BBC81EC2877 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		2CB054D80FFCB722E8DCD81A /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */; };
 		2E7345733FC4B4875CFAC161 /* ReviewPromptManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B3B10BBD804653FFAD01A9 /* ReviewPromptManager.swift */; };
 		30455C3CE0B719CD5AB1526C /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
@@ -87,6 +89,9 @@
 		9225E0C3F751197B4854559E /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */; };
 		94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8810ED7037826FE830C9 /* FastedUITests.swift */; };
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
+		98548E8AD56DF8EE3923EC20 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
+		994FE67C1CE31DACA5B1898F /* WatchPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */; };
+		9AECBC71B2D7B00723DF7DA5 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		9BB47C1977B50828F59E41C0 /* FastManager+AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3740D6FCC59A6BDB6F776A5A /* FastManager+AppGroup.swift */; };
 		9BE30CD05FF60B9801D9FE66 /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
 		9F63DEE6FD9FF3C8741E6000 /* MetabolicStageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */; };
@@ -96,6 +101,7 @@
 		A4CC9B5820FF216E19E1B794 /* FastingStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DCBC6565F8F188353EA37C0 /* FastingStateSnapshotTests.swift */; };
 		A6EA958C9BC9DA1C8A102AD5 /* FastManager+Mocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */; };
 		A6F27686EB0A3226E99509F8 /* FastingActionCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */; };
+		A71939927381C5F648E58F9C /* WatchSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8510A4F30BE91396C83AA545 /* WatchSessionCoordinator.swift */; };
 		A7CB4AE6B4B374CE0561A354 /* SetFastingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA87A58AA38A6EC7409FE5F /* SetFastingIntent.swift */; };
 		A9705B0AB96ABFFC991D8437 /* FeedbackHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */; };
 		AAD783B848631089CFCFAEA1 /* MetabolicStagesSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */; };
@@ -217,6 +223,7 @@
 		15A78317288959CA1D370A02 /* FastManager+Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Notifications.swift"; sourceTree = "<group>"; };
 		15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStageBadgeView.swift; sourceTree = "<group>"; };
 		1CFA4EEB688E8CA3F0D63709 /* NotificationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManagerTests.swift; sourceTree = "<group>"; };
+		1F11893E710BA95F8A4A0839 /* WatchPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPayload.swift; sourceTree = "<group>"; };
 		1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeFastIntent.swift; sourceTree = "<group>"; };
 		21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedDialMathTests.swift; sourceTree = "<group>"; };
 		23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolsticeThemeTests.swift; sourceTree = "<group>"; };
@@ -254,6 +261,7 @@
 		80ABF2C76FAC79CAD26EEC81 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarwinNotificationCenter.swift; sourceTree = "<group>"; };
+		8510A4F30BE91396C83AA545 /* WatchSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSessionCoordinator.swift; sourceTree = "<group>"; };
 		852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicalDisclaimerView.swift; sourceTree = "<group>"; };
 		8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialHeaderCardView.swift; sourceTree = "<group>"; };
 		8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedApp.swift; sourceTree = "<group>"; };
@@ -274,6 +282,7 @@
 		B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialFaceView.swift; sourceTree = "<group>"; };
 		B7160CB9DE9689FEF2EFEC10 /* FastedUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7EE8D5EE638B61DA187E53A /* FastControlWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastControlWidget.swift; sourceTree = "<group>"; };
+		BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPayloadTests.swift; sourceTree = "<group>"; };
 		C410780F466CF5987E506477 /* CalendarHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeatmapView.swift; sourceTree = "<group>"; };
 		C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSummaryCardsView.swift; sourceTree = "<group>"; };
 		C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Validation.swift"; sourceTree = "<group>"; };
@@ -326,6 +335,7 @@
 				7683DDF7EF4692383D712670 /* FastedWatchApp.swift */,
 				4A8D00563B7A100741A574FA /* Info.plist */,
 				30075AF85C05CFEC9FB09DCD /* WatchRootView.swift */,
+				8510A4F30BE91396C83AA545 /* WatchSessionCoordinator.swift */,
 			);
 			path = FastedWatch;
 			sourceTree = "<group>";
@@ -383,6 +393,7 @@
 				DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */,
 				D0EE0A457EFF011B0258010B /* README.md */,
 				4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */,
+				1F11893E710BA95F8A4A0839 /* WatchPayload.swift */,
 				69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */,
 				3CAF647EBBC44516C01EB985 /* Intents */,
 			);
@@ -473,6 +484,7 @@
 				780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */,
 				23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */,
 				F624342259EC84B9174A4FAE /* StreakCalculatorTests.swift */,
+				BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */,
 				E3CE3910952492A92BB64DD0 /* WidgetTimelineBuilderTests.swift */,
 			);
 			path = FastedTests;
@@ -705,7 +717,9 @@
 				BD7B9EA2D7B7CB3207FC128C /* SnoozeFastIntent.swift in Sources */,
 				C7A0AE6139079DA758A59AD8 /* SolsticeTheme.swift in Sources */,
 				4F4850543F7E0E60AEB97354 /* StartFastIntent.swift in Sources */,
+				084F697FBF35CB11AABC725E /* WatchPayload.swift in Sources */,
 				39156B8BD6396C734A368D72 /* WatchRootView.swift in Sources */,
+				A71939927381C5F648E58F9C /* WatchSessionCoordinator.swift in Sources */,
 				089D9A852E6784E04D5691EF /* WidgetTimelineBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -727,6 +741,7 @@
 				A0B3A591793493FB73C04BD5 /* ReviewPromptManagerTests.swift in Sources */,
 				FCDDC5D7524F3419E7D9A55E /* SolsticeThemeTests.swift in Sources */,
 				CAF9AF507CA760F146E6B2D0 /* StreakCalculatorTests.swift in Sources */,
+				994FE67C1CE31DACA5B1898F /* WatchPayloadTests.swift in Sources */,
 				203C8F4DEC49656BCE19B8FD /* WidgetTimelineBuilderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -786,6 +801,7 @@
 				63AA188B0D1CF981C33B4F9E /* StartFastIntent.swift in Sources */,
 				F501504029E2FF98114B915E /* StreakCalculator.swift in Sources */,
 				B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */,
+				2B5CB84B8C663BBC81EC2877 /* WatchPayload.swift in Sources */,
 				46AF3A5C15F7732867DC594A /* WatchSessionManager.swift in Sources */,
 				281063BCF8438C5CECA4B923 /* WidgetTimelineBuilder.swift in Sources */,
 			);
@@ -809,6 +825,7 @@
 				1120760C163B6A1E33297FDB /* SnoozeFastIntent.swift in Sources */,
 				2CB054D80FFCB722E8DCD81A /* SolsticeTheme.swift in Sources */,
 				669719083CB80521E2E92B45 /* StartFastIntent.swift in Sources */,
+				98548E8AD56DF8EE3923EC20 /* WatchPayload.swift in Sources */,
 				51EBE5DFAF8D1E643F74CB41 /* WidgetTimelineBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -834,6 +851,7 @@
 				1D42DAA75426B7751F9AA21A /* SnoozeFastIntent.swift in Sources */,
 				6731DABAFE89191832089A9C /* SolsticeTheme.swift in Sources */,
 				8C37E9CABAB67BC19B684F22 /* StartFastIntent.swift in Sources */,
+				9AECBC71B2D7B00723DF7DA5 /* WatchPayload.swift in Sources */,
 				6BE827D1FD3E26B857FB9C7C /* WidgetTimelineBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

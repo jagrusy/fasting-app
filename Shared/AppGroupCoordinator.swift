@@ -48,6 +48,11 @@ public final class AppGroupCoordinator: @unchecked Sendable {
     }
 
     public func enqueueCommand(_ command: FastingActionCommand) {
+        let envelope = PendingCommandEnvelope(command: command)
+        enqueueEnvelope(envelope)
+    }
+
+    public func enqueueEnvelope(_ envelope: PendingCommandEnvelope) {
         lock.lock()
         defer { lock.unlock() }
 
@@ -57,7 +62,6 @@ public final class AppGroupCoordinator: @unchecked Sendable {
             commands = existing
         }
 
-        let envelope = PendingCommandEnvelope(command: command)
         commands.append(envelope)
 
         if let encoded = try? JSONEncoder().encode(commands) {
@@ -67,6 +71,7 @@ public final class AppGroupCoordinator: @unchecked Sendable {
     }
 
     public func drainPendingCommands() -> [PendingCommandEnvelope] {
+
         lock.lock()
         defer { lock.unlock() }
 
