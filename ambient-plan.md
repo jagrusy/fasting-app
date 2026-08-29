@@ -6,8 +6,9 @@ This is built by a single agent working through the workstreams below in order, 
 
 - [x] W-A — Notification quick wins
 - [x] W0 — Build foundation
-- [ ] W1 — Shared state layer
+- [x] W1 — Shared state layer
 - [ ] W2 — Target skeletons
+
 
 
 - [ ] W3 — App Intents layer

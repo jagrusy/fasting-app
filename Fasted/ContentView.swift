@@ -58,18 +58,22 @@ struct ContentView: View {
             } else if ProcessInfo.processInfo.arguments.contains("-seedScreenshots100") {
                 fastManager.seedMockDataForScreenshots(progress: 1.05)
             }
+            fastManager.processPendingCommands()
+            fastManager.publishSnapshot()
             fastManager.syncNotifications()
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
+                fastManager.processPendingCommands()
+                fastManager.publishSnapshot()
                 fastManager.syncNotifications()
             }
         }
-
     }
 }
 
 struct FastTabView: View {
+
     @ObservedObject var fastManager: FastManager
 
     var body: some View {
