@@ -12,11 +12,14 @@ struct FastComplications: Widget {
     let kind: String = "FastComplications"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: FastWatchTimelineProvider()) { _ in
-            Text("Solstice")
+        StaticConfiguration(kind: kind, provider: FastWatchTimelineProvider()) { entry in
+            FastComplicationEntryView(entry: entry)
+                .containerBackground(for: .widget) {
+                    Color.clear
+                }
         }
-        .configurationDisplayName("Fast Complication")
-        .description("Track your fast on Apple Watch.")
+        .configurationDisplayName("Fast Tracker")
+        .description("Track your fasting status directly on your Apple Watch face.")
         .supportedFamilies([
             .accessoryCircular,
             .accessoryRectangular,
@@ -32,16 +35,51 @@ struct FastWatchTimelineProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (FastWatchEntry) -> Void) {
-        completion(FastWatchEntry(date: Date(), snapshot: .idle))
+        let snapshot = AppGroupCoordinator.shared.readSnapshot()
+        completion(FastWatchEntry(date: Date(), snapshot: snapshot))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<FastWatchEntry>) -> Void) {
-        let entry = FastWatchEntry(date: Date(), snapshot: .idle)
-        completion(Timeline(entries: [entry], policy: .atEnd))
+        let snapshot = AppGroupCoordinator.shared.readSnapshot()
+        let now = Date()
+        let entries = WidgetTimelineBuilder.entries(for: snapshot, now: now)
+
+        let watchEntries = entries.map { entry in
+            FastWatchEntry(date: entry.date, snapshot: entry.snapshot)
+        }
+
+        let reloadPolicy: TimelineReloadPolicy
+        if let nextDate = WidgetTimelineBuilder.nextReloadDate(entries: entries, now: now) {
+            reloadPolicy = .after(nextDate)
+        } else {
+            reloadPolicy = .never
+        }
+
+        completion(Timeline(entries: watchEntries, policy: reloadPolicy))
     }
 }
 
 struct FastWatchEntry: TimelineEntry {
     let date: Date
     let snapshot: FastingStateSnapshot
+}
+
+struct FastComplicationEntryView: View {
+    @Environment(\.widgetFamily) var family
+    let entry: FastWatchEntry
+
+    var body: some View {
+        switch family {
+        case .accessoryCircular:
+            AccessoryCircularFastView(snapshot: entry.snapshot, currentDate: entry.date)
+        case .accessoryRectangular:
+            AccessoryRectangularFastView(snapshot: entry.snapshot, currentDate: entry.date)
+        case .accessoryInline:
+            AccessoryInlineFastView(snapshot: entry.snapshot, currentDate: entry.date)
+        case .accessoryCorner:
+            AccessoryCornerFastView(snapshot: entry.snapshot, currentDate: entry.date)
+        default:
+            AccessoryCircularFastView(snapshot: entry.snapshot, currentDate: entry.date)
+        }
+    }
 }
