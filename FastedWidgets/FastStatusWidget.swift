@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 import WidgetKit
 
@@ -5,11 +6,14 @@ struct FastStatusWidget: Widget {
     let kind: String = "FastStatusWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: FastStatusTimelineProvider()) { _ in
-            Text("Fast Status")
+        StaticConfiguration(kind: kind, provider: FastStatusTimelineProvider()) { entry in
+            FastStatusWidgetEntryView(entry: entry)
+                .containerBackground(for: .widget) {
+                    Color(uiColor: .systemBackground)
+                }
         }
-        .configurationDisplayName("Fast Status")
-        .description("Track your fasting progress at a glance.")
+        .configurationDisplayName("Fast Tracker")
+        .description("Track your fasting progress and metabolic stages.")
         .supportedFamilies([
             .systemSmall,
             .systemMedium,
@@ -21,21 +25,58 @@ struct FastStatusWidget: Widget {
 }
 
 struct FastStatusTimelineProvider: TimelineProvider {
-    func placeholder(in context: Context) -> FastStatusEntry {
-        FastStatusEntry(date: Date(), snapshot: .idle)
+    func placeholder(in context: Context) -> FastStatusWidgetEntry {
+        FastStatusWidgetEntry(date: Date(), snapshot: .idle)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (FastStatusEntry) -> Void) {
-        completion(FastStatusEntry(date: Date(), snapshot: .idle))
+    func getSnapshot(in context: Context, completion: @escaping (FastStatusWidgetEntry) -> Void) {
+        let snapshot = AppGroupCoordinator.shared.readSnapshot()
+        completion(FastStatusWidgetEntry(date: Date(), snapshot: snapshot))
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<FastStatusEntry>) -> Void) {
-        let entry = FastStatusEntry(date: Date(), snapshot: .idle)
-        completion(Timeline(entries: [entry], policy: .atEnd))
+    func getTimeline(in context: Context, completion: @escaping (Timeline<FastStatusWidgetEntry>) -> Void) {
+        let snapshot = AppGroupCoordinator.shared.readSnapshot()
+        let now = Date()
+        let entries = WidgetTimelineBuilder.entries(for: snapshot, now: now)
+
+        let widgetEntries = entries.map { entry in
+            FastStatusWidgetEntry(date: entry.date, snapshot: entry.snapshot)
+        }
+
+        let reloadPolicy: TimelineReloadPolicy
+        if let nextDate = WidgetTimelineBuilder.nextReloadDate(entries: entries, now: now) {
+            reloadPolicy = .after(nextDate)
+        } else {
+            reloadPolicy = .never
+        }
+
+        completion(Timeline(entries: widgetEntries, policy: reloadPolicy))
     }
 }
 
-struct FastStatusEntry: TimelineEntry {
+struct FastStatusWidgetEntry: TimelineEntry {
     let date: Date
     let snapshot: FastingStateSnapshot
+}
+
+struct FastStatusWidgetEntryView: View {
+    @Environment(\.widgetFamily) var family
+    let entry: FastStatusWidgetEntry
+
+    var body: some View {
+        switch family {
+        case .systemSmall:
+            SmallFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
+        case .systemMedium:
+            MediumFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
+        case .accessoryCircular:
+            AccessoryCircularFastView(snapshot: entry.snapshot, currentDate: entry.date)
+        case .accessoryRectangular:
+            AccessoryRectangularFastView(snapshot: entry.snapshot, currentDate: entry.date)
+        case .accessoryInline:
+            AccessoryInlineFastView(snapshot: entry.snapshot, currentDate: entry.date)
+        default:
+            SmallFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
+        }
+    }
 }
