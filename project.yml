@@ -34,6 +34,9 @@ targets:
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         TARGETED_DEVICE_FAMILY: "1"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+        # Info.plist's CFBundleVersion reads this. CI overrides it per build with the next
+        # unused TestFlight build number; this default just keeps local builds working.
+        CURRENT_PROJECT_VERSION: "1"
       configs:
         # Release is what `xcodebuild archive` uses, so it must ask for a *distribution*
         # identity. This was previously "iPhone Developer" in both configs, which made
