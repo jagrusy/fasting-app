@@ -80,3 +80,33 @@ targets:
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         TARGETED_DEVICE_FAMILY: "1"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+
+# Schemes were previously not defined anywhere, so Xcode auto-created them implicitly. The
+# auto-created "FastedTests" scheme picked up *both* test targets, which is why CI's separate
+# "Run UI Tests" step re-ran the UI suite that "Run Unit Tests" had already run. Declaring them
+# makes the split explicit and reproducible instead of dependent on Xcode's autocreation rules.
+schemes:
+  Fasted:
+    build:
+      targets:
+        Fasted: all
+    test:
+      targets:
+        - FastedTests
+        - FastedUITests
+  FastedTests:
+    build:
+      targets:
+        Fasted: [test]
+        FastedTests: [test]
+    test:
+      targets:
+        - FastedTests
+  FastedUITests:
+    build:
+      targets:
+        Fasted: [test]
+        FastedUITests: [test]
+    test:
+      targets:
+        - FastedUITests

@@ -6,19 +6,24 @@ public struct FastMetricsCenterView: View {
     public let progress: Double
     public let centerDisplayMode: CenterDisplayMode
     public let now: Date
+    /// Start time to display instead of the stored one while a ring drag is in progress — the
+    /// drag isn't written to Core Data until release, so `fast.startDate` is stale until then.
+    public let previewStartDate: Date?
 
     public init(
         fast: Fast?,
         currentProtocol: FastingProtocol,
         progress: Double,
         centerDisplayMode: CenterDisplayMode,
-        now: Date
+        now: Date,
+        previewStartDate: Date? = nil
     ) {
         self.fast = fast
         self.currentProtocol = currentProtocol
         self.progress = progress
         self.centerDisplayMode = centerDisplayMode
         self.now = now
+        self.previewStartDate = previewStartDate
     }
 
     public var body: some View {
@@ -32,7 +37,7 @@ public struct FastMetricsCenterView: View {
     }
 
     private func activeDisplay(fast: Fast) -> some View {
-        let startDate = fast.startDate ?? now
+        let startDate = previewStartDate ?? fast.startDate ?? now
         let elapsed = max(0, now.timeIntervalSince(startDate))
         let remaining = fast.targetDuration - elapsed
 
