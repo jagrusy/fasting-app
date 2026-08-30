@@ -37,13 +37,18 @@ platform :ios do
       team_id: team_id
     )
 
+    # Explicit manual signing, using the exact profile get_provisioning_profile just fetched
+    # (ENV["SIGH_NAME"]) — no -allowProvisioningUpdates. That flag tells Xcode to fall back to its
+    # *automatic* signing assistant if anything looks off, and that assistant needs an Apple ID
+    # signed in to Xcode, which a bare CI runner doesn't have ("No Accounts: Add a new account").
+    # sigh already resolved a valid profile; there's nothing for automatic signing to fix here.
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: "-allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=#{team_id}",
-      export_xcargs: "-allowProvisioningUpdates"
+      xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" " \
+              "PROVISIONING_PROFILE_SPECIFIER=\"#{ENV['SIGH_NAME']}\" DEVELOPMENT_TEAM=#{team_id}"
     )
 
     upload_to_testflight(
@@ -99,13 +104,18 @@ platform :ios do
       team_id: team_id
     )
 
+    # Explicit manual signing, using the exact profile get_provisioning_profile just fetched
+    # (ENV["SIGH_NAME"]) — no -allowProvisioningUpdates. That flag tells Xcode to fall back to its
+    # *automatic* signing assistant if anything looks off, and that assistant needs an Apple ID
+    # signed in to Xcode, which a bare CI runner doesn't have ("No Accounts: Add a new account").
+    # sigh already resolved a valid profile; there's nothing for automatic signing to fix here.
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: "-allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=#{team_id}",
-      export_xcargs: "-allowProvisioningUpdates"
+      xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" " \
+              "PROVISIONING_PROFILE_SPECIFIER=\"#{ENV['SIGH_NAME']}\" DEVELOPMENT_TEAM=#{team_id}"
     )
 
     # Apple requires review-contact info before a submission is accepted. Solstice has no
