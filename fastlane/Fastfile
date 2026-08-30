@@ -1,3 +1,4 @@
+require 'tmpdir'
 require 'fileutils'
 
 default_platform(:ios)
@@ -27,6 +28,32 @@ def install_appstore_profile_everywhere
   uuid
 end
 
+# Reads the team ID out of the provisioning profile Apple just issued.
+#
+# Preferred over the APPLE_TEAM_ID secret because the profile and the signing certificate are
+# necessarily from the same team (Apple issued the profile against that certificate), whereas the
+# secret is hand-entered and can drift. A mismatch shows up as the thoroughly unhelpful
+# "Provisioning profile ... belongs to team X, which does not match the selected team Y".
+def team_id_from_profile
+  path = lane_context[SharedValues::SIGH_PROFILE_PATH]
+  plist_path = File.join(Dir.tmpdir, "profile-#{Process.pid}.plist")
+  system("security cms -D -i '#{path}' -o '#{plist_path}' 2>/dev/null")
+  team = `plutil -extract TeamIdentifier.0 raw -o - '#{plist_path}' 2>/dev/null`.strip
+  FileUtils.rm_f(plist_path)
+  team = nil if team.empty?
+
+  if team.nil?
+    UI.important("Could not read TeamIdentifier from the profile; falling back to APPLE_TEAM_ID")
+    team = ENV["APPLE_TEAM_ID"]
+  elsif ENV["APPLE_TEAM_ID"] && ENV["APPLE_TEAM_ID"] != team
+    UI.important("APPLE_TEAM_ID (#{ENV['APPLE_TEAM_ID']}) does not match the team that owns the " \
+                 "provisioning profile (#{team}). Using #{team} — consider correcting the secret.")
+  end
+
+  UI.user_error!("Could not determine a team ID for signing") if team.to_s.empty?
+  team
+end
+
 platform :ios do
   desc "Run full test suite (Unit & UI tests)"
   lane :test do
@@ -52,8 +79,6 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    team_id = ENV["APPLE_TEAM_ID"]
-
     # Fetch the App Store distribution profile, then sign manually against it.
     #
     # Automatic signing does not work on this runner: it insists on a *development* identity for
@@ -63,10 +88,10 @@ platform :ios do
     # an explicitly fetched distribution profile is the combination that matches what CI has.
     get_provisioning_profile(
       api_key: api_key,
-      app_identifier: "com.grusy.SolsticeFast",
-      team_id: team_id
+      app_identifier: "com.grusy.SolsticeFast"
     )
     profile_uuid = install_appstore_profile_everywhere
+    team_id = team_id_from_profile
 
     build_app(
       project: "Fasted.xcodeproj",
@@ -126,8 +151,6 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    team_id = ENV["APPLE_TEAM_ID"]
-
     # Fetch the App Store distribution profile, then sign manually against it.
     #
     # Automatic signing does not work on this runner: it insists on a *development* identity for
@@ -137,10 +160,10 @@ platform :ios do
     # an explicitly fetched distribution profile is the combination that matches what CI has.
     get_provisioning_profile(
       api_key: api_key,
-      app_identifier: "com.grusy.SolsticeFast",
-      team_id: team_id
+      app_identifier: "com.grusy.SolsticeFast"
     )
     profile_uuid = install_appstore_profile_everywhere
+    team_id = team_id_from_profile
 
     build_app(
       project: "Fasted.xcodeproj",
