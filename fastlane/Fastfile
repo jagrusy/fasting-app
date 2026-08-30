@@ -41,20 +41,22 @@ platform :ios do
     # ~/Library/MobileDevice/Provisioning Profiles/ on this CI image — xcodebuild's manual signing
     # lookup by name/UUID only searches that exact directory, so without this it fails with
     # "No profile ... found" even though sigh just downloaded a perfectly valid one.
-    install_provisioning_profile(path: ENV["SIGH_PROFILE_PATH"])
+    install_provisioning_profile(path: lane_context[SharedValues::SIGH_PROFILE_PATH])
 
     # Explicit manual signing, using the exact profile get_provisioning_profile just fetched
-    # (ENV["SIGH_NAME"]) — no -allowProvisioningUpdates. That flag tells Xcode to fall back to its
-    # *automatic* signing assistant if anything looks off, and that assistant needs an Apple ID
-    # signed in to Xcode, which a bare CI runner doesn't have ("No Accounts: Add a new account").
-    # sigh already resolved a valid profile; there's nothing for automatic signing to fix here.
+    # (lane_context[SharedValues::SIGH_NAME]) — no -allowProvisioningUpdates. That flag tells
+    # Xcode to fall back to its *automatic* signing assistant if anything looks off, and that
+    # assistant needs an Apple ID signed in to Xcode, which a bare CI runner doesn't have
+    # ("No Accounts: Add a new account"). sigh already resolved a valid profile; there's nothing
+    # for automatic signing to fix here.
+    profile_name = lane_context[SharedValues::SIGH_NAME]
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
       xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" " \
-              "PROVISIONING_PROFILE_SPECIFIER=\"#{ENV['SIGH_NAME']}\" DEVELOPMENT_TEAM=#{team_id}"
+              "PROVISIONING_PROFILE_SPECIFIER=\"#{profile_name}\" DEVELOPMENT_TEAM=#{team_id}"
     )
 
     upload_to_testflight(
@@ -114,20 +116,22 @@ platform :ios do
     # ~/Library/MobileDevice/Provisioning Profiles/ on this CI image — xcodebuild's manual signing
     # lookup by name/UUID only searches that exact directory, so without this it fails with
     # "No profile ... found" even though sigh just downloaded a perfectly valid one.
-    install_provisioning_profile(path: ENV["SIGH_PROFILE_PATH"])
+    install_provisioning_profile(path: lane_context[SharedValues::SIGH_PROFILE_PATH])
 
     # Explicit manual signing, using the exact profile get_provisioning_profile just fetched
-    # (ENV["SIGH_NAME"]) — no -allowProvisioningUpdates. That flag tells Xcode to fall back to its
-    # *automatic* signing assistant if anything looks off, and that assistant needs an Apple ID
-    # signed in to Xcode, which a bare CI runner doesn't have ("No Accounts: Add a new account").
-    # sigh already resolved a valid profile; there's nothing for automatic signing to fix here.
+    # (lane_context[SharedValues::SIGH_NAME]) — no -allowProvisioningUpdates. That flag tells
+    # Xcode to fall back to its *automatic* signing assistant if anything looks off, and that
+    # assistant needs an Apple ID signed in to Xcode, which a bare CI runner doesn't have
+    # ("No Accounts: Add a new account"). sigh already resolved a valid profile; there's nothing
+    # for automatic signing to fix here.
+    profile_name = lane_context[SharedValues::SIGH_NAME]
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
       xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" " \
-              "PROVISIONING_PROFILE_SPECIFIER=\"#{ENV['SIGH_NAME']}\" DEVELOPMENT_TEAM=#{team_id}"
+              "PROVISIONING_PROFILE_SPECIFIER=\"#{profile_name}\" DEVELOPMENT_TEAM=#{team_id}"
     )
 
     # Apple requires review-contact info before a submission is accepted. Solstice has no
