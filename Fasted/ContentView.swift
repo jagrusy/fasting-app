@@ -58,14 +58,14 @@ struct ContentView: View {
             } else if ProcessInfo.processInfo.arguments.contains("-seedScreenshots100") {
                 fastManager.seedMockDataForScreenshots(progress: 1.05)
             }
-            fastManager.processPendingCommands()
-            fastManager.publishSnapshot()
+            fastManager.refresh()
             fastManager.syncNotifications()
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                fastManager.processPendingCommands()
-                fastManager.publishSnapshot()
+                // The primary drain trigger: applies anything the widget, Control Center, or the
+                // watch enqueued while the app was backgrounded or terminated.
+                fastManager.refresh()
                 fastManager.syncNotifications()
             }
         }
@@ -73,7 +73,6 @@ struct ContentView: View {
 }
 
 struct FastTabView: View {
-
     @ObservedObject var fastManager: FastManager
 
     var body: some View {

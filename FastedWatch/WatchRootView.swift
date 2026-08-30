@@ -77,7 +77,9 @@ struct WatchRootView: View {
                     }
 
                     Button {
-                        let proto = FastingProtocol.from(protocolType: snapshot.protocolType ?? "16:8")
+                        let proto = FastingProtocol.from(
+                            protocolType: snapshot.protocolType ?? FastingProtocol.default.ratioString
+                        )
                         coordinator.startFast(
                             startDate: Date(),
                             duration: proto.fastingSeconds,

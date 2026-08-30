@@ -11,6 +11,15 @@ public final class AppGroupCoordinator: @unchecked Sendable {
     private let appGroupId: String
     private let lock = NSLock()
 
+    /// False when the App Group container could not be opened and this instance fell back to a
+    /// process-local `UserDefaults`.
+    ///
+    /// Worth checking, because the fallback fails *silently and convincingly*: an extension writes
+    /// its optimistic snapshot, reads it straight back, and renders correctly — while the app never
+    /// sees a single command. If the App Group entitlement or provisioning profile is wrong, this
+    /// is the only signal that anything is amiss.
+    public let isUsingSharedContainer: Bool
+
     public static let snapshotKey = "fasting_state_snapshot"
     public static let pendingCommandsKey = "pending_fasting_commands"
 
@@ -18,10 +27,15 @@ public final class AppGroupCoordinator: @unchecked Sendable {
         self.appGroupId = appGroupId
         if let defaults = userDefaults {
             self.userDefaults = defaults
+            self.isUsingSharedContainer = true
         } else if let groupDefaults = UserDefaults(suiteName: appGroupId) {
             self.userDefaults = groupDefaults
+            self.isUsingSharedContainer = true
         } else {
             self.userDefaults = .standard
+            self.isUsingSharedContainer = false
+            NSLog("[Solstice] App Group \(appGroupId) unavailable — widget and watch commands "
+                + "will not reach the app. Check the App Group entitlement and provisioning profile.")
         }
     }
 
@@ -71,7 +85,6 @@ public final class AppGroupCoordinator: @unchecked Sendable {
     }
 
     public func drainPendingCommands() -> [PendingCommandEnvelope] {
-
         lock.lock()
         defer { lock.unlock() }
 

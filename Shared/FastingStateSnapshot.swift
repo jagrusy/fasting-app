@@ -44,7 +44,6 @@ public struct FastingStateSnapshot: Codable, Sendable, Equatable {
     }
 
     public func elapsedSeconds(at date: Date = Date()) -> TimeInterval {
-
         guard isFasting, let start = startDate else { return 0 }
         return max(0, date.timeIntervalSince(start))
     }

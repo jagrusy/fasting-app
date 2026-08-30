@@ -52,7 +52,6 @@ jobs:
         run: xcodegen generate
 
       - name: Run Tests Before Deploy
-
         run: |
           xcodebuild test \
             -project Fasted.xcodeproj \

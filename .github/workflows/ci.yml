@@ -80,7 +80,6 @@ jobs:
             SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 
       - name: Run Unit Tests
-
         run: |
           xcodebuild test \
             -project Fasted.xcodeproj \

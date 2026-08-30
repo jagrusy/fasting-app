@@ -19,7 +19,6 @@ final class PendingCommandReconciliationTests: XCTestCase {
         let persistence = PersistenceController(inMemory: true)
         let notif = NotificationManager.shared
         let manager = FastManager(
-
             context: persistence.container.viewContext,
             notificationManager: notif,
             defaults: defaults,
@@ -118,5 +117,61 @@ final class PendingCommandReconciliationTests: XCTestCase {
         XCTAssertTrue(snapshot.isFasting)
         // 16 hours + 1 hour snooze = 17 hours
         XCTAssertEqual(snapshot.targetDuration, 17 * 3600)
+    }
+
+    /// A watch out of Bluetooth range queues its "end fast" via `transferUserInfo`, which is
+    /// delivered whenever the phone next runs — potentially after the user already ended that fast
+    /// on the phone and started a new one. Applied verbatim it would stamp an endDate *before* the
+    /// new fast's startDate, leaving a negative-duration fast in History.
+    func testStaleEndCommandIsDroppedRatherThanCorruptingANewerFast() {
+        guard let fastManager = fastManager, let coordinator = coordinator else {
+            XCTFail("Setup failed")
+            return
+        }
+        let watchTapTime = Date().addingTimeInterval(-4 * 3600)
+
+        // The user ended that fast on the phone and started a fresh one an hour ago.
+        let newStart = Date().addingTimeInterval(-3600)
+        fastManager.startFast(startDate: newStart, targetDuration: 16 * 3600, protocolType: "16:8")
+
+        // The watch's command finally lands.
+        coordinator.enqueueCommand(.endFast(endDate: watchTapTime))
+        fastManager.processPendingCommands()
+
+        XCTAssertTrue(fastManager.isFasting, "The newer fast must survive a stale end command")
+        XCTAssertNil(fastManager.activeFast?.endDate)
+        XCTAssertEqual(fastManager.activeFast?.startDate, newStart)
+    }
+
+    /// Commands can arrive out of order — the App Group queue and WatchConnectivity are separate
+    /// delivery paths — so they are applied in tap order, not arrival order.
+    func testCommandsApplyInTapOrderNotArrivalOrder() {
+        guard let fastManager = fastManager, let coordinator = coordinator else {
+            XCTFail("Setup failed")
+            return
+        }
+        let startTime = Date().addingTimeInterval(-17 * 3600)
+        let endTime = Date().addingTimeInterval(-3600)
+
+        // The end arrives first, but was tapped last.
+        coordinator.enqueueEnvelope(
+            PendingCommandEnvelope(timestamp: endTime, command: .endFast(endDate: endTime))
+        )
+        coordinator.enqueueEnvelope(
+            PendingCommandEnvelope(
+                timestamp: startTime,
+                command: .startFast(startDate: startTime, duration: 16 * 3600, protocolType: "16:8")
+            )
+        )
+
+        fastManager.processPendingCommands()
+
+        XCTAssertFalse(fastManager.isFasting, "start-then-end must settle as one completed fast")
+        let request: NSFetchRequest<Fast> = Fast.fetchRequest()
+        request.predicate = NSPredicate(format: "endDate != nil")
+        let completed = (try? persistenceController?.container.viewContext.fetch(request)) ?? []
+        XCTAssertEqual(completed.count, 1)
+        XCTAssertEqual(completed.first?.startDate, startTime)
+        XCTAssertEqual(completed.first?.endDate, endTime)
     }
 }

@@ -9,6 +9,9 @@ public final class FastManager: ObservableObject {
     let defaults: UserDefaults
     public let coordinator: AppGroupCoordinator
     private var darwinObserverToken: DarwinNotificationCenter.ObserverToken?
+    /// Guards `processPendingCommands()` — the scene-phase hook and the Darwin observer can both
+    /// fire for the same enqueue.
+    var isDrainingCommands = false
 
     @Published public internal(set) var activeFast: Fast?
     @Published public internal(set) var userSettings: UserSettings?
@@ -48,6 +51,9 @@ public final class FastManager: ObservableObject {
         }
     }
 
+    /// Order matters: pending commands are applied against freshly-fetched state, and the
+    /// snapshot every other surface reads is rewritten from Core Data last, so an optimistic
+    /// write from a widget or the watch is always overwritten by the authoritative value.
     public func refresh() {
         fetchActiveFast()
         fetchUserSettings()
@@ -57,7 +63,6 @@ public final class FastManager: ObservableObject {
 
     public func fetchActiveFast() {
         let request: NSFetchRequest<Fast> = Fast.fetchRequest()
-
         request.predicate = NSPredicate(format: "endDate == nil")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \Fast.startDate, ascending: false)]
         request.fetchLimit = 1
@@ -209,7 +214,6 @@ public final class FastManager: ObservableObject {
     }
 
     public func updateActiveFast(
-
         startDate: Date,
         targetDuration: TimeInterval? = nil,
         protocolType: String? = nil

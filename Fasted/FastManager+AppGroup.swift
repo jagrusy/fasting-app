@@ -40,28 +40,43 @@ extension FastManager {
         WatchSessionManager.shared.syncSnapshotToWatch(snapshot)
     }
 
+    /// Applies commands enqueued by the widget, Control Center, a notification action, or the
+    /// watch. Core Data is unreachable from those processes, so the queue is the only durable
+    /// channel — but a command can also be arbitrarily *stale* by the time it lands here
+    /// (`transferUserInfo` from an out-of-range watch is delivered whenever the phone next runs).
+    /// Every command is therefore re-validated against current state rather than trusted.
     public func processPendingCommands() {
+        // The scene-phase hook and the Darwin observer can both fire; a nested drain would see an
+        // already-emptied queue, but the flag keeps the Core Data writes strictly serialized.
+        guard !isDrainingCommands else { return }
+        isDrainingCommands = true
+        defer { isDrainingCommands = false }
 
         let pending = coordinator.drainPendingCommands()
         guard !pending.isEmpty else { return }
 
-        for envelope in pending {
-            switch envelope.command {
-            case .startFast(let startDate, let duration, let proto):
-                if activeFast == nil {
-                    startFast(startDate: startDate, targetDuration: duration, protocolType: proto)
-                }
-            case .endFast(let endDate):
-                if activeFast != nil {
-                    endFast(endDate: endDate)
-                }
-            case .snoozeFast(let extensionSeconds):
-                if activeFast != nil {
-                    snoozeFast(by: extensionSeconds)
-                }
-            }
+        // Deliveries can interleave (App Group queue vs. WatchConnectivity), so order by the
+        // moment of the tap, not the moment of arrival.
+        for envelope in pending.sorted(by: { $0.timestamp < $1.timestamp }) {
+            apply(envelope.command)
         }
         publishSnapshot()
+    }
+
+    private func apply(_ command: FastingActionCommand) {
+        switch command {
+        case .startFast(let startDate, let duration, let proto):
+            guard activeFast == nil, validateInterval(startDate: startDate).isValid else { return }
+            startFast(startDate: startDate, targetDuration: duration, protocolType: proto)
+        case .endFast(let endDate):
+            // A stale end can arrive after the phone already ended that fast and started a new
+            // one; applying it verbatim would write an endDate before the startDate.
+            guard let start = activeFast?.startDate, endDate > start else { return }
+            endFast(endDate: endDate)
+        case .snoozeFast(let extensionSeconds):
+            guard activeFast != nil else { return }
+            snoozeFast(by: extensionSeconds)
+        }
     }
 
     /// Ends the current fast without saving it to history — used when the user explicitly discards

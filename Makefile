@@ -40,7 +40,6 @@ build-watch:
 		-destination $(DESTINATION_WATCH) \
 		SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 
-
 test:
 	@echo "🧪 Running Unit Tests with simulator target: $(SIM_NAME)"
 	xcodebuild test \

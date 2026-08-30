@@ -103,7 +103,6 @@ platform :ios do
       )
     end
 
-
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",

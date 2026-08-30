@@ -17,7 +17,6 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     public var onSnoozeRequested: (@MainActor (TimeInterval) -> Void)?
 
     private override init() {
-
         super.init()
         UNUserNotificationCenter.current().delegate = self
         registerCategories()
@@ -77,7 +76,6 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     }
 
     public func scheduleGoalNotification(targetEndDate: Date, protocolName: String, enabled: Bool = true) {
-
         cancelGoalNotification()
         guard enabled else { return }
 
@@ -156,7 +154,12 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     }
 
     public func cancelRecurringReminders() {
-        let identifiers = (1...7).map { "recurring_start_day_\($0)" }
+        // `recurring_end_day_*` is no longer scheduled, but builds shipped before it was removed
+        // may still have those requests pending — keep cancelling them or they fire forever.
+        let identifiers = (1...7).flatMap { [
+            "recurring_start_day_\($0)",
+            "recurring_end_day_\($0)"
+        ] }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 

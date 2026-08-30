@@ -20,7 +20,6 @@ A minimal, native intermittent fasting tracker for iOS (18+) and watchOS (11+), 
 - `FastedTests/`: Unit tests (Snapshot logic, timeline builders, App Intents, conversion, data models)
 - `FastedUITests/`: UI tests for critical user journeys
 
-
 ## Developer Quickstart
 
 ```bash

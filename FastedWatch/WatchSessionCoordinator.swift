@@ -25,8 +25,8 @@ final class WatchSessionCoordinator: NSObject, ObservableObject, WCSessionDelega
 
     func startFast(
         startDate: Date = Date(),
-        duration: TimeInterval = 16 * 3600,
-        protocolType: String = "16:8"
+        duration: TimeInterval = FastingProtocol.default.fastingSeconds,
+        protocolType: String = FastingProtocol.default.ratioString
     ) {
         let command = FastingActionCommand.startFast(
             startDate: startDate,

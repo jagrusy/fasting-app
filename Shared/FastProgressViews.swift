@@ -15,9 +15,34 @@ public struct FastLiveTimerView: View {
     }
 
     public var body: some View {
-        Text(timerInterval: startDate...goalDate, countsDown: false)
+        FastElapsedText(startDate: startDate, goalDate: goalDate, isCompleted: isCompleted)
             .monospacedDigit()
             .fontWeight(.bold)
+    }
+}
+
+/// Elapsed time that keeps ticking without waking the process.
+///
+/// `Text(timerInterval:)` clamps to its range, so past the goal a `start...goal` range freezes at
+/// the goal duration — an overdue fast would sit at "16:00:00" forever. Past the goal we switch to
+/// the open-ended `.timer` style, which counts up indefinitely and is equally reload-free.
+public struct FastElapsedText: View {
+    public let startDate: Date
+    public let goalDate: Date
+    public let isCompleted: Bool
+
+    public init(startDate: Date, goalDate: Date, isCompleted: Bool) {
+        self.startDate = startDate
+        self.goalDate = goalDate
+        self.isCompleted = isCompleted
+    }
+
+    public var body: some View {
+        if isCompleted {
+            Text(startDate, style: .timer)
+        } else {
+            Text(timerInterval: startDate...goalDate, countsDown: false)
+        }
     }
 }
 
@@ -123,6 +148,7 @@ public struct AccessoryRectangularFastView: View {
         if snapshot.isFasting, let start = snapshot.startDate, let target = snapshot.targetDuration {
             let goal = start.addingTimeInterval(target)
             let stage = snapshot.currentStage(at: currentDate)
+            let isGoalMet = snapshot.isGoalMet(at: currentDate)
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
@@ -137,7 +163,7 @@ public struct AccessoryRectangularFastView: View {
                 }
                 .font(.caption2)
 
-                Text(timerInterval: start...goal, countsDown: false)
+                FastElapsedText(startDate: start, goalDate: goal, isCompleted: isGoalMet)
                     .font(.headline)
                     .monospacedDigit()
 
@@ -170,10 +196,11 @@ public struct AccessoryInlineFastView: View {
             let goal = start.addingTimeInterval(target)
             let stage = snapshot.currentStage(at: currentDate)
             let stageName = stage?.title ?? "Fast"
+            let isGoalMet = snapshot.isGoalMet(at: currentDate)
             ViewThatFits {
                 HStack {
                     Image(systemName: stage?.systemIcon ?? "timer")
-                    Text(timerInterval: start...goal, countsDown: false)
+                    FastElapsedText(startDate: start, goalDate: goal, isCompleted: isGoalMet)
                 }
                 Text("\(stageName)")
             }
@@ -195,7 +222,11 @@ public struct AccessoryCornerFastView: View {
     public var body: some View {
         if snapshot.isFasting, let start = snapshot.startDate, let target = snapshot.targetDuration {
             let goal = start.addingTimeInterval(target)
-            Text(timerInterval: start...goal, countsDown: false)
+            FastElapsedText(
+                startDate: start,
+                goalDate: goal,
+                isCompleted: snapshot.isGoalMet(at: currentDate)
+            )
                 .widgetLabel {
                     if let stage = snapshot.currentStage(at: currentDate) {
                         Text(stage.shortTitle)
