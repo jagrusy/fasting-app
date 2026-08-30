@@ -80,6 +80,24 @@ final class FastedDialMathTests: XCTestCase {
         XCTAssertFalse(DialMath.isAngle(240.0, between: 300.0, and: 180.0))
     }
 
+    /// Regression test for a drag that felt stuck: accumulating each frame's delta onto the
+    /// previously *snapped* value discards anything smaller than half a step, so a slow drag
+    /// never moves. Accumulating raw and snapping only for display keeps small deltas.
+    func testSmallDeltasAccumulateWhenNotSnappedEachStep() {
+        let step = 5.0 * 60.0
+        let perFrameDelta = 30.0 // well under half a step, i.e. lost if snapped every frame
+
+        // Snapping the running total each frame: never escapes the starting value.
+        var snappedEachFrame = 0.0
+        for _ in 0..<10 { snappedEachFrame = DialMath.snapInterval(snappedEachFrame + perFrameDelta, toMinutes: 5) }
+        XCTAssertEqual(snappedEachFrame, 0, "snapping every frame should swallow sub-step movement")
+
+        // Accumulating raw and snapping once: 10 * 30s = 300s = exactly one step.
+        var raw = 0.0
+        for _ in 0..<10 { raw += perFrameDelta }
+        XCTAssertEqual(DialMath.snapInterval(raw, toMinutes: 5), step)
+    }
+
     func testSnapIntervalRoundsToNearestFiveMinutes() {
         XCTAssertEqual(DialMath.snapInterval(0, toMinutes: 5), 0)
         XCTAssertEqual(DialMath.snapInterval(60, toMinutes: 5), 0) // rounds down to nearest 5 min

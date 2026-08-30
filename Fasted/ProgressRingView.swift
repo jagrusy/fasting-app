@@ -102,7 +102,11 @@ public struct ProgressRingView: View {
     }
 
     private func dragKnob(center: CGPoint, radius: CGFloat) -> some View {
-        let angle = Angle.degrees(clampedProgress * 360.0 - 90.0)
+        // Past 100% the knob keeps travelling around the dial instead of parking at 12 o'clock.
+        // Clamping it there made dragging an already-over-goal fast feel dead — the finger moved
+        // and nothing followed. 1.0 and 0.0 both sit at the top, so this stays continuous.
+        let knobProgress = progress > 1.0 ? progress.truncatingRemainder(dividingBy: 1.0) : clampedProgress
+        let angle = Angle.degrees(knobProgress * 360.0 - 90.0)
         let knobX = center.x + CGFloat(cos(angle.radians)) * radius
         let knobY = center.y + CGFloat(sin(angle.radians)) * radius
         let knobSize = ringWidth + 6
