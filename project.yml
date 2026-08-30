@@ -34,6 +34,15 @@ targets:
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         TARGETED_DEVICE_FAMILY: "1"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+      configs:
+        # Release is what `xcodebuild archive` uses, so it must ask for a *distribution*
+        # identity. This was previously "iPhone Developer" in both configs, which made
+        # automatic signing hunt for an "iOS App Development" profile when archiving for the
+        # App Store and fail — declared here so regenerating the project keeps it correct.
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+        Release:
+          CODE_SIGN_IDENTITY: Apple Distribution
 
   FastedTests:
     type: bundle.unit-test
