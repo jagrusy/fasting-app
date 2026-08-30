@@ -13,10 +13,26 @@ settings:
     SWIFT_TREAT_WARNINGS_AS_ERRORS: "YES"
     ENABLE_PREVIEWS: "YES"
     DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+    # Every bundle in the archive must carry the same version pair, or App Store validation
+    # rejects the upload. All four Info.plists read these, and CI overrides
+    # CURRENT_PROJECT_VERSION per build with the next unused TestFlight build number.
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"
+    # Per-target provisioning profile, supplied by fastlane at archive time (see the
+    # SIGNED_BUNDLE_IDS map in fastlane/Fastfile). A single global
+    # PROVISIONING_PROFILE_SPECIFIER xcarg cannot work once there is more than one signed
+    # bundle: it would hand the app's profile to the widget and watch targets, whose
+    # entitlements and bundle ids don't match it. Empty by default so local builds and the
+    # simulator builds in CI keep using automatic signing.
+    SOLSTICE_PROFILE_APP: ""
+    SOLSTICE_PROFILE_WIDGETS: ""
+    SOLSTICE_PROFILE_WATCH: ""
+    SOLSTICE_PROFILE_WATCH_WIDGETS: ""
 
-
+# The iOS-only keys that used to live in settings.base (IPHONEOS_DEPLOYMENT_TARGET,
+# SUPPORTED_PLATFORMS, TARGETED_DEVICE_FAMILY, SUPPORTS_MACCATALYST) are declared per target
+# instead. Inherited by a watchOS target they produce a misleading "does not support the
+# platform iOS" failure.
 targets:
   Fasted:
     type: application
@@ -35,11 +51,22 @@ targets:
         GENERATE_INFOPLIST_FILE: "NO"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: Fasted/Fasted.entitlements
+        PROVISIONING_PROFILE_SPECIFIER: $(SOLSTICE_PROFILE_APP)
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
+        SUPPORTS_MACCATALYST: "NO"
         TARGETED_DEVICE_FAMILY: "1"
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+      configs:
+        # Release is what `xcodebuild archive` uses, so it must ask for a *distribution*
+        # identity. This was previously "iPhone Developer" in both configs, which made
+        # automatic signing hunt for an "iOS App Development" profile when archiving for the
+        # App Store and fail — declared here so regenerating the project keeps it correct.
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+        Release:
+          CODE_SIGN_IDENTITY: Apple Distribution
 
   FastedWidgets:
     type: app-extension
@@ -56,11 +83,18 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.grusy.SolsticeFast.Widgets
         SKIP_INSTALL: "YES"
         CODE_SIGN_ENTITLEMENTS: FastedWidgets/FastedWidgets.entitlements
+        PROVISIONING_PROFILE_SPECIFIER: $(SOLSTICE_PROFILE_WIDGETS)
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
+        SUPPORTS_MACCATALYST: "NO"
         TARGETED_DEVICE_FAMILY: "1"
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+      configs:
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+        Release:
+          CODE_SIGN_IDENTITY: Apple Distribution
 
   FastedWatch:
     type: application
@@ -79,11 +113,17 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.grusy.SolsticeFast.watchkitapp
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: FastedWatch/FastedWatch.entitlements
+        PROVISIONING_PROFILE_SPECIFIER: $(SOLSTICE_PROFILE_WATCH)
         SDKROOT: watchos
         SUPPORTED_PLATFORMS: "watchsimulator watchos"
         TARGETED_DEVICE_FAMILY: "4"
         WATCHOS_DEPLOYMENT_TARGET: "11.0"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+      configs:
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+        Release:
+          CODE_SIGN_IDENTITY: Apple Distribution
 
   FastedWatchWidgets:
     type: app-extension
@@ -100,11 +140,17 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.grusy.SolsticeFast.watchkitapp.Widgets
         SKIP_INSTALL: "YES"
         CODE_SIGN_ENTITLEMENTS: FastedWatchWidgets/FastedWatchWidgets.entitlements
+        PROVISIONING_PROFILE_SPECIFIER: $(SOLSTICE_PROFILE_WATCH_WIDGETS)
         SDKROOT: watchos
         SUPPORTED_PLATFORMS: "watchsimulator watchos"
         TARGETED_DEVICE_FAMILY: "4"
         WATCHOS_DEPLOYMENT_TARGET: "11.0"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+      configs:
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+        Release:
+          CODE_SIGN_IDENTITY: Apple Distribution
 
   FastedTests:
     type: bundle.unit-test
@@ -120,6 +166,7 @@ targets:
         GENERATE_INFOPLIST_FILE: "YES"
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
+        SUPPORTS_MACCATALYST: "NO"
         TARGETED_DEVICE_FAMILY: "1"
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
@@ -138,81 +185,52 @@ targets:
         GENERATE_INFOPLIST_FILE: "YES"
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
+        SUPPORTS_MACCATALYST: "NO"
         TARGETED_DEVICE_FAMILY: "1"
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
 
+# Schemes were previously not defined anywhere, so Xcode auto-created them implicitly. The
+# auto-created "FastedTests" scheme picked up *both* test targets, which is why CI's separate
+# "Run UI Tests" step re-ran the UI suite that "Run Unit Tests" had already run. Declaring them
+# makes the split explicit and reproducible instead of dependent on Xcode's autocreation rules.
+#
+# The scheme names Fasted, FastedTests and FastedUITests are referenced by ci.yml, deploy.yml,
+# the Makefile and fastlane/Fastfile — do not rename them.
 schemes:
   Fasted:
     build:
       targets:
         Fasted: all
-    run:
-      config: Debug
     test:
-      config: Debug
       targets:
         - FastedTests
-    profile:
-      config: Release
-    analyze:
-      config: Debug
-    archive:
-      config: Release
-
+        - FastedUITests
+  FastedTests:
+    build:
+      targets:
+        Fasted: [test]
+        FastedTests: [test]
+    test:
+      targets:
+        - FastedTests
+  FastedUITests:
+    build:
+      targets:
+        Fasted: [test]
+        FastedUITests: [test]
+    test:
+      targets:
+        - FastedUITests
   FastedWidgets:
     build:
       targets:
         FastedWidgets: all
-    run:
-      config: Debug
-    profile:
-      config: Release
-    analyze:
-      config: Debug
-    archive:
-      config: Release
-
   FastedWatch:
     build:
       targets:
         FastedWatch: all
-    run:
-      config: Debug
-    profile:
-      config: Release
-    analyze:
-      config: Debug
-    archive:
-      config: Release
-
   FastedWatchWidgets:
     build:
       targets:
         FastedWatchWidgets: all
-    run:
-      config: Debug
-    profile:
-      config: Release
-    analyze:
-      config: Debug
-    archive:
-      config: Release
-
-  FastedTests:
-    build:
-      targets:
-        FastedTests: all
-    test:
-      config: Debug
-      targets:
-        - FastedTests
-
-  FastedUITests:
-    build:
-      targets:
-        FastedUITests: all
-    test:
-      config: Debug
-      targets:
-        - FastedUITests

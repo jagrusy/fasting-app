@@ -1,4 +1,114 @@
+require 'tmpdir'
+require 'fileutils'
+
 default_platform(:ios)
+
+# Copies the profile get_provisioning_profile just downloaded into every directory Xcode might
+# read provisioning profiles from, named by UUID, and returns that UUID.
+#
+# fastlane's install_provisioning_profile targets ~/Library/MobileDevice/Provisioning Profiles,
+# but Xcode 16 reads from ~/Library/Developer/Xcode/UserData/Provisioning Profiles — which is why
+# a profile could install "successfully" and still come back as "No profile ... found" at archive
+# time. Writing both costs nothing and is version-agnostic. Referencing the profile by UUID
+# rather than name also avoids depending on Apple's generated display name matching exactly.
+def install_appstore_profile_everywhere
+  source = lane_context[SharedValues::SIGH_PROFILE_PATH]
+  uuid = lane_context[SharedValues::SIGH_UUID]
+  UI.user_error!("get_provisioning_profile did not set a profile path/UUID") if source.nil? || uuid.nil?
+
+  [
+    File.join(Dir.home, "Library/MobileDevice/Provisioning Profiles"),
+    File.join(Dir.home, "Library/Developer/Xcode/UserData/Provisioning Profiles")
+  ].each do |dir|
+    FileUtils.mkdir_p(dir)
+    FileUtils.cp(source, File.join(dir, "#{uuid}.mobileprovision"))
+  end
+
+  UI.success("Installed provisioning profile #{uuid} for manual signing")
+  uuid
+end
+
+# Reads the team ID out of the provisioning profile Apple just issued.
+#
+# Preferred over the APPLE_TEAM_ID secret because the profile and the signing certificate are
+# necessarily from the same team (Apple issued the profile against that certificate), whereas the
+# secret is hand-entered and can drift. A mismatch shows up as the thoroughly unhelpful
+# "Provisioning profile ... belongs to team X, which does not match the selected team Y".
+def team_id_from_profile
+  path = lane_context[SharedValues::SIGH_PROFILE_PATH]
+  plist_path = File.join(Dir.tmpdir, "profile-#{Process.pid}.plist")
+  system("security cms -D -i '#{path}' -o '#{plist_path}' 2>/dev/null")
+  team = `plutil -extract TeamIdentifier.0 raw -o - '#{plist_path}' 2>/dev/null`.strip
+  FileUtils.rm_f(plist_path)
+  team = nil if team.empty?
+
+  if team.nil?
+    UI.important("Could not read TeamIdentifier from the profile; falling back to APPLE_TEAM_ID")
+    team = ENV["APPLE_TEAM_ID"]
+  elsif ENV["APPLE_TEAM_ID"] && ENV["APPLE_TEAM_ID"] != team
+    UI.important("APPLE_TEAM_ID (#{ENV['APPLE_TEAM_ID']}) does not match the team that owns the " \
+                 "provisioning profile (#{team}). Using #{team} — consider correcting the secret.")
+  end
+
+  UI.user_error!("Could not determine a team ID for signing") if team.to_s.empty?
+  team
+end
+
+# Every code-signed bundle in the archive needs its own App Store provisioning profile, keyed
+# here by the build setting each target reads it through (see project.yml).
+#
+# A single global PROVISIONING_PROFILE_SPECIFIER xcarg — which is what this signed when the app
+# was the only bundle — cannot work now: xcodebuild applies command-line settings to *every*
+# target, so the widget and watch targets would each be handed the app's profile, whose bundle id
+# and entitlements don't match theirs. Passing one setting per target is the only way to express
+# four profiles in one archive.
+SIGNED_BUNDLE_IDS = {
+  "SOLSTICE_PROFILE_APP" => "com.grusy.SolsticeFast",
+  "SOLSTICE_PROFILE_WIDGETS" => "com.grusy.SolsticeFast.Widgets",
+  "SOLSTICE_PROFILE_WATCH" => "com.grusy.SolsticeFast.watchkitapp",
+  "SOLSTICE_PROFILE_WATCH_WIDGETS" => "com.grusy.SolsticeFast.watchkitapp.Widgets"
+}.freeze
+
+# Fetches and installs an App Store profile for every signed bundle, in order.
+#
+# Returns [{ bundle_id => profile_uuid }, team_id]. The app comes first in SIGNED_BUNDLE_IDS so a
+# missing App ID surfaces as a failure on the app itself rather than on an extension, and so the
+# team is read from the app's own profile.
+#
+# Each App ID must exist in the developer portal with App Groups enabled before this can succeed.
+# If one is missing, Apple's error is an unhelpful "There is no App ID with Identifier ..." —
+# create it at https://developer.apple.com/account/resources/identifiers.
+def fetch_appstore_profiles(api_key)
+  uuids = {}
+  team_id = nil
+
+  SIGNED_BUNDLE_IDS.each_value do |bundle_id|
+    get_provisioning_profile(
+      api_key: api_key,
+      app_identifier: bundle_id
+    )
+    uuids[bundle_id] = install_appstore_profile_everywhere
+    team_id ||= team_id_from_profile
+  end
+
+  [uuids, team_id]
+end
+
+# Build settings for a manually-signed App Store archive of all four bundles.
+def manual_signing_xcargs(uuids, team_id, build_number)
+  per_target = SIGNED_BUNDLE_IDS.map do |setting, bundle_id|
+    "#{setting}=#{uuids.fetch(bundle_id)}"
+  end
+
+  [
+    "CODE_SIGN_STYLE=Manual",
+    "CODE_SIGN_IDENTITY=\"Apple Distribution\"",
+    "DEVELOPMENT_TEAM=#{team_id}",
+    # Every bundle reads this for CFBundleVersion; App Store validation rejects an upload whose
+    # extension versions don't match the app's.
+    "CURRENT_PROJECT_VERSION=#{build_number}"
+  ].concat(per_target).join(" ")
+end
 
 platform :ios do
   desc "Run full test suite (Unit & UI tests)"
@@ -25,27 +135,34 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    team_id = ENV["APPLE_TEAM_ID"]
+    # Fetch an App Store distribution profile per signed bundle, then sign manually against them.
+    #
+    # Automatic signing does not work on this runner: it insists on a *development* identity for
+    # the archive step ("Xcode couldn't find any iOS App Development provisioning profiles"),
+    # but the CI keychain only holds the distribution certificate — and supplying a distribution
+    # identity alongside it just yields "conflicting provisioning settings". Manual signing with
+    # explicitly fetched distribution profiles is the combination that matches what CI has.
+    profile_uuids, team_id = fetch_appstore_profiles(api_key)
 
-    # get_provisioning_profile (sigh) can bind a profile to an *existing* certificate via the API
-    # key above, but it can't create the certificate itself. The certificate is imported into a
-    # temporary CI keychain by the "Import Code-Signing Certificate" workflow step before this
-    # lane runs (see .github/workflows/deploy.yml and FASTLANE_SETUP.md).
-    ["com.grusy.SolsticeFast", "com.grusy.SolsticeFast.Widgets", "com.grusy.SolsticeFast.watchkitapp", "com.grusy.SolsticeFast.watchkitapp.Widgets"].each do |bundle_id|
-      get_provisioning_profile(
-        api_key: api_key,
-        app_identifier: bundle_id,
-        team_id: team_id
-      )
-    end
+    # Apple rejects an upload whose CFBundleVersion was already used, so take the next one
+    # after whatever TestFlight already has rather than the static value in Info.plist.
+    build_number = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: "com.grusy.SolsticeFast",
+      initial_build_number: 0
+    ) + 1
+    UI.message("Building as build number #{build_number}")
 
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: "-allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=#{team_id}",
-      export_xcargs: "-allowProvisioningUpdates"
+      xcargs: manual_signing_xcargs(profile_uuids, team_id, build_number),
+      export_options: {
+        signingStyle: "manual",
+        provisioningProfiles: profile_uuids
+      }
     )
 
     upload_to_testflight(
@@ -93,24 +210,43 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    team_id = ENV["APPLE_TEAM_ID"]
+    # Fetch an App Store distribution profile per signed bundle, then sign manually against them.
+    #
+    # Automatic signing does not work on this runner: it insists on a *development* identity for
+    # the archive step ("Xcode couldn't find any iOS App Development provisioning profiles"),
+    # but the CI keychain only holds the distribution certificate — and supplying a distribution
+    # identity alongside it just yields "conflicting provisioning settings". Manual signing with
+    # explicitly fetched distribution profiles is the combination that matches what CI has.
+    profile_uuids, team_id = fetch_appstore_profiles(api_key)
 
-    ["com.grusy.SolsticeFast", "com.grusy.SolsticeFast.Widgets", "com.grusy.SolsticeFast.watchkitapp", "com.grusy.SolsticeFast.watchkitapp.Widgets"].each do |bundle_id|
-      get_provisioning_profile(
-        api_key: api_key,
-        app_identifier: bundle_id,
-        team_id: team_id
-      )
-    end
+    # Apple rejects an upload whose CFBundleVersion was already used, so take the next one
+    # after whatever TestFlight already has rather than the static value in Info.plist.
+    build_number = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: "com.grusy.SolsticeFast",
+      initial_build_number: 0
+    ) + 1
+    UI.message("Building as build number #{build_number}")
 
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: "-allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=#{team_id}",
-      export_xcargs: "-allowProvisioningUpdates"
+      xcargs: manual_signing_xcargs(profile_uuids, team_id, build_number),
+      export_options: {
+        signingStyle: "manual",
+        provisioningProfiles: profile_uuids
+      }
     )
+
+    # Apple requires review-contact info before a submission is accepted. Solstice has no
+    # accounts/login, so sign_in_required is false and there's nothing to demo-log-in with.
+    review_phone = ENV["APP_REVIEW_PHONE"]
+    UI.user_error!(
+      "Set APP_REVIEW_PHONE (App Review contact phone number, e.g. +15551234567) before " \
+      "running the release lane — Apple requires it to accept a submission."
+    ) if review_phone.nil? || review_phone.empty?
 
     deliver(
       api_key: api_key,
@@ -119,8 +255,25 @@ platform :ios do
       metadata_path: "./fastlane/metadata",
       skip_metadata: false,
       skip_screenshots: false,
+      # Replace the existing set rather than appending to it. Without this, deliver adds to
+      # whatever is already on App Store Connect, and once the combined count passes Apple's
+      # per-device limit the extras are silently dropped — which is how 05 and 06 went missing
+      # with only six screenshots in the folder.
+      overwrite_screenshots: true,
       submit_for_review: true,
-      automatic_release: true
+      automatic_release: true,
+      # precheck can't inspect in-app purchases when authenticating with an App Store Connect
+      # API key, and fails the whole submission over it. Solstice has no IAP at all (no
+      # subscriptions, no paywalls), so there is nothing for this check to look at.
+      precheck_include_in_app_purchases: false,
+      app_review_information: {
+        first_name: ENV["APP_REVIEW_FIRST_NAME"] || "Alan",
+        last_name: ENV["APP_REVIEW_LAST_NAME"] || "Grusy",
+        phone_number: review_phone,
+        email_address: ENV["APP_REVIEW_EMAIL"] || "jagrusy@gmail.com",
+        notes: "Solstice has no accounts or sign-in — every feature is reachable immediately."
+        # No demo_user/demo_password: nothing to log into (no accounts in the app at all).
+      }
     )
   end
 end

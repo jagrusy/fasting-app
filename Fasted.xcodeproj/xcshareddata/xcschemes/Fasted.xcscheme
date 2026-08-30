@@ -50,6 +50,17 @@
                ReferencedContainer = "container:Fasted.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A1D3CF1DC13453B009F3FA5A"
+               BuildableName = "FastedUITests.xctest"
+               BlueprintName = "FastedUITests"
+               ReferencedContainer = "container:Fasted.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>
@@ -74,8 +85,6 @@
             ReferencedContainer = "container:Fasted.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -93,8 +102,6 @@
             ReferencedContainer = "container:Fasted.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-      </CommandLineArguments>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

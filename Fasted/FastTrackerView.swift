@@ -9,7 +9,12 @@ public struct FastTrackerView: View {
     @State private var showStagesSheet: Bool = false
     @State private var centerDisplayMode: CenterDisplayMode = .elapsed
     @State private var tempTime: Date = Date()
+    /// Snapped value, used for everything the user sees.
     @State private var draggingElapsed: TimeInterval?
+    /// Unsnapped accumulator. Kept separately because snapping the running total each frame
+    /// discards any movement smaller than half a step, so a slow drag would accumulate nothing
+    /// and the ring would feel stuck until you moved fast enough to clear the threshold.
+    @State private var dragRawElapsed: TimeInterval?
     @State private var showValidationAlert: Bool = false
     @State private var validationMessage: String?
 
@@ -40,13 +45,14 @@ public struct FastTrackerView: View {
 
     private func trackerContent(now: Date) -> some View {
         let progress = displayedProgress(now: now)
+        let previewStart = previewStartDate(now: now)
         return VStack(spacing: 20) {
             headerView(progress: progress)
-            progressSection(now: now, progress: progress)
+            progressSection(now: now, progress: progress, previewStart: previewStart)
 
             if fastManager.isFasting {
                 let elapsed: TimeInterval = fastManager.activeFast.map {
-                    now.timeIntervalSince($0.startDate ?? now)
+                    now.timeIntervalSince(previewStart ?? $0.startDate ?? now)
                 } ?? 0
                 let currentStage = MetabolicStage.stage(for: elapsed)
                 MetabolicStageBadgeView(stage: currentStage) {
@@ -59,6 +65,7 @@ public struct FastTrackerView: View {
                 FastStartedCardView(
                     fast: fast,
                     now: now,
+                    previewStartDate: previewStart,
                     onSelectDayOffset: { offset in
                         updateStartDate(dayOffset: offset, from: fast.startDate ?? now)
                     },
@@ -108,7 +115,7 @@ public struct FastTrackerView: View {
         .padding(.top, 16)
     }
 
-    private func progressSection(now: Date, progress: Double) -> some View {
+    private func progressSection(now: Date, progress: Double, previewStart: Date?) -> some View {
         ZStack {
             ProgressRingView(
                 progress: progress,
@@ -135,7 +142,8 @@ public struct FastTrackerView: View {
                     currentProtocol: fastManager.currentProtocol,
                     progress: progress,
                     centerDisplayMode: centerDisplayMode,
-                    now: now
+                    now: now,
+                    previewStartDate: previewStart
                 )
             }
             .buttonStyle(.plain)
@@ -228,10 +236,11 @@ public struct FastTrackerView: View {
     /// happens to land.
     private func handleProgressDragDelta(deltaProgress: Double, now: Date) {
         guard let fast = fastManager.activeFast, fast.targetDuration > 0 else { return }
-        let baseline = draggingElapsed ?? now.timeIntervalSince(fast.startDate ?? now)
-        let updatedElapsed = max(0, baseline + deltaProgress * fast.targetDuration)
-        let snappedElapsed = DialMath.snapInterval(updatedElapsed, toMinutes: 5)
+        let baseline = dragRawElapsed ?? now.timeIntervalSince(fast.startDate ?? now)
+        let rawElapsed = max(0, baseline + deltaProgress * fast.targetDuration)
+        dragRawElapsed = rawElapsed
 
+        let snappedElapsed = DialMath.snapInterval(rawElapsed, toMinutes: 5)
         if let previous = draggingElapsed, previous != snappedElapsed {
             #if canImport(UIKit)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -241,7 +250,10 @@ public struct FastTrackerView: View {
     }
 
     private func commitProgressDrag(now: Date) {
-        defer { draggingElapsed = nil }
+        defer {
+            draggingElapsed = nil
+            dragRawElapsed = nil
+        }
         guard let fast = fastManager.activeFast, let elapsed = draggingElapsed else { return }
         let adjustedStart = now.addingTimeInterval(-elapsed)
         let validation = fastManager.validateInterval(startDate: adjustedStart, excludingFastId: fast.id)
@@ -258,6 +270,14 @@ public struct FastTrackerView: View {
             return max(0.0, dragging / fast.targetDuration)
         }
         return calculateProgress(at: now)
+    }
+
+    /// While a drag is in flight nothing is written to Core Data until release, so `fast.startDate`
+    /// is stale. Every readout (elapsed clock, START time, GOAL TARGET) needs this instead, or the
+    /// ring appears to move while all the numbers sit frozen until you lift your finger.
+    private func previewStartDate(now: Date) -> Date? {
+        guard let dragging = draggingElapsed else { return nil }
+        return now.addingTimeInterval(-dragging)
     }
 
     private func calculateProgress(at date: Date) -> Double {

@@ -3,23 +3,28 @@ import SwiftUI
 public struct FastStartedCardView: View {
     public let fast: Fast
     public let now: Date
+    /// Start time to display instead of the stored one while a ring drag is in progress — the
+    /// drag isn't written to Core Data until release, so `fast.startDate` is stale until then.
+    public let previewStartDate: Date?
     public let onSelectDayOffset: (Int) -> Void
     public let onSelectTime: () -> Void
 
     public init(
         fast: Fast,
         now: Date,
+        previewStartDate: Date? = nil,
         onSelectDayOffset: @escaping (Int) -> Void,
         onSelectTime: @escaping () -> Void
     ) {
         self.fast = fast
         self.now = now
+        self.previewStartDate = previewStartDate
         self.onSelectDayOffset = onSelectDayOffset
         self.onSelectTime = onSelectTime
     }
 
     public var body: some View {
-        let startDate = fast.startDate ?? now
+        let startDate = previewStartDate ?? fast.startDate ?? now
         let isStartedYesterday = Calendar.current.isDateInYesterday(startDate)
 
         HStack(alignment: .center, spacing: 12) {
