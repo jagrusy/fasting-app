@@ -16,6 +16,11 @@ on:
           - ''
           - beta
           - release
+      skip_tests:
+        description: 'Skip the pre-deploy test run (for iterating on signing/deploy config)'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -24,10 +29,23 @@ concurrency:
 jobs:
   deploy:
     name: Fastlane Deploy
-    runs-on: macos-15
+    # Apple requires the iOS 26 SDK (Xcode 26+) for App Store Connect uploads; the macos-15
+    # image tops out at Xcode 16 / iOS 18.5, which uploads reject with a 409 "SDK version issue".
+    runs-on: macos-26
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      # Pin the toolchain explicitly rather than trusting the image default, so an image update
+      # can't silently move the SDK back under Apple's minimum.
+      - name: Select Xcode
+        run: |
+          ls /Applications | grep -i '^Xcode' || true
+          LATEST=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -n 1)
+          echo "Selecting $LATEST"
+          sudo xcode-select -s "$LATEST/Contents/Developer"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i "iphoneos" || true
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -35,8 +53,13 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
+      # Both steps below exist only to run the pre-deploy test suite, and that suite takes
+      # 6-14 minutes — while the deploy steps after it take seconds. When iterating on signing
+      # or deploy config (where the code is unchanged and CI already tested it on the PR),
+      # dispatch with skip_tests=true to get a ~1 minute feedback loop instead of ~15.
       - name: Discover iOS Simulator
         id: sim
+        if: ${{ !inputs.skip_tests }}
         run: |
           SIM_NAME=$(xcrun simctl list devices available -j | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
           if [ -z "$SIM_NAME" ]; then
@@ -46,6 +69,7 @@ jobs:
           echo "name=$SIM_NAME" >> $GITHUB_OUTPUT
 
       - name: Run Tests Before Deploy
+        if: ${{ !inputs.skip_tests }}
         run: |
           xcodebuild test \
             -project Fasted.xcodeproj \
@@ -88,9 +112,26 @@ jobs:
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+
+          # No `-t cert`: that imports only the certificate and silently drops the private key,
+          # which surfaces much later as xcodebuild's confusing "No signing certificate ... with
+          # a private key was found". Letting security infer the type from the pkcs12 brings in
+          # the full identity (certificate + key).
+          security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -f pkcs12 -k "$KEYCHAIN_PATH"
           security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain
           security set-key-partition-list -S apple-tool:,apple:,codesign: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          # Fail here, with a clear message, rather than 15 confusing lines deep in an xcodebuild
+          # archive error. find-identity -p codesigning only lists complete identities, so this
+          # verifies the private key actually came across.
+          echo "Signing identities available to the build:"
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
+          if ! security find-identity -v -p codesigning "$KEYCHAIN_PATH" | grep -q "Apple Distribution"; then
+            echo "::error::No 'Apple Distribution' identity with a private key in the CI keychain."
+            echo "::error::BUILD_CERTIFICATE_BASE64 must be a .p12 exported from Keychain Access"
+            echo "::error::under 'My Certificates' (which includes the private key), not 'Certificates'."
+            exit 1
+          fi
 
       - name: Run Fastlane Deployment
         env:
