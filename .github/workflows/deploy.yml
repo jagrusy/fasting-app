@@ -29,10 +29,23 @@ concurrency:
 jobs:
   deploy:
     name: Fastlane Deploy
-    runs-on: macos-15
+    # Apple requires the iOS 26 SDK (Xcode 26+) for App Store Connect uploads; the macos-15
+    # image tops out at Xcode 16 / iOS 18.5, which uploads reject with a 409 "SDK version issue".
+    runs-on: macos-26
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      # Pin the toolchain explicitly rather than trusting the image default, so an image update
+      # can't silently move the SDK back under Apple's minimum.
+      - name: Select Xcode
+        run: |
+          ls /Applications | grep -i '^Xcode' || true
+          LATEST=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -n 1)
+          echo "Selecting $LATEST"
+          sudo xcode-select -s "$LATEST/Contents/Developer"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i "iphoneos" || true
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
