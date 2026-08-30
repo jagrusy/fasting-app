@@ -37,6 +37,12 @@ platform :ios do
       team_id: team_id
     )
 
+    # get_provisioning_profile's own install step doesn't reliably land the profile in
+    # ~/Library/MobileDevice/Provisioning Profiles/ on this CI image — xcodebuild's manual signing
+    # lookup by name/UUID only searches that exact directory, so without this it fails with
+    # "No profile ... found" even though sigh just downloaded a perfectly valid one.
+    install_provisioning_profile(path: ENV["SIGH_PROFILE_PATH"])
+
     # Explicit manual signing, using the exact profile get_provisioning_profile just fetched
     # (ENV["SIGH_NAME"]) — no -allowProvisioningUpdates. That flag tells Xcode to fall back to its
     # *automatic* signing assistant if anything looks off, and that assistant needs an Apple ID
@@ -103,6 +109,12 @@ platform :ios do
       app_identifier: "com.grusy.SolsticeFast",
       team_id: team_id
     )
+
+    # get_provisioning_profile's own install step doesn't reliably land the profile in
+    # ~/Library/MobileDevice/Provisioning Profiles/ on this CI image — xcodebuild's manual signing
+    # lookup by name/UUID only searches that exact directory, so without this it fails with
+    # "No profile ... found" even though sigh just downloaded a perfectly valid one.
+    install_provisioning_profile(path: ENV["SIGH_PROFILE_PATH"])
 
     # Explicit manual signing, using the exact profile get_provisioning_profile just fetched
     # (ENV["SIGH_NAME"]) — no -allowProvisioningUpdates. That flag tells Xcode to fall back to its
