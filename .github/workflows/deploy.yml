@@ -16,6 +16,11 @@ on:
           - ''
           - beta
           - release
+      skip_tests:
+        description: 'Skip the pre-deploy test run (for iterating on signing/deploy config)'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -35,8 +40,13 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
+      # Both steps below exist only to run the pre-deploy test suite, and that suite takes
+      # 6-14 minutes — while the deploy steps after it take seconds. When iterating on signing
+      # or deploy config (where the code is unchanged and CI already tested it on the PR),
+      # dispatch with skip_tests=true to get a ~1 minute feedback loop instead of ~15.
       - name: Discover iOS Simulator
         id: sim
+        if: ${{ !inputs.skip_tests }}
         run: |
           SIM_NAME=$(xcrun simctl list devices available -j | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
           if [ -z "$SIM_NAME" ]; then
@@ -46,6 +56,7 @@ jobs:
           echo "name=$SIM_NAME" >> $GITHUB_OUTPUT
 
       - name: Run Tests Before Deploy
+        if: ${{ !inputs.skip_tests }}
         run: |
           xcodebuild test \
             -project Fasted.xcodeproj \
