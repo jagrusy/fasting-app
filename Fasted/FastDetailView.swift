@@ -117,7 +117,7 @@ public struct FastDetailView: View {
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 .datePickerStyle(.compact)
-                .onChange(of: startDate) { _ in hasChanges = true }
+                .onChange(of: startDate) { hasChanges = true }
                 .accessibilityIdentifier("edit_start_date_picker")
             }
             .padding(16)
@@ -136,7 +136,7 @@ public struct FastDetailView: View {
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 .datePickerStyle(.compact)
-                .onChange(of: endDate) { _ in hasChanges = true }
+                .onChange(of: endDate) { hasChanges = true }
                 .accessibilityIdentifier("edit_end_date_picker")
             }
             .padding(16)

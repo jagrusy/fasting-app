@@ -11,7 +11,7 @@ SIM_NAME := iPhone 16
 endif
 
 DESTINATION_IOS = 'platform=iOS Simulator,name=$(SIM_NAME)'
-DESTINATION_WATCH = 'platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)'
+DESTINATION_WATCH = 'generic/platform=watchOS Simulator'
 
 .PHONY: all build build-ios build-watch test uitest lint hooks clean beta-local
 
@@ -38,7 +38,7 @@ build-watch:
 		-project $(PROJECT_NAME).xcodeproj \
 		-scheme $(SCHEME_WATCH) \
 		-destination $(DESTINATION_WATCH) \
-		SWIFT_TREAT_WARNINGS_AS_ERRORS=YES || echo "Watch scheme not built yet"
+		SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 
 test:
 	@echo "🧪 Running Unit Tests with simulator target: $(SIM_NAME)"

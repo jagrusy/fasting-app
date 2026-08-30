@@ -7,67 +7,173 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0267E3819DA156E3C21AA688 /* FastingActionCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */; };
+		02E2B44BF8D1A49309056806 /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
+		03F3712F2C298E85F4192E68 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D0EE0A457EFF011B0258010B /* README.md */; };
 		043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */; };
+		084F697FBF35CB11AABC725E /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
+		089D9A852E6784E04D5691EF /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
 		0B2AD02224339FDBB03BCC7B /* CalendarHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C410780F466CF5987E506477 /* CalendarHeatmapView.swift */; };
 		0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71CDC6BEC973FA849ACE8BB /* DialMath.swift */; };
 		0DA5795F7E3BF7899CCB21F3 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */; };
+		1120760C163B6A1E33297FDB /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
+		13AFB3B30007E6BB4426F6EB /* SetFastingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA87A58AA38A6EC7409FE5F /* SetFastingIntent.swift */; };
+		14678D1BE85E2284DEE1EE88 /* SetFastingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA87A58AA38A6EC7409FE5F /* SetFastingIntent.swift */; };
+		167E90B7010E53020453A722 /* FastProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */; };
+		18C49FDC275706630E3D2927 /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
+		19C70B2B4B19C83424685877 /* FastStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3A7103D0883246EA1A90ECD /* FastStatusWidget.swift */; };
 		1A1CEC7520DE250DBA021796 /* FastDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44F4C21FE2197D21744A872 /* FastDetailView.swift */; };
+		1C2D0A64D8220A8783332DCF /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
+		1D42DAA75426B7751F9AA21A /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
+		203C8F4DEC49656BCE19B8FD /* WidgetTimelineBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3CE3910952492A92BB64DD0 /* WidgetTimelineBuilderTests.swift */; };
 		2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFF304C7359306211445686 /* NotificationSchedule.swift */; };
-		230E8F5D74F41671E07B1BDE /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906DF983BABCA66D6350B45A /* FastingProtocol.swift */; };
 		250B6E2DE094437E20F3DC66 /* FastManagerValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776385FA5C186C9AFB85A306 /* FastManagerValidationTests.swift */; };
+		26C19A5BD6BDB1553F38F4C1 /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
+		281063BCF8438C5CECA4B923 /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
+		290EB23E7C0C6FB242F90E6F /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
+		2AEB2AFC805215E2DE91E60D /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
+		2B5CB84B8C663BBC81EC2877 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
+		2CB054D80FFCB722E8DCD81A /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */; };
 		2E7345733FC4B4875CFAC161 /* ReviewPromptManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B3B10BBD804653FFAD01A9 /* ReviewPromptManager.swift */; };
+		30455C3CE0B719CD5AB1526C /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
 		32CD46CD2BD3A67D6FDC1E50 /* EndFastButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686659048DA2EF750EEC4B80 /* EndFastButtonView.swift */; };
+		360CFB21C3156EAD7E510477 /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
+		37B8A9BBE8451FE77AF2539F /* AppGroupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */; };
+		39156B8BD6396C734A368D72 /* WatchRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30075AF85C05CFEC9FB09DCD /* WatchRootView.swift */; };
 		3D385853457F9BE5FE7B2073 /* DialHeaderCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */; };
 		415B59ABB94BB486947A64A6 /* FeedbackHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */; };
 		42B7EDBE72C5CBDF62F4E7EF /* FastRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A408558CA277F27154BD5D /* FastRowView.swift */; };
+		44A347C62848D29830367142 /* FastWidgetFamilyViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E748AAFCB4B3F2DDF13BB549 /* FastWidgetFamilyViews.swift */; };
+		46AF3A5C15F7732867DC594A /* WatchSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133D5524D58FDC210D137DE4 /* WatchSessionManager.swift */; };
+		47653CDF25CE50B9A6FD65C4 /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
 		48744890067ECB53BA38115A /* ProtocolPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978196104603395EF5659F9F /* ProtocolPickerView.swift */; };
 		48FB0D427459DB6A18EF8ADB /* DialFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */; };
 		4C57B9976769EFFCFCD58D14 /* Fasted.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 79E00FFDBAD21B51249AC6C9 /* Fasted.xcdatamodeld */; };
+		4F4850543F7E0E60AEB97354 /* StartFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */; };
 		4F73B0E08C8899B1D478714E /* FastManager+Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A78317288959CA1D370A02 /* FastManager+Notifications.swift */; };
-		501D23BDD8E4408B4F1FA38A /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E30FCE9FA6750C6C0ABBF8C /* SolsticeTheme.swift */; };
+		50D4819AD5B0D7760254EF9B /* NotificationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CFA4EEB688E8CA3F0D63709 /* NotificationManagerTests.swift */; };
+		51EBE5DFAF8D1E643F74CB41 /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
+		531868EFC09E78273AEE5663 /* AppGroupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */; };
+		558062F10AACD30B80898353 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
+		599FBCC772982680206A9F9F /* FastingActionCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */; };
 		5E28F103B04991B5DC71121C /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98639EA5CF96432052AC501B /* NotificationManager.swift */; };
 		62B0C00563C611B6973E931E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */; };
+		63AA188B0D1CF981C33B4F9E /* StartFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */; };
 		63DD19E655D1AD38E81DF671 /* FastMetricsCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F3859AA323EFA3BAE7F2B4 /* FastMetricsCenterView.swift */; };
 		65BCCE113DE373261E9D27CF /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97ABFA5E1D53249C053A768E /* PersistenceController.swift */; };
+		6642F8D9E27AE3956A132F16 /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */; };
+		6671A715865B552AFA906692 /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */; };
+		669719083CB80521E2E92B45 /* StartFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */; };
+		6731DABAFE89191832089A9C /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */; };
 		67747AFA11317A45528691C1 /* MetabolicStageBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */; };
+		67AEEAD45BA64231399E9117 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D0EE0A457EFF011B0258010B /* README.md */; };
 		67F7593024E306184CEB9657 /* FastManager+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */; };
 		680301A03BB0BED727DFF532 /* FastedDialMathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */; };
+		6841D4A6B7C49C45ABDB9A67 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
+		6BE827D1FD3E26B857FB9C7C /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
+		6C164C0151D5ECB7A647B3D8 /* FastControlWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7EE8D5EE638B61DA187E53A /* FastControlWidget.swift */; };
+		6DE2700B0F22827A12AF6DC4 /* FastProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */; };
 		70A1E82B96E8466B544F780D /* FastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B49461E82EC597415611F11 /* FastManager.swift */; };
+		71446816ECFD1B3B44A4D52C /* AppGroupCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F6EB86FD0EE011CBF07654B /* AppGroupCoordinatorTests.swift */; };
 		73B5FF9FD0E9363FCC6A241D /* FastTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */; };
+		75312F18463E489F7246ED00 /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
 		78B975439882F6B9107E507D /* ProgressRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */; };
 		830AB177EA6601337FCA6524 /* AppStoreScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */; };
 		83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */; };
+		8343AF3A1CFD480B1A021E44 /* FastingActionCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */; };
+		83E2EB75A702AD6976FAFBFF /* FastedWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7683DDF7EF4692383D712670 /* FastedWatchApp.swift */; };
+		86055F2337D28D87733DB3A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E0AA730541330E520D556185 /* Assets.xcassets */; };
 		8887E910A75D71DC6B8927C6 /* FastTimePickerSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556AA56BFF312CEBC9395C9D /* FastTimePickerSheetView.swift */; };
+		8C37E9CABAB67BC19B684F22 /* StartFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */; };
 		8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */; };
+		8FDA62E522C2C964409F5B64 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 48B2569387B61EDED4A6712E /* PrivacyInfo.xcprivacy */; };
+		9225E0C3F751197B4854559E /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */; };
 		94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8810ED7037826FE830C9 /* FastedUITests.swift */; };
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
+		98548E8AD56DF8EE3923EC20 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
+		994FE67C1CE31DACA5B1898F /* WatchPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */; };
+		9AECBC71B2D7B00723DF7DA5 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
+		9BB47C1977B50828F59E41C0 /* FastManager+AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3740D6FCC59A6BDB6F776A5A /* FastManager+AppGroup.swift */; };
+		9BE30CD05FF60B9801D9FE66 /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
 		9F63DEE6FD9FF3C8741E6000 /* MetabolicStageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */; };
+		A010696E2F601C2340464FD7 /* FastProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */; };
 		A0B3A591793493FB73C04BD5 /* ReviewPromptManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */; };
 		A2A58808F0405BA2C2D8406B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 81E0320AF8E2D6046FFFFD73 /* PrivacyInfo.xcprivacy */; };
+		A4A02E40E9CD27ED2C474FCE /* FastedWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 96DB5DCAC3C45A6B9DB04467 /* FastedWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A4CC9B5820FF216E19E1B794 /* FastingStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DCBC6565F8F188353EA37C0 /* FastingStateSnapshotTests.swift */; };
 		A6EA958C9BC9DA1C8A102AD5 /* FastManager+Mocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */; };
+		A6F27686EB0A3226E99509F8 /* FastingActionCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */; };
+		A71939927381C5F648E58F9C /* WatchSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8510A4F30BE91396C83AA545 /* WatchSessionCoordinator.swift */; };
+		A7CB4AE6B4B374CE0561A354 /* SetFastingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA87A58AA38A6EC7409FE5F /* SetFastingIntent.swift */; };
 		A9705B0AB96ABFFC991D8437 /* FeedbackHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */; };
 		AAD783B848631089CFCFAEA1 /* MetabolicStagesSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */; };
+		AD1F34E4BBC014393E1DDEE2 /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
 		B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */; };
+		B24EE21CBC7DABBBEE6BC9E5 /* AppIntentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E2F0F37B26044C995133130 /* AppIntentsTests.swift */; };
 		B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */; };
 		B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D4D805535A363DDAF977B89 /* FastingArcShape.swift */; };
+		B3F4D66F591A6BC5540BFFE6 /* AppGroupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */; };
 		BAC60C4DD062EAB06EA240E2 /* MedicalDisclaimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */; };
+		BC2CF35F91EA9AC368E7444F /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
+		BD7B9EA2D7B7CB3207FC128C /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
+		C16FE1D2D9A43E674540AC0D /* FastComplications.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23249B6FE33FC0540C9DE9B /* FastComplications.swift */; };
+		C3798D8BCAAE1F1B30E50E4E /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
+		C599741E6A0988A4ED07D94E /* FastProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */; };
+		C7A0AE6139079DA758A59AD8 /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */; };
+		C899B9F2E0CE96DDFC63EAF0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D0EE0A457EFF011B0258010B /* README.md */; };
 		CAF9AF507CA760F146E6B2D0 /* StreakCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624342259EC84B9174A4FAE /* StreakCalculatorTests.swift */; };
 		CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145B081A157492E5B631A378 /* ProtocolCardView.swift */; };
-		DCD2C2B878ADA52913A6CDFA /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015C62C37743171065D5B23D /* MetabolicStage.swift */; };
+		CEE7D1F27040279663FF4240 /* FastedWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2B538F1D5624D86393BC382B /* FastedWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D12E0B387D9AAEE305F83553 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 74B3116F5CED78A31F9BCBFD /* PrivacyInfo.xcprivacy */; };
+		D20827AA470C4E755E1BAD0D /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */; };
+		D2151F33998A3270EFF2DE87 /* FastedWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 963166C19485453DFD344BCF /* FastedWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D38F2D85CD0BA970935C2573 /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
+		D48B0A4D04512F7E3D7B0977 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
+		D4F2AFBE8351BC02953E6CA4 /* AppGroupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */; };
+		DD2A1F1E7D941774BADAAAAA /* PendingCommandReconciliationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18C07DDCC7D9F2D9FB5D6B8 /* PendingCommandReconciliationTests.swift */; };
 		DEFA541DB7379B894DDBE400 /* FastStartedCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */; };
+		DF3FF48801379EB3905E6F77 /* FastedWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2861876CC85284102739ACA4 /* FastedWidgetsBundle.swift */; };
 		E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47F0F9EAF3379520543128F /* FastedTests.swift */; };
+		E0C993AB8D2B4405872918E8 /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
+		E4961D7D9EDBBE71BB479A7B /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
+		E7A8BC23F24404937890CB0A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D0EE0A457EFF011B0258010B /* README.md */; };
+		E8A5B963DF26327D10D275D0 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
+		EC997B42B09ED34EDDF1B7F0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DE8B4FD5DF967B569F2716A6 /* PrivacyInfo.xcprivacy */; };
+		EDE4E6FC88BB4C19DD5D6DEA /* SetFastingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA87A58AA38A6EC7409FE5F /* SetFastingIntent.swift */; };
 		F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1845606048434908EA9499 /* ContentView.swift */; };
 		F501504029E2FF98114B915E /* StreakCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA35504122572AB7F1EB512 /* StreakCalculator.swift */; };
+		FB277731465C3AE2B319DC6F /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */; };
 		FCDDC5D7524F3419E7D9A55E /* SolsticeThemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		21707F3C06911C5660FF21F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 693AB501A38FAFC9D0C790B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC6E01BB515F34D666FA8660;
+			remoteInfo = FastedWidgets;
+		};
 		4BFCFF57B691570F6B8E427C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 693AB501A38FAFC9D0C790B7 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 0A23D54D311FDECC7C46A32A;
 			remoteInfo = Fasted;
+		};
+		6A1B19BA5D59B69BF1EC736C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 693AB501A38FAFC9D0C790B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B1D5E537D851865F55892C1C;
+			remoteInfo = FastedWatch;
+		};
+		9F33B4A18A6674774218D6B2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 693AB501A38FAFC9D0C790B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC1FFDAC16141D7ECA59A7B4;
+			remoteInfo = FastedWatchWidgets;
 		};
 		BB23AF11D8E22B230FEAF5D1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -78,57 +184,137 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		5808867D88FB11636D0288A7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				CEE7D1F27040279663FF4240 /* FastedWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5DE13829BC153B92D2A8EFDE /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				A4A02E40E9CD27ED2C474FCE /* FastedWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		650467F0D08AD932A0A0890C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D2151F33998A3270EFF2DE87 /* FastedWatchWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		015C62C37743171065D5B23D /* MetabolicStage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStage.swift; sourceTree = "<group>"; };
 		0B49461E82EC597415611F11 /* FastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManager.swift; sourceTree = "<group>"; };
+		133D5524D58FDC210D137DE4 /* WatchSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSessionManager.swift; sourceTree = "<group>"; };
 		145B081A157492E5B631A378 /* ProtocolCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolCardView.swift; sourceTree = "<group>"; };
 		15A78317288959CA1D370A02 /* FastManager+Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Notifications.swift"; sourceTree = "<group>"; };
 		15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStageBadgeView.swift; sourceTree = "<group>"; };
+		1CFA4EEB688E8CA3F0D63709 /* NotificationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManagerTests.swift; sourceTree = "<group>"; };
+		1F11893E710BA95F8A4A0839 /* WatchPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPayload.swift; sourceTree = "<group>"; };
+		1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeFastIntent.swift; sourceTree = "<group>"; };
 		21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedDialMathTests.swift; sourceTree = "<group>"; };
 		23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolsticeThemeTests.swift; sourceTree = "<group>"; };
+		2861876CC85284102739ACA4 /* FastedWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedWidgetsBundle.swift; sourceTree = "<group>"; };
+		2B538F1D5624D86393BC382B /* FastedWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = FastedWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D4D805535A363DDAF977B89 /* FastingArcShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingArcShape.swift; sourceTree = "<group>"; };
 		2EA35504122572AB7F1EB512 /* StreakCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalculator.swift; sourceTree = "<group>"; };
+		30075AF85C05CFEC9FB09DCD /* WatchRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRootView.swift; sourceTree = "<group>"; };
+		35F13BC4673309354E798401 /* FastedWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FastedWatch.entitlements; sourceTree = "<group>"; };
+		3740D6FCC59A6BDB6F776A5A /* FastManager+AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+AppGroup.swift"; sourceTree = "<group>"; };
 		37F15CA34B550C7DFC463680 /* FastedTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DCBC6565F8F188353EA37C0 /* FastingStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingStateSnapshotTests.swift; sourceTree = "<group>"; };
 		3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackHelper.swift; sourceTree = "<group>"; };
 		3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterDisplayMode.swift; sourceTree = "<group>"; };
+		430F756F747961AC57EF500D /* Fasted.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Fasted.entitlements; sourceTree = "<group>"; };
+		48B2569387B61EDED4A6712E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		49AFD758FFD1AFB86BE41633 /* Fasted.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Fasted.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A8D00563B7A100741A574FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolsticeTheme.swift; sourceTree = "<group>"; };
+		4F6EB86FD0EE011CBF07654B /* AppGroupCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupCoordinatorTests.swift; sourceTree = "<group>"; };
+		50419E8BE341F9BD49A034CD /* FastedWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FastedWidgets.entitlements; sourceTree = "<group>"; };
+		5093F93825789F6E237BD2A2 /* EndFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndFastIntent.swift; sourceTree = "<group>"; };
+		53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingActionCommand.swift; sourceTree = "<group>"; };
 		556AA56BFF312CEBC9395C9D /* FastTimePickerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTimePickerSheetView.swift; sourceTree = "<group>"; };
+		66847625426DFA2D05A362D2 /* FastingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingProtocol.swift; sourceTree = "<group>"; };
+		66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingStateSnapshot.swift; sourceTree = "<group>"; };
 		686659048DA2EF750EEC4B80 /* EndFastButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndFastButtonView.swift; sourceTree = "<group>"; };
+		69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTimelineBuilder.swift; sourceTree = "<group>"; };
 		6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRingView.swift; sourceTree = "<group>"; };
 		7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsSection.swift; sourceTree = "<group>"; };
+		74B3116F5CED78A31F9BCBFD /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7683DDF7EF4692383D712670 /* FastedWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedWatchApp.swift; sourceTree = "<group>"; };
 		776385FA5C186C9AFB85A306 /* FastManagerValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManagerValidationTests.swift; sourceTree = "<group>"; };
 		780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptManagerTests.swift; sourceTree = "<group>"; };
-		7E30FCE9FA6750C6C0ABBF8C /* SolsticeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolsticeTheme.swift; sourceTree = "<group>"; };
+		7A4E30FBBD70FE6DA156368A /* FastedWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FastedWatchWidgets.entitlements; sourceTree = "<group>"; };
+		7E2F0F37B26044C995133130 /* AppIntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntentsTests.swift; sourceTree = "<group>"; };
 		80ABF2C76FAC79CAD26EEC81 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		81E0320AF8E2D6046FFFFD73 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarwinNotificationCenter.swift; sourceTree = "<group>"; };
+		8510A4F30BE91396C83AA545 /* WatchSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSessionCoordinator.swift; sourceTree = "<group>"; };
 		852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicalDisclaimerView.swift; sourceTree = "<group>"; };
 		8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialHeaderCardView.swift; sourceTree = "<group>"; };
 		8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedApp.swift; sourceTree = "<group>"; };
-		906DF983BABCA66D6350B45A /* FastingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingProtocol.swift; sourceTree = "<group>"; };
+		963166C19485453DFD344BCF /* FastedWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FastedWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		96DB5DCAC3C45A6B9DB04467 /* FastedWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FastedWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9703687703B4FF485009663A /* Fasted.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Fasted.xcdatamodel; sourceTree = "<group>"; };
 		978196104603395EF5659F9F /* ProtocolPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolPickerView.swift; sourceTree = "<group>"; };
 		97ABFA5E1D53249C053A768E /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		98639EA5CF96432052AC501B /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		9C1845606048434908EA9499 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListView.swift; sourceTree = "<group>"; };
+		A3A7103D0883246EA1A90ECD /* FastStatusWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastStatusWidget.swift; sourceTree = "<group>"; };
 		A71CDC6BEC973FA849ACE8BB /* DialMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialMath.swift; sourceTree = "<group>"; };
 		A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AAA87A58AA38A6EC7409FE5F /* SetFastingIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetFastingIntent.swift; sourceTree = "<group>"; };
+		B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastSnapshotModifiers.swift; sourceTree = "<group>"; };
 		B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackHelperTests.swift; sourceTree = "<group>"; };
 		B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialFaceView.swift; sourceTree = "<group>"; };
 		B7160CB9DE9689FEF2EFEC10 /* FastedUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7EE8D5EE638B61DA187E53A /* FastControlWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastControlWidget.swift; sourceTree = "<group>"; };
+		BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPayloadTests.swift; sourceTree = "<group>"; };
 		C410780F466CF5987E506477 /* CalendarHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeatmapView.swift; sourceTree = "<group>"; };
 		C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSummaryCardsView.swift; sourceTree = "<group>"; };
 		C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Validation.swift"; sourceTree = "<group>"; };
+		C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastProgressViews.swift; sourceTree = "<group>"; };
 		C8A408558CA277F27154BD5D /* FastRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastRowView.swift; sourceTree = "<group>"; };
+		C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartFastIntent.swift; sourceTree = "<group>"; };
+		D0EE0A457EFF011B0258010B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		D18C07DDCC7D9F2D9FB5D6B8 /* PendingCommandReconciliationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingCommandReconciliationTests.swift; sourceTree = "<group>"; };
 		D1B3B10BBD804653FFAD01A9 /* ReviewPromptManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptManager.swift; sourceTree = "<group>"; };
+		D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupCoordinator.swift; sourceTree = "<group>"; };
+		DE8B4FD5DF967B569F2716A6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStage.swift; sourceTree = "<group>"; };
 		DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTrackerView.swift; sourceTree = "<group>"; };
+		E0AA730541330E520D556185 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E1F3859AA323EFA3BAE7F2B4 /* FastMetricsCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastMetricsCenterView.swift; sourceTree = "<group>"; };
+		E23249B6FE33FC0540C9DE9B /* FastComplications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastComplications.swift; sourceTree = "<group>"; };
+		E3CE3910952492A92BB64DD0 /* WidgetTimelineBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTimelineBuilderTests.swift; sourceTree = "<group>"; };
 		E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreScreenshotTests.swift; sourceTree = "<group>"; };
+		E748AAFCB4B3F2DDF13BB549 /* FastWidgetFamilyViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastWidgetFamilyViews.swift; sourceTree = "<group>"; };
 		E95F8810ED7037826FE830C9 /* FastedUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedUITests.swift; sourceTree = "<group>"; };
+		EA12AA8BCBEE6124BC4224F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastStartedCardView.swift; sourceTree = "<group>"; };
 		EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStageTests.swift; sourceTree = "<group>"; };
 		EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Mocking.swift"; sourceTree = "<group>"; };
+		F251D1E7406927D3585598E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F44F4C21FE2197D21744A872 /* FastDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastDetailView.swift; sourceTree = "<group>"; };
 		F47F0F9EAF3379520543128F /* FastedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedTests.swift; sourceTree = "<group>"; };
 		F624342259EC84B9174A4FAE /* StreakCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalculatorTests.swift; sourceTree = "<group>"; };
@@ -138,12 +324,41 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		3CAF647EBBC44516C01EB985 /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				5093F93825789F6E237BD2A2 /* EndFastIntent.swift */,
+				AAA87A58AA38A6EC7409FE5F /* SetFastingIntent.swift */,
+				1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */,
+				C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		4D0451849D15ED745D5D9760 /* FastedWatch */ = {
+			isa = PBXGroup;
+			children = (
+				E0AA730541330E520D556185 /* Assets.xcassets */,
+				35F13BC4673309354E798401 /* FastedWatch.entitlements */,
+				7683DDF7EF4692383D712670 /* FastedWatchApp.swift */,
+				4A8D00563B7A100741A574FA /* Info.plist */,
+				74B3116F5CED78A31F9BCBFD /* PrivacyInfo.xcprivacy */,
+				30075AF85C05CFEC9FB09DCD /* WatchRootView.swift */,
+				8510A4F30BE91396C83AA545 /* WatchSessionCoordinator.swift */,
+			);
+			path = FastedWatch;
+			sourceTree = "<group>";
+		};
 		867EEE02883DF0582CD8873E = {
 			isa = PBXGroup;
 			children = (
 				FA2CF958379392EFE41B27EF /* Fasted */,
 				FF13538E02A928EAD0AA52A2 /* FastedTests */,
 				D69B656B0B03041654851581 /* FastedUITests */,
+				4D0451849D15ED745D5D9760 /* FastedWatch */,
+				B60130939EA86AED119398F4 /* FastedWatchWidgets */,
+				AD8DC57EF389A81C6A3946AA /* FastedWidgets */,
+				B3038D5CED8DB75F5970CF61 /* Shared */,
 				9092DA5EE35FF49A58DA03C5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -154,8 +369,56 @@
 				49AFD758FFD1AFB86BE41633 /* Fasted.app */,
 				37F15CA34B550C7DFC463680 /* FastedTests.xctest */,
 				B7160CB9DE9689FEF2EFEC10 /* FastedUITests.xctest */,
+				96DB5DCAC3C45A6B9DB04467 /* FastedWatch.app */,
+				963166C19485453DFD344BCF /* FastedWatchWidgets.appex */,
+				2B538F1D5624D86393BC382B /* FastedWidgets.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AD8DC57EF389A81C6A3946AA /* FastedWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				B7EE8D5EE638B61DA187E53A /* FastControlWidget.swift */,
+				50419E8BE341F9BD49A034CD /* FastedWidgets.entitlements */,
+				2861876CC85284102739ACA4 /* FastedWidgetsBundle.swift */,
+				A3A7103D0883246EA1A90ECD /* FastStatusWidget.swift */,
+				E748AAFCB4B3F2DDF13BB549 /* FastWidgetFamilyViews.swift */,
+				EA12AA8BCBEE6124BC4224F9 /* Info.plist */,
+				DE8B4FD5DF967B569F2716A6 /* PrivacyInfo.xcprivacy */,
+			);
+			path = FastedWidgets;
+			sourceTree = "<group>";
+		};
+		B3038D5CED8DB75F5970CF61 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */,
+				84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */,
+				53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */,
+				66847625426DFA2D05A362D2 /* FastingProtocol.swift */,
+				66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */,
+				C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */,
+				B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */,
+				DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */,
+				D0EE0A457EFF011B0258010B /* README.md */,
+				4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */,
+				1F11893E710BA95F8A4A0839 /* WatchPayload.swift */,
+				69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */,
+				3CAF647EBBC44516C01EB985 /* Intents */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		B60130939EA86AED119398F4 /* FastedWatchWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				E23249B6FE33FC0540C9DE9B /* FastComplications.swift */,
+				7A4E30FBBD70FE6DA156368A /* FastedWatchWidgets.entitlements */,
+				F251D1E7406927D3585598E2 /* Info.plist */,
+				48B2569387B61EDED4A6712E /* PrivacyInfo.xcprivacy */,
+			);
+			path = FastedWatchWidgets;
 			sourceTree = "<group>";
 		};
 		D69B656B0B03041654851581 /* FastedUITests */ = {
@@ -180,11 +443,12 @@
 				FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */,
 				686659048DA2EF750EEC4B80 /* EndFastButtonView.swift */,
 				F44F4C21FE2197D21744A872 /* FastDetailView.swift */,
+				430F756F747961AC57EF500D /* Fasted.entitlements */,
 				79E00FFDBAD21B51249AC6C9 /* Fasted.xcdatamodeld */,
 				8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */,
 				2D4D805535A363DDAF977B89 /* FastingArcShape.swift */,
-				906DF983BABCA66D6350B45A /* FastingProtocol.swift */,
 				0B49461E82EC597415611F11 /* FastManager.swift */,
+				3740D6FCC59A6BDB6F776A5A /* FastManager+AppGroup.swift */,
 				EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */,
 				15A78317288959CA1D370A02 /* FastManager+Notifications.swift */,
 				C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */,
@@ -197,7 +461,6 @@
 				9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */,
 				80ABF2C76FAC79CAD26EEC81 /* Info.plist */,
 				852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */,
-				015C62C37743171065D5B23D /* MetabolicStage.swift */,
 				15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */,
 				FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */,
 				98639EA5CF96432052AC501B /* NotificationManager.swift */,
@@ -210,9 +473,9 @@
 				978196104603395EF5659F9F /* ProtocolPickerView.swift */,
 				D1B3B10BBD804653FFAD01A9 /* ReviewPromptManager.swift */,
 				8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */,
-				7E30FCE9FA6750C6C0ABBF8C /* SolsticeTheme.swift */,
 				2EA35504122572AB7F1EB512 /* StreakCalculator.swift */,
 				C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */,
+				133D5524D58FDC210D137DE4 /* WatchSessionManager.swift */,
 			);
 			path = Fasted;
 			sourceTree = "<group>";
@@ -220,14 +483,21 @@
 		FF13538E02A928EAD0AA52A2 /* FastedTests */ = {
 			isa = PBXGroup;
 			children = (
+				4F6EB86FD0EE011CBF07654B /* AppGroupCoordinatorTests.swift */,
+				7E2F0F37B26044C995133130 /* AppIntentsTests.swift */,
 				21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */,
 				F47F0F9EAF3379520543128F /* FastedTests.swift */,
+				3DCBC6565F8F188353EA37C0 /* FastingStateSnapshotTests.swift */,
 				776385FA5C186C9AFB85A306 /* FastManagerValidationTests.swift */,
 				B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */,
 				EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */,
+				1CFA4EEB688E8CA3F0D63709 /* NotificationManagerTests.swift */,
+				D18C07DDCC7D9F2D9FB5D6B8 /* PendingCommandReconciliationTests.swift */,
 				780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */,
 				23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */,
 				F624342259EC84B9174A4FAE /* StreakCalculatorTests.swift */,
+				BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */,
+				E3CE3910952492A92BB64DD0 /* WidgetTimelineBuilderTests.swift */,
 			);
 			path = FastedTests;
 			sourceTree = "<group>";
@@ -241,10 +511,14 @@
 			buildPhases = (
 				3F78296DD467265C725B5256 /* Sources */,
 				F092C963FED7A78FF52D2275 /* Resources */,
+				5808867D88FB11636D0288A7 /* Embed Foundation Extensions */,
+				5DE13829BC153B92D2A8EFDE /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				EBA9EEE5966D70A59B6CB30A /* PBXTargetDependency */,
+				6258A7A16E09AD33D8809D0D /* PBXTargetDependency */,
 			);
 			name = Fasted;
 			packageProductDependencies = (
@@ -270,6 +544,62 @@
 			productName = FastedUITests;
 			productReference = B7160CB9DE9689FEF2EFEC10 /* FastedUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		AC6E01BB515F34D666FA8660 /* FastedWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0E43220D88CFF136A7C5F51D /* Build configuration list for PBXNativeTarget "FastedWidgets" */;
+			buildPhases = (
+				DA8361789178392958843F99 /* Sources */,
+				DA01785B2B8D4831C62C7A40 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FastedWidgets;
+			packageProductDependencies = (
+			);
+			productName = FastedWidgets;
+			productReference = 2B538F1D5624D86393BC382B /* FastedWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		B1D5E537D851865F55892C1C /* FastedWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80D4C7FA5D8BE68BBA61ED06 /* Build configuration list for PBXNativeTarget "FastedWatch" */;
+			buildPhases = (
+				0766BBBDC84CB83489D5E64B /* Sources */,
+				8066E4D2EC060CC18A73CC9E /* Resources */,
+				650467F0D08AD932A0A0890C /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5AA3496F3F34FF454C09E017 /* PBXTargetDependency */,
+			);
+			name = FastedWatch;
+			packageProductDependencies = (
+			);
+			productName = FastedWatch;
+			productReference = 96DB5DCAC3C45A6B9DB04467 /* FastedWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BC1FFDAC16141D7ECA59A7B4 /* FastedWatchWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F9ADA0F55FF26E7161C802D /* Build configuration list for PBXNativeTarget "FastedWatchWidgets" */;
+			buildPhases = (
+				5B812C52D8BF8B63D7187DC4 /* Sources */,
+				D40AE3D402E6F1418B2A5C60 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FastedWatchWidgets;
+			packageProductDependencies = (
+			);
+			productName = FastedWatchWidgets;
+			productReference = 963166C19485453DFD344BCF /* FastedWatchWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		C383F9169379EEB61DEDE0FE /* FastedTests */ = {
 			isa = PBXNativeTarget;
@@ -305,6 +635,15 @@
 						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
 						TestTargetID = 0A23D54D311FDECC7C46A32A;
 					};
+					AC6E01BB515F34D666FA8660 = {
+						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
+					};
+					B1D5E537D851865F55892C1C = {
+						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
+					};
+					BC1FFDAC16141D7ECA59A7B4 = {
+						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
+					};
 					C383F9169379EEB61DEDE0FE = {
 						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
 					};
@@ -327,35 +666,99 @@
 				0A23D54D311FDECC7C46A32A /* Fasted */,
 				C383F9169379EEB61DEDE0FE /* FastedTests */,
 				A1D3CF1DC13453B009F3FA5A /* FastedUITests */,
+				B1D5E537D851865F55892C1C /* FastedWatch */,
+				BC1FFDAC16141D7ECA59A7B4 /* FastedWatchWidgets */,
+				AC6E01BB515F34D666FA8660 /* FastedWidgets */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		8066E4D2EC060CC18A73CC9E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86055F2337D28D87733DB3A6 /* Assets.xcassets in Resources */,
+				D12E0B387D9AAEE305F83553 /* PrivacyInfo.xcprivacy in Resources */,
+				67AEEAD45BA64231399E9117 /* README.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D40AE3D402E6F1418B2A5C60 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8FDA62E522C2C964409F5B64 /* PrivacyInfo.xcprivacy in Resources */,
+				C899B9F2E0CE96DDFC63EAF0 /* README.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA01785B2B8D4831C62C7A40 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC997B42B09ED34EDDF1B7F0 /* PrivacyInfo.xcprivacy in Resources */,
+				E7A8BC23F24404937890CB0A /* README.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F092C963FED7A78FF52D2275 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				62B0C00563C611B6973E931E /* Assets.xcassets in Resources */,
 				A2A58808F0405BA2C2D8406B /* PrivacyInfo.xcprivacy in Resources */,
+				03F3712F2C298E85F4192E68 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0766BBBDC84CB83489D5E64B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4F2AFBE8351BC02953E6CA4 /* AppGroupCoordinator.swift in Sources */,
+				9225E0C3F751197B4854559E /* DarwinNotificationCenter.swift in Sources */,
+				75312F18463E489F7246ED00 /* EndFastIntent.swift in Sources */,
+				A010696E2F601C2340464FD7 /* FastProgressViews.swift in Sources */,
+				2AEB2AFC805215E2DE91E60D /* FastSnapshotModifiers.swift in Sources */,
+				83E2EB75A702AD6976FAFBFF /* FastedWatchApp.swift in Sources */,
+				599FBCC772982680206A9F9F /* FastingActionCommand.swift in Sources */,
+				02E2B44BF8D1A49309056806 /* FastingProtocol.swift in Sources */,
+				E8A5B963DF26327D10D275D0 /* FastingStateSnapshot.swift in Sources */,
+				D38F2D85CD0BA970935C2573 /* MetabolicStage.swift in Sources */,
+				EDE4E6FC88BB4C19DD5D6DEA /* SetFastingIntent.swift in Sources */,
+				BD7B9EA2D7B7CB3207FC128C /* SnoozeFastIntent.swift in Sources */,
+				C7A0AE6139079DA758A59AD8 /* SolsticeTheme.swift in Sources */,
+				4F4850543F7E0E60AEB97354 /* StartFastIntent.swift in Sources */,
+				084F697FBF35CB11AABC725E /* WatchPayload.swift in Sources */,
+				39156B8BD6396C734A368D72 /* WatchRootView.swift in Sources */,
+				A71939927381C5F648E58F9C /* WatchSessionCoordinator.swift in Sources */,
+				089D9A852E6784E04D5691EF /* WidgetTimelineBuilder.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		17D5C6AFF27830625177EE79 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71446816ECFD1B3B44A4D52C /* AppGroupCoordinatorTests.swift in Sources */,
+				B24EE21CBC7DABBBEE6BC9E5 /* AppIntentsTests.swift in Sources */,
 				250B6E2DE094437E20F3DC66 /* FastManagerValidationTests.swift in Sources */,
 				680301A03BB0BED727DFF532 /* FastedDialMathTests.swift in Sources */,
 				E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */,
+				A4CC9B5820FF216E19E1B794 /* FastingStateSnapshotTests.swift in Sources */,
 				415B59ABB94BB486947A64A6 /* FeedbackHelperTests.swift in Sources */,
 				9F63DEE6FD9FF3C8741E6000 /* MetabolicStageTests.swift in Sources */,
+				50D4819AD5B0D7760254EF9B /* NotificationManagerTests.swift in Sources */,
+				DD2A1F1E7D941774BADAAAAA /* PendingCommandReconciliationTests.swift in Sources */,
 				A0B3A591793493FB73C04BD5 /* ReviewPromptManagerTests.swift in Sources */,
 				FCDDC5D7524F3419E7D9A55E /* SolsticeThemeTests.swift in Sources */,
 				CAF9AF507CA760F146E6B2D0 /* StreakCalculatorTests.swift in Sources */,
+				994FE67C1CE31DACA5B1898F /* WatchPayloadTests.swift in Sources */,
+				203C8F4DEC49656BCE19B8FD /* WidgetTimelineBuilderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,32 +766,40 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3F4D66F591A6BC5540BFFE6 /* AppGroupCoordinator.swift in Sources */,
 				0B2AD02224339FDBB03BCC7B /* CalendarHeatmapView.swift in Sources */,
 				043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */,
 				F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */,
+				6642F8D9E27AE3956A132F16 /* DarwinNotificationCenter.swift in Sources */,
 				48FB0D427459DB6A18EF8ADB /* DialFaceView.swift in Sources */,
 				3D385853457F9BE5FE7B2073 /* DialHeaderCardView.swift in Sources */,
 				0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */,
 				9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */,
 				32CD46CD2BD3A67D6FDC1E50 /* EndFastButtonView.swift in Sources */,
+				E0C993AB8D2B4405872918E8 /* EndFastIntent.swift in Sources */,
 				1A1CEC7520DE250DBA021796 /* FastDetailView.swift in Sources */,
+				9BB47C1977B50828F59E41C0 /* FastManager+AppGroup.swift in Sources */,
 				A6EA958C9BC9DA1C8A102AD5 /* FastManager+Mocking.swift in Sources */,
 				4F73B0E08C8899B1D478714E /* FastManager+Notifications.swift in Sources */,
 				67F7593024E306184CEB9657 /* FastManager+Validation.swift in Sources */,
 				70A1E82B96E8466B544F780D /* FastManager.swift in Sources */,
 				63DD19E655D1AD38E81DF671 /* FastMetricsCenterView.swift in Sources */,
+				C599741E6A0988A4ED07D94E /* FastProgressViews.swift in Sources */,
 				42B7EDBE72C5CBDF62F4E7EF /* FastRowView.swift in Sources */,
+				47653CDF25CE50B9A6FD65C4 /* FastSnapshotModifiers.swift in Sources */,
 				DEFA541DB7379B894DDBE400 /* FastStartedCardView.swift in Sources */,
 				8887E910A75D71DC6B8927C6 /* FastTimePickerSheetView.swift in Sources */,
 				73B5FF9FD0E9363FCC6A241D /* FastTrackerView.swift in Sources */,
 				4C57B9976769EFFCFCD58D14 /* Fasted.xcdatamodeld in Sources */,
 				8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */,
+				0267E3819DA156E3C21AA688 /* FastingActionCommand.swift in Sources */,
 				B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */,
-				230E8F5D74F41671E07B1BDE /* FastingProtocol.swift in Sources */,
+				18C49FDC275706630E3D2927 /* FastingProtocol.swift in Sources */,
+				558062F10AACD30B80898353 /* FastingStateSnapshot.swift in Sources */,
 				A9705B0AB96ABFFC991D8437 /* FeedbackHelper.swift in Sources */,
 				B222C61D69407C4F7F2A47BA /* HistoryListView.swift in Sources */,
 				BAC60C4DD062EAB06EA240E2 /* MedicalDisclaimerView.swift in Sources */,
-				DCD2C2B878ADA52913A6CDFA /* MetabolicStage.swift in Sources */,
+				30455C3CE0B719CD5AB1526C /* MetabolicStage.swift in Sources */,
 				67747AFA11317A45528691C1 /* MetabolicStageBadgeView.swift in Sources */,
 				AAD783B848631089CFCFAEA1 /* MetabolicStagesSheetView.swift in Sources */,
 				5E28F103B04991B5DC71121C /* NotificationManager.swift in Sources */,
@@ -399,10 +810,65 @@
 				CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */,
 				48744890067ECB53BA38115A /* ProtocolPickerView.swift in Sources */,
 				2E7345733FC4B4875CFAC161 /* ReviewPromptManager.swift in Sources */,
+				14678D1BE85E2284DEE1EE88 /* SetFastingIntent.swift in Sources */,
 				0DA5795F7E3BF7899CCB21F3 /* SettingsView.swift in Sources */,
-				501D23BDD8E4408B4F1FA38A /* SolsticeTheme.swift in Sources */,
+				26C19A5BD6BDB1553F38F4C1 /* SnoozeFastIntent.swift in Sources */,
+				D20827AA470C4E755E1BAD0D /* SolsticeTheme.swift in Sources */,
+				63AA188B0D1CF981C33B4F9E /* StartFastIntent.swift in Sources */,
 				F501504029E2FF98114B915E /* StreakCalculator.swift in Sources */,
 				B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */,
+				2B5CB84B8C663BBC81EC2877 /* WatchPayload.swift in Sources */,
+				46AF3A5C15F7732867DC594A /* WatchSessionManager.swift in Sources */,
+				281063BCF8438C5CECA4B923 /* WidgetTimelineBuilder.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5B812C52D8BF8B63D7187DC4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37B8A9BBE8451FE77AF2539F /* AppGroupCoordinator.swift in Sources */,
+				FB277731465C3AE2B319DC6F /* DarwinNotificationCenter.swift in Sources */,
+				360CFB21C3156EAD7E510477 /* EndFastIntent.swift in Sources */,
+				C16FE1D2D9A43E674540AC0D /* FastComplications.swift in Sources */,
+				6DE2700B0F22827A12AF6DC4 /* FastProgressViews.swift in Sources */,
+				290EB23E7C0C6FB242F90E6F /* FastSnapshotModifiers.swift in Sources */,
+				A6F27686EB0A3226E99509F8 /* FastingActionCommand.swift in Sources */,
+				BC2CF35F91EA9AC368E7444F /* FastingProtocol.swift in Sources */,
+				D48B0A4D04512F7E3D7B0977 /* FastingStateSnapshot.swift in Sources */,
+				1C2D0A64D8220A8783332DCF /* MetabolicStage.swift in Sources */,
+				13AFB3B30007E6BB4426F6EB /* SetFastingIntent.swift in Sources */,
+				1120760C163B6A1E33297FDB /* SnoozeFastIntent.swift in Sources */,
+				2CB054D80FFCB722E8DCD81A /* SolsticeTheme.swift in Sources */,
+				669719083CB80521E2E92B45 /* StartFastIntent.swift in Sources */,
+				98548E8AD56DF8EE3923EC20 /* WatchPayload.swift in Sources */,
+				51EBE5DFAF8D1E643F74CB41 /* WidgetTimelineBuilder.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA8361789178392958843F99 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				531868EFC09E78273AEE5663 /* AppGroupCoordinator.swift in Sources */,
+				6671A715865B552AFA906692 /* DarwinNotificationCenter.swift in Sources */,
+				E4961D7D9EDBBE71BB479A7B /* EndFastIntent.swift in Sources */,
+				6C164C0151D5ECB7A647B3D8 /* FastControlWidget.swift in Sources */,
+				167E90B7010E53020453A722 /* FastProgressViews.swift in Sources */,
+				AD1F34E4BBC014393E1DDEE2 /* FastSnapshotModifiers.swift in Sources */,
+				19C70B2B4B19C83424685877 /* FastStatusWidget.swift in Sources */,
+				44A347C62848D29830367142 /* FastWidgetFamilyViews.swift in Sources */,
+				DF3FF48801379EB3905E6F77 /* FastedWidgetsBundle.swift in Sources */,
+				8343AF3A1CFD480B1A021E44 /* FastingActionCommand.swift in Sources */,
+				9BE30CD05FF60B9801D9FE66 /* FastingProtocol.swift in Sources */,
+				6841D4A6B7C49C45ABDB9A67 /* FastingStateSnapshot.swift in Sources */,
+				C3798D8BCAAE1F1B30E50E4E /* MetabolicStage.swift in Sources */,
+				A7CB4AE6B4B374CE0561A354 /* SetFastingIntent.swift in Sources */,
+				1D42DAA75426B7751F9AA21A /* SnoozeFastIntent.swift in Sources */,
+				6731DABAFE89191832089A9C /* SolsticeTheme.swift in Sources */,
+				8C37E9CABAB67BC19B684F22 /* StartFastIntent.swift in Sources */,
+				9AECBC71B2D7B00723DF7DA5 /* WatchPayload.swift in Sources */,
+				6BE827D1FD3E26B857FB9C7C /* WidgetTimelineBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,6 +889,21 @@
 			target = 0A23D54D311FDECC7C46A32A /* Fasted */;
 			targetProxy = BB23AF11D8E22B230FEAF5D1 /* PBXContainerItemProxy */;
 		};
+		5AA3496F3F34FF454C09E017 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC1FFDAC16141D7ECA59A7B4 /* FastedWatchWidgets */;
+			targetProxy = 9F33B4A18A6674774218D6B2 /* PBXContainerItemProxy */;
+		};
+		6258A7A16E09AD33D8809D0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B1D5E537D851865F55892C1C /* FastedWatch */;
+			targetProxy = 6A1B19BA5D59B69BF1EC736C /* PBXContainerItemProxy */;
+		};
+		EBA9EEE5966D70A59B6CB30A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC6E01BB515F34D666FA8660 /* FastedWidgets */;
+			targetProxy = 21707F3C06911C5660FF21F9 /* PBXContainerItemProxy */;
+		};
 		FF57507F871D1DA9F89A2F69 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0A23D54D311FDECC7C46A32A /* Fasted */;
@@ -431,6 +912,51 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		495F179AEB7FF69FE48FEB50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FastedWidgets/FastedWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FastedWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFast.Widgets;
+				PRODUCT_NAME = FastedWidgets;
+				PROVISIONING_PROFILE_SPECIFIER = "$(SOLSTICE_PROFILE_WIDGETS)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		5A35F65319C5A72A7DD0BE04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FastedWatch/FastedWatch.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FastedWatch/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFast.watchkitapp;
+				PRODUCT_NAME = FastedWatch;
+				PROVISIONING_PROFILE_SPECIFIER = "$(SOLSTICE_PROFILE_WATCH)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
 		606261B15CD6B5F76AB2DD3A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -465,6 +991,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -478,38 +1005,110 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SUPPORTS_MACCATALYST = NO;
+				SOLSTICE_PROFILE_APP = "";
+				SOLSTICE_PROFILE_WATCH = "";
+				SOLSTICE_PROFILE_WATCH_WIDGETS = "";
+				SOLSTICE_PROFILE_WIDGETS = "";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
 			};
 			name = Release;
+		};
+		6E1DB802719B0A6A786B927F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FastedWatchWidgets/FastedWatchWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FastedWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFast.watchkitapp.Widgets;
+				PRODUCT_NAME = FastedWatchWidgets;
+				PROVISIONING_PROFILE_SPECIFIER = "$(SOLSTICE_PROFILE_WATCH_WIDGETS)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+		87254FF7E8EA8B0083EDD40A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FastedWatchWidgets/FastedWatchWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FastedWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFast.watchkitapp.Widgets;
+				PRODUCT_NAME = FastedWatchWidgets;
+				PROVISIONING_PROFILE_SPECIFIER = "$(SOLSTICE_PROFILE_WATCH_WIDGETS)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		88CB18EC520CD4453F77EF58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FastedWatch/FastedWatch.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FastedWatch/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFast.watchkitapp;
+				PRODUCT_NAME = FastedWatch;
+				PROVISIONING_PROFILE_SPECIFIER = "$(SOLSTICE_PROFILE_WATCH)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
 		};
 		8B658F62377B74CC944EC070 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Fasted/Fasted.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
-				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Fasted/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFast;
+				PROVISIONING_PROFILE_SPECIFIER = "$(SOLSTICE_PROFILE_APP)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -520,7 +1119,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -529,6 +1128,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFastTests;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Fasted.app/Fasted";
 			};
@@ -568,6 +1168,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				ENABLE_PREVIEWS = YES;
@@ -587,18 +1188,45 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SUPPORTS_MACCATALYST = NO;
+				SOLSTICE_PROFILE_APP = "";
+				SOLSTICE_PROFILE_WATCH = "";
+				SOLSTICE_PROFILE_WATCH_WIDGETS = "";
+				SOLSTICE_PROFILE_WIDGETS = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		A73BAAB67A59C9130BD7F8CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FastedWidgets/FastedWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FastedWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFast.Widgets;
+				PRODUCT_NAME = FastedWidgets;
+				PROVISIONING_PROFILE_SPECIFIER = "$(SOLSTICE_PROFILE_WIDGETS)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -607,19 +1235,21 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Fasted/Fasted.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Fasted/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFast;
+				PROVISIONING_PROFILE_SPECIFIER = "$(SOLSTICE_PROFILE_APP)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -630,7 +1260,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -639,6 +1269,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFastUITests;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = Fasted;
 			};
@@ -650,7 +1281,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -659,6 +1290,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFastUITests;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = Fasted;
 			};
@@ -670,7 +1302,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -679,6 +1311,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.grusy.SolsticeFastTests;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Fasted.app/Fasted";
 			};
@@ -687,6 +1320,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0E43220D88CFF136A7C5F51D /* Build configuration list for PBXNativeTarget "FastedWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A73BAAB67A59C9130BD7F8CE /* Debug */,
+				495F179AEB7FF69FE48FEB50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		54E6C0D3DDF6D0ED13D8705F /* Build configuration list for PBXProject "Fasted" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -701,6 +1343,24 @@
 			buildConfigurations = (
 				980C5DFA826AB5EA3B5925F0 /* Debug */,
 				C8EB19B359B263F25D478C49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		80D4C7FA5D8BE68BBA61ED06 /* Build configuration list for PBXNativeTarget "FastedWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				88CB18EC520CD4453F77EF58 /* Debug */,
+				5A35F65319C5A72A7DD0BE04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8F9ADA0F55FF26E7161C802D /* Build configuration list for PBXNativeTarget "FastedWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				87254FF7E8EA8B0083EDD40A /* Debug */,
+				6E1DB802719B0A6A786B927F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

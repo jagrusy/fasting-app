@@ -36,10 +36,16 @@ jobs:
         run: |
           SIM_NAME=$(xcrun simctl list devices available -j | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
           if [ -z "$SIM_NAME" ]; then
-            SIM_NAME="iPhone 15"
+            SIM_NAME="iPhone 16"
           fi
           echo "Found available iOS Simulator: $SIM_NAME"
           echo "name=$SIM_NAME" >> $GITHUB_OUTPUT
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
 
       - name: Build iOS Application
         run: |
@@ -47,6 +53,30 @@ jobs:
             -project Fasted.xcodeproj \
             -scheme Fasted \
             -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+
+      - name: Build iOS Widget Extension
+        run: |
+          xcodebuild build \
+            -project Fasted.xcodeproj \
+            -scheme FastedWidgets \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+
+      - name: Build watchOS Application
+        run: |
+          xcodebuild build \
+            -project Fasted.xcodeproj \
+            -scheme FastedWatch \
+            -destination "generic/platform=watchOS Simulator" \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+
+      - name: Build watchOS Widget Extension
+        run: |
+          xcodebuild build \
+            -project Fasted.xcodeproj \
+            -scheme FastedWatchWidgets \
+            -destination "generic/platform=watchOS Simulator" \
             SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 
       - name: Run Unit Tests

@@ -7,6 +7,11 @@ public final class FastManager: ObservableObject {
     let viewContext: NSManagedObjectContext
     public let notificationManager: NotificationManager
     let defaults: UserDefaults
+    public let coordinator: AppGroupCoordinator
+    private var darwinObserverToken: DarwinNotificationCenter.ObserverToken?
+    /// Guards `processPendingCommands()` — the scene-phase hook and the Darwin observer can both
+    /// fire for the same enqueue.
+    var isDrainingCommands = false
 
     @Published public internal(set) var activeFast: Fast?
     @Published public internal(set) var userSettings: UserSettings?
@@ -14,31 +19,46 @@ public final class FastManager: ObservableObject {
     public init(
         context: NSManagedObjectContext = PersistenceController.shared.container.viewContext,
         notificationManager: NotificationManager = .shared,
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = .standard,
+        coordinator: AppGroupCoordinator = .shared
     ) {
         self.viewContext = context
         self.notificationManager = notificationManager
         self.defaults = defaults
+        self.coordinator = coordinator
         self.setupNotificationCallbacks()
+        self.setupDarwinObserver()
         self.refresh()
     }
 
-    private func setupNotificationCallbacks() {
-        notificationManager.onEndFastRequested = { [weak self] in
+    private func setupDarwinObserver() {
+        darwinObserverToken = DarwinNotificationCenter.shared.observe { [weak self] in
             Task { @MainActor [weak self] in
-                self?.endFast()
-            }
-        }
-        notificationManager.onSnoozeRequested = { [weak self] snoozeSeconds in
-            Task { @MainActor [weak self] in
-                self?.snoozeFast(by: snoozeSeconds)
+                self?.processPendingCommands()
             }
         }
     }
 
+    private func setupNotificationCallbacks() {
+        notificationManager.onStartFastRequested = { [weak self] in
+            self?.startFast()
+        }
+        notificationManager.onEndFastRequested = { [weak self] in
+            self?.endFast()
+        }
+        notificationManager.onSnoozeRequested = { [weak self] snoozeSeconds in
+            self?.snoozeFast(by: snoozeSeconds)
+        }
+    }
+
+    /// Order matters: pending commands are applied against freshly-fetched state, and the
+    /// snapshot every other surface reads is rewritten from Core Data last, so an optimistic
+    /// write from a widget or the watch is always overwritten by the authoritative value.
     public func refresh() {
         fetchActiveFast()
         fetchUserSettings()
+        processPendingCommands()
+        publishSnapshot()
     }
 
     public func fetchActiveFast() {
@@ -112,6 +132,7 @@ public final class FastManager: ObservableObject {
         do {
             try viewContext.save()
             self.objectWillChange.send()
+            publishSnapshot()
         } catch {
             NSLog("Error saving protocol setting: \(error)")
         }
@@ -149,6 +170,11 @@ public final class FastManager: ObservableObject {
                 protocolName: proto,
                 enabled: notificationSchedule.notifyOnGoalReached
             )
+            notificationManager.scheduleStageTransitionNotifications(
+                startDate: startDate,
+                enabled: notificationSchedule.notifyOnStageChange
+            )
+            publishSnapshot()
         } catch {
             NSLog("Error starting fast: \(error)")
         }
@@ -171,7 +197,9 @@ public final class FastManager: ObservableObject {
             let completed = fast
             self.activeFast = nil
             notificationManager.cancelGoalNotification()
+            notificationManager.cancelStageTransitionNotifications()
             clearSnoozeOffset(for: fast)
+            publishSnapshot()
 
             let request: NSFetchRequest<Fast> = Fast.fetchRequest()
             request.predicate = NSPredicate(format: "endDate != nil AND isCompleted == YES")
@@ -183,13 +211,6 @@ public final class FastManager: ObservableObject {
         } catch {
             NSLog("Error ending fast: \(error)")
         }
-    }
-
-    /// Ends the current fast without saving it to history — used when the user explicitly discards
-    /// an early end rather than saving a partial fast.
-    public func discardActiveFast() {
-        guard let fast = activeFast else { return }
-        deleteFast(fast)
     }
 
     public func updateActiveFast(
@@ -218,6 +239,11 @@ public final class FastManager: ObservableObject {
                 protocolName: proto,
                 enabled: notificationSchedule.notifyOnGoalReached
             )
+            notificationManager.scheduleStageTransitionNotifications(
+                startDate: startDate,
+                enabled: notificationSchedule.notifyOnStageChange
+            )
+            publishSnapshot()
         } catch {
             NSLog("Error updating active fast: \(error)")
         }
@@ -236,40 +262,6 @@ public final class FastManager: ObservableObject {
             protocolName: proto,
             enabled: notificationSchedule.notifyOnGoalReached
         )
-    }
-
-    public func updateCompletedFast(
-        _ fast: Fast,
-        startDate: Date,
-        endDate: Date
-    ) {
-        fast.startDate = startDate
-        fast.endDate = endDate
-        let elapsed = endDate.timeIntervalSince(startDate)
-        fast.isCompleted = (elapsed >= fast.targetDuration)
-        fast.updatedAt = Date()
-
-        do {
-            try viewContext.save()
-            self.objectWillChange.send()
-        } catch {
-            NSLog("Error updating completed fast: \(error)")
-        }
-    }
-
-    public func deleteFast(_ fast: Fast) {
-        if let active = activeFast, active === fast {
-            activeFast = nil
-            notificationManager.cancelGoalNotification()
-        }
-        clearSnoozeOffset(for: fast)
-        viewContext.delete(fast)
-
-        do {
-            try viewContext.save()
-            self.objectWillChange.send()
-        } catch {
-            NSLog("Error deleting fast: \(error)")
-        }
+        publishSnapshot()
     }
 }

@@ -54,6 +54,62 @@ def team_id_from_profile
   team
 end
 
+# Every code-signed bundle in the archive needs its own App Store provisioning profile, keyed
+# here by the build setting each target reads it through (see project.yml).
+#
+# A single global PROVISIONING_PROFILE_SPECIFIER xcarg — which is what this signed when the app
+# was the only bundle — cannot work now: xcodebuild applies command-line settings to *every*
+# target, so the widget and watch targets would each be handed the app's profile, whose bundle id
+# and entitlements don't match theirs. Passing one setting per target is the only way to express
+# four profiles in one archive.
+SIGNED_BUNDLE_IDS = {
+  "SOLSTICE_PROFILE_APP" => "com.grusy.SolsticeFast",
+  "SOLSTICE_PROFILE_WIDGETS" => "com.grusy.SolsticeFast.Widgets",
+  "SOLSTICE_PROFILE_WATCH" => "com.grusy.SolsticeFast.watchkitapp",
+  "SOLSTICE_PROFILE_WATCH_WIDGETS" => "com.grusy.SolsticeFast.watchkitapp.Widgets"
+}.freeze
+
+# Fetches and installs an App Store profile for every signed bundle, in order.
+#
+# Returns [{ bundle_id => profile_uuid }, team_id]. The app comes first in SIGNED_BUNDLE_IDS so a
+# missing App ID surfaces as a failure on the app itself rather than on an extension, and so the
+# team is read from the app's own profile.
+#
+# Each App ID must exist in the developer portal with App Groups enabled before this can succeed.
+# If one is missing, Apple's error is an unhelpful "There is no App ID with Identifier ..." —
+# create it at https://developer.apple.com/account/resources/identifiers.
+def fetch_appstore_profiles(api_key)
+  uuids = {}
+  team_id = nil
+
+  SIGNED_BUNDLE_IDS.each_value do |bundle_id|
+    get_provisioning_profile(
+      api_key: api_key,
+      app_identifier: bundle_id
+    )
+    uuids[bundle_id] = install_appstore_profile_everywhere
+    team_id ||= team_id_from_profile
+  end
+
+  [uuids, team_id]
+end
+
+# Build settings for a manually-signed App Store archive of all four bundles.
+def manual_signing_xcargs(uuids, team_id, build_number)
+  per_target = SIGNED_BUNDLE_IDS.map do |setting, bundle_id|
+    "#{setting}=#{uuids.fetch(bundle_id)}"
+  end
+
+  [
+    "CODE_SIGN_STYLE=Manual",
+    "CODE_SIGN_IDENTITY=\"Apple Distribution\"",
+    "DEVELOPMENT_TEAM=#{team_id}",
+    # Every bundle reads this for CFBundleVersion; App Store validation rejects an upload whose
+    # extension versions don't match the app's.
+    "CURRENT_PROJECT_VERSION=#{build_number}"
+  ].concat(per_target).join(" ")
+end
+
 platform :ios do
   desc "Run full test suite (Unit & UI tests)"
   lane :test do
@@ -79,19 +135,14 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # Fetch the App Store distribution profile, then sign manually against it.
+    # Fetch an App Store distribution profile per signed bundle, then sign manually against them.
     #
     # Automatic signing does not work on this runner: it insists on a *development* identity for
     # the archive step ("Xcode couldn't find any iOS App Development provisioning profiles"),
     # but the CI keychain only holds the distribution certificate — and supplying a distribution
     # identity alongside it just yields "conflicting provisioning settings". Manual signing with
-    # an explicitly fetched distribution profile is the combination that matches what CI has.
-    get_provisioning_profile(
-      api_key: api_key,
-      app_identifier: "com.grusy.SolsticeFast"
-    )
-    profile_uuid = install_appstore_profile_everywhere
-    team_id = team_id_from_profile
+    # explicitly fetched distribution profiles is the combination that matches what CI has.
+    profile_uuids, team_id = fetch_appstore_profiles(api_key)
 
     # Apple rejects an upload whose CFBundleVersion was already used, so take the next one
     # after whatever TestFlight already has rather than the static value in Info.plist.
@@ -107,12 +158,10 @@ platform :ios do
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" " \
-              "PROVISIONING_PROFILE_SPECIFIER=#{profile_uuid} DEVELOPMENT_TEAM=#{team_id} " \
-              "CURRENT_PROJECT_VERSION=#{build_number}",
+      xcargs: manual_signing_xcargs(profile_uuids, team_id, build_number),
       export_options: {
         signingStyle: "manual",
-        provisioningProfiles: { "com.grusy.SolsticeFast" => profile_uuid }
+        provisioningProfiles: profile_uuids
       }
     )
 
@@ -161,19 +210,14 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # Fetch the App Store distribution profile, then sign manually against it.
+    # Fetch an App Store distribution profile per signed bundle, then sign manually against them.
     #
     # Automatic signing does not work on this runner: it insists on a *development* identity for
     # the archive step ("Xcode couldn't find any iOS App Development provisioning profiles"),
     # but the CI keychain only holds the distribution certificate — and supplying a distribution
     # identity alongside it just yields "conflicting provisioning settings". Manual signing with
-    # an explicitly fetched distribution profile is the combination that matches what CI has.
-    get_provisioning_profile(
-      api_key: api_key,
-      app_identifier: "com.grusy.SolsticeFast"
-    )
-    profile_uuid = install_appstore_profile_everywhere
-    team_id = team_id_from_profile
+    # explicitly fetched distribution profiles is the combination that matches what CI has.
+    profile_uuids, team_id = fetch_appstore_profiles(api_key)
 
     # Apple rejects an upload whose CFBundleVersion was already used, so take the next one
     # after whatever TestFlight already has rather than the static value in Info.plist.
@@ -189,12 +233,10 @@ platform :ios do
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" " \
-              "PROVISIONING_PROFILE_SPECIFIER=#{profile_uuid} DEVELOPMENT_TEAM=#{team_id} " \
-              "CURRENT_PROJECT_VERSION=#{build_number}",
+      xcargs: manual_signing_xcargs(profile_uuids, team_id, build_number),
       export_options: {
         signingStyle: "manual",
-        provisioningProfiles: { "com.grusy.SolsticeFast" => profile_uuid }
+        provisioningProfiles: profile_uuids
       }
     )
 
