@@ -213,8 +213,17 @@ platform :ios do
       metadata_path: "./fastlane/metadata",
       skip_metadata: false,
       skip_screenshots: false,
+      # Replace the existing set rather than appending to it. Without this, deliver adds to
+      # whatever is already on App Store Connect, and once the combined count passes Apple's
+      # per-device limit the extras are silently dropped — which is how 05 and 06 went missing
+      # with only six screenshots in the folder.
+      overwrite_screenshots: true,
       submit_for_review: true,
       automatic_release: true,
+      # precheck can't inspect in-app purchases when authenticating with an App Store Connect
+      # API key, and fails the whole submission over it. Solstice has no IAP at all (no
+      # subscriptions, no paywalls), so there is nothing for this check to look at.
+      precheck_include_in_app_purchases: false,
       app_review_information: {
         first_name: ENV["APP_REVIEW_FIRST_NAME"] || "Alan",
         last_name: ENV["APP_REVIEW_LAST_NAME"] || "Grusy",
