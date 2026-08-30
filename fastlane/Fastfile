@@ -1,4 +1,20 @@
+require 'base64'
+require 'tmpdir'
+
 default_platform(:ios)
+
+# Writes the App Store Connect API key to a real file so xcodebuild can authenticate with Apple
+# directly (-authenticationKeyPath). Returns an absolute path; xcodebuild rejects relative ones.
+def app_store_connect_key_file
+  key_id = ENV["APP_STORE_CONNECT_KEY_ID"]
+  content = ENV["APP_STORE_CONNECT_KEY_CONTENT"]
+  UI.user_error!("APP_STORE_CONNECT_KEY_ID / _KEY_CONTENT must be set") if key_id.to_s.empty? || content.to_s.empty?
+
+  path = File.join(Dir.tmpdir, "AuthKey_#{key_id}.p8")
+  File.write(path, Base64.decode64(content))
+  File.chmod(0o600, path)
+  path
+end
 
 platform :ios do
   desc "Run full test suite (Unit & UI tests)"
@@ -27,36 +43,31 @@ platform :ios do
 
     team_id = ENV["APPLE_TEAM_ID"]
 
-    # get_provisioning_profile (sigh) can bind a profile to an *existing* certificate via the API
-    # key above, but it can't create the certificate itself. The certificate is imported into a
-    # temporary CI keychain by the "Import Code-Signing Certificate" workflow step before this
-    # lane runs (see .github/workflows/deploy.yml and FASTLANE_SETUP.md).
-    get_provisioning_profile(
-      api_key: api_key,
-      app_identifier: "com.grusy.SolsticeFast",
-      team_id: team_id
-    )
-
-    # get_provisioning_profile's own install step doesn't reliably land the profile in
-    # ~/Library/MobileDevice/Provisioning Profiles/ on this CI image — xcodebuild's manual signing
-    # lookup by name/UUID only searches that exact directory, so without this it fails with
-    # "No profile ... found" even though sigh just downloaded a perfectly valid one.
-    install_provisioning_profile(path: lane_context[SharedValues::SIGH_PROFILE_PATH])
-
-    # Explicit manual signing, using the exact profile get_provisioning_profile just fetched
-    # (lane_context[SharedValues::SIGH_NAME]) — no -allowProvisioningUpdates. That flag tells
-    # Xcode to fall back to its *automatic* signing assistant if anything looks off, and that
-    # assistant needs an Apple ID signed in to Xcode, which a bare CI runner doesn't have
-    # ("No Accounts: Add a new account"). sigh already resolved a valid profile; there's nothing
-    # for automatic signing to fix here.
-    profile_name = lane_context[SharedValues::SIGH_NAME]
+    # Automatic signing, authenticating to Apple with the App Store Connect API key directly.
+    # This is Apple's supported CI path: -authenticationKey* lets xcodebuild create and download
+    # provisioning profiles itself, with no Xcode GUI account and no separate fetch/install dance.
+    #
+    # We previously drove this by hand (get_provisioning_profile -> install_provisioning_profile
+    # -> manual signing) and hit a different failure at every layer, ending with xcodebuild
+    # reporting "No profile ... found" for a profile that had just been installed successfully —
+    # Xcode 16 reads profiles from a different directory than fastlane's installer writes to.
+    # Letting xcodebuild own profile management end to end removes that whole class of problem.
+    # The signing *certificate* still has to be in the keychain; the workflow's
+    # "Import Code-Signing Certificate" step puts it there.
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" " \
-              "PROVISIONING_PROFILE_SPECIFIER=\"#{profile_name}\" DEVELOPMENT_TEAM=#{team_id}"
+      xcargs: "-allowProvisioningUpdates " \
+              "-authenticationKeyPath #{app_store_connect_key_file} " \
+              "-authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} " \
+              "-authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']} " \
+              "CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=#{team_id}",
+      export_xcargs: "-allowProvisioningUpdates " \
+                     "-authenticationKeyPath #{app_store_connect_key_file} " \
+                     "-authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} " \
+                     "-authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']}"
     )
 
     upload_to_testflight(
@@ -106,32 +117,31 @@ platform :ios do
 
     team_id = ENV["APPLE_TEAM_ID"]
 
-    get_provisioning_profile(
-      api_key: api_key,
-      app_identifier: "com.grusy.SolsticeFast",
-      team_id: team_id
-    )
-
-    # get_provisioning_profile's own install step doesn't reliably land the profile in
-    # ~/Library/MobileDevice/Provisioning Profiles/ on this CI image — xcodebuild's manual signing
-    # lookup by name/UUID only searches that exact directory, so without this it fails with
-    # "No profile ... found" even though sigh just downloaded a perfectly valid one.
-    install_provisioning_profile(path: lane_context[SharedValues::SIGH_PROFILE_PATH])
-
-    # Explicit manual signing, using the exact profile get_provisioning_profile just fetched
-    # (lane_context[SharedValues::SIGH_NAME]) — no -allowProvisioningUpdates. That flag tells
-    # Xcode to fall back to its *automatic* signing assistant if anything looks off, and that
-    # assistant needs an Apple ID signed in to Xcode, which a bare CI runner doesn't have
-    # ("No Accounts: Add a new account"). sigh already resolved a valid profile; there's nothing
-    # for automatic signing to fix here.
-    profile_name = lane_context[SharedValues::SIGH_NAME]
+    # Automatic signing, authenticating to Apple with the App Store Connect API key directly.
+    # This is Apple's supported CI path: -authenticationKey* lets xcodebuild create and download
+    # provisioning profiles itself, with no Xcode GUI account and no separate fetch/install dance.
+    #
+    # We previously drove this by hand (get_provisioning_profile -> install_provisioning_profile
+    # -> manual signing) and hit a different failure at every layer, ending with xcodebuild
+    # reporting "No profile ... found" for a profile that had just been installed successfully —
+    # Xcode 16 reads profiles from a different directory than fastlane's installer writes to.
+    # Letting xcodebuild own profile management end to end removes that whole class of problem.
+    # The signing *certificate* still has to be in the keychain; the workflow's
+    # "Import Code-Signing Certificate" step puts it there.
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" " \
-              "PROVISIONING_PROFILE_SPECIFIER=\"#{profile_name}\" DEVELOPMENT_TEAM=#{team_id}"
+      xcargs: "-allowProvisioningUpdates " \
+              "-authenticationKeyPath #{app_store_connect_key_file} " \
+              "-authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} " \
+              "-authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']} " \
+              "CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=#{team_id}",
+      export_xcargs: "-allowProvisioningUpdates " \
+                     "-authenticationKeyPath #{app_store_connect_key_file} " \
+                     "-authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} " \
+                     "-authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']}"
     )
 
     # Apple requires review-contact info before a submission is accepted. Solstice has no
