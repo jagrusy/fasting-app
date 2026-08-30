@@ -99,9 +99,26 @@ jobs:
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+
+          # No `-t cert`: that imports only the certificate and silently drops the private key,
+          # which surfaces much later as xcodebuild's confusing "No signing certificate ... with
+          # a private key was found". Letting security infer the type from the pkcs12 brings in
+          # the full identity (certificate + key).
+          security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -f pkcs12 -k "$KEYCHAIN_PATH"
           security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain
           security set-key-partition-list -S apple-tool:,apple:,codesign: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          # Fail here, with a clear message, rather than 15 confusing lines deep in an xcodebuild
+          # archive error. find-identity -p codesigning only lists complete identities, so this
+          # verifies the private key actually came across.
+          echo "Signing identities available to the build:"
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
+          if ! security find-identity -v -p codesigning "$KEYCHAIN_PATH" | grep -q "Apple Distribution"; then
+            echo "::error::No 'Apple Distribution' identity with a private key in the CI keychain."
+            echo "::error::BUILD_CERTIFICATE_BASE64 must be a .p12 exported from Keychain Access"
+            echo "::error::under 'My Certificates' (which includes the private key), not 'Certificates'."
+            exit 1
+          fi
 
       - name: Run Fastlane Deployment
         env:
