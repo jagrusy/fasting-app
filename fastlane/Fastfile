@@ -67,7 +67,42 @@ platform :ios do
 
   desc "Capture production App Store screenshots"
   lane :screenshots do
-    sh("../scripts/generate_screenshots.sh 'iPhone 17 Pro'")
+    # No device argument: the script's own defaults capture every display size App Store
+    # Connect requires (6.9" and 6.5"). Passing one device here would silently fill only one
+    # slot and the submission would be rejected for a missing size.
+    sh("../scripts/generate_screenshots.sh")
+  end
+
+  desc "Replace App Store screenshots only - no build, no metadata, no resubmission"
+  lane :screenshots_upload do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_KEY_CONTENT"],
+      is_key_content_base64: true
+    )
+
+    # deliver seeds its per-slot "already uploaded" counter from App Store Connect *before*
+    # overwrite_screenshots runs its delete, so within a single invocation the counter stays
+    # stale and it starts refusing uploads once the pre-delete count is reached — silently
+    # dropping the last screenshots and leaving a mix of old and new on the listing.
+    #
+    # Running the upload twice works around it: the first pass clears the slots, and the
+    # second pass starts from an accurate (lower) count and gets the full set through.
+    2.times do |attempt|
+      UI.message("Screenshot upload pass #{attempt + 1} of 2...")
+      deliver(
+        api_key: api_key,
+        force: true,
+        screenshots_path: "./fastlane/screenshots",
+        overwrite_screenshots: true,
+        skip_screenshots: false,
+        skip_binary_upload: true,
+        skip_metadata: true,
+        submit_for_review: false,
+        precheck_include_in_app_purchases: false
+      )
+    end
   end
 
   desc "Build and upload to TestFlight (Beta)"
