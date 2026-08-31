@@ -60,7 +60,7 @@ platform :ios do
     run_tests(
       project: "Fasted.xcodeproj",
       scheme: "FastedTests",
-      devices: ["iPhone 17 Pro"],
+      devices: ["iPhone 17 Pro Max"],
       clean: true
     )
   end
