@@ -22,7 +22,7 @@ echo "📱 Running UI Screenshot Suite on '$SIMULATOR_NAME'..."
 
 xcodebuild test \
     -project "$PROJECT_DIR/Fasted.xcodeproj" \
-    -scheme FastedTests \
+    -scheme FastedUITests \
     -destination "platform=iOS Simulator,name=$SIMULATOR_NAME" \
     -only-testing:FastedUITests/AppStoreScreenshotTests/testCaptureAppStoreScreenshots \
     -quiet
