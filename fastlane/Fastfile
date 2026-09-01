@@ -54,6 +54,69 @@ def team_id_from_profile
   team
 end
 
+# Answers the questions App Review asks of every new app up front, in the Notes field.
+#
+# The first submission was rejected under Guideline 2.1 (Information Needed) asking for the
+# app's functions, target audience, setup/demo instructions, external services, regional
+# differences and regulated-industry status. Keeping the answers here means every future
+# submission carries them automatically instead of relying on someone remembering.
+#
+# Apple also asks for a screen recording made on a physical device. That cannot be produced
+# from CI and has to be attached by a human in the App Review conversation.
+def app_review_notes
+  devices = ENV["APP_REVIEW_TEST_DEVICES"] || "iPhone (physical device) running iOS 26, via TestFlight"
+
+  <<~NOTES
+    WHAT SOLSTICE IS
+    An intermittent fasting timer. The user starts a fast, the app counts elapsed time against
+    a target duration (12:12, 14:10, 16:8, 18:6, 20:4 or 23:1 OMAD), and saves completed fasts
+    to a local history with streaks and a monthly calendar heatmap.
+
+    TARGET AUDIENCE
+    Adults who practise time-restricted eating and want a simple, private timer and habit
+    tracker. This is a general wellness app. It gives no medical advice, makes no diagnostic or
+    treatment claims, and shows a medical disclaimer in Settings.
+
+    NO ACCOUNT, NO PURCHASES
+    There is no sign-up, sign-in or account of any kind, and no paid content, subscriptions or
+    in-app purchases. Every feature is available immediately on first launch. There are no demo
+    credentials to supply because there is nothing to log in to.
+
+    HOW TO EXERCISE EVERY FEATURE
+    1. Fast tab: tap "Start Fast". The ring shows progress. Tap the centre to cycle between
+       Elapsed / Remaining / Percentage. Drag the knob on the ring to adjust the start time in
+       5-minute steps. Tap the badge under the ring for the metabolic stage explanations.
+    2. Tap "End Fast" to finish, then choose "Save Fast" to record it or "Discard Fast" to
+       throw it away.
+    3. History tab: completed fasts, current and best streak, and a monthly heatmap. Tap any
+       row to edit its start/end times or delete it.
+    4. Settings tab: change the fasting protocol, switch appearance (light/dark/system),
+       enable notification reminders, read the medical disclaimer, erase all data.
+
+    DEVICES AND OS TESTED
+    #{devices}. Also exercised on the iOS 26 Simulator across iPhone 17 Pro, 17 Pro Max and
+    13 Pro Max, with automated unit and UI test suites run on every commit.
+
+    EXTERNAL SERVICES
+    None. Solstice makes no network requests. There is no backend, no accounts, no analytics,
+    no advertising and no third-party tracking SDKs. All data is stored on-device using Core
+    Data. The only outbound links are ordinary Safari links to public health articles (Johns
+    Hopkins, Harvard Health, Mayo Clinic) and a mailto: feedback link, all inside Settings.
+
+    PERMISSIONS
+    Local notifications only, and only if the user turns reminders on in Settings. The app does
+    not request location, camera, microphone, contacts, photos, or App Tracking Transparency.
+
+    REGIONAL DIFFERENCES
+    None. Behaviour is identical in every territory. The app ships in English (U.S.) and uses
+    the device locale only for formatting dates and times.
+
+    REGULATED INDUSTRY
+    Not applicable. Solstice is a general wellness timer, not a medical device, and provides no
+    protected or third-party regulated content.
+  NOTES
+end
+
 platform :ios do
   desc "Run full test suite (Unit & UI tests)"
   lane :test do
@@ -264,7 +327,7 @@ platform :ios do
         last_name: ENV["APP_REVIEW_LAST_NAME"] || "Grusy",
         phone_number: review_phone,
         email_address: ENV["APP_REVIEW_EMAIL"] || "jagrusy@gmail.com",
-        notes: "Solstice has no accounts or sign-in — every feature is reachable immediately."
+        notes: app_review_notes
         # No demo_user/demo_password: nothing to log into (no accounts in the app at all).
       }
     )
