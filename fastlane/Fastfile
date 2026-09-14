@@ -110,20 +110,128 @@ def manual_signing_xcargs(uuids, team_id, build_number)
   ].concat(per_target).join(" ")
 end
 
+# Answers the questions App Review asks of every new app up front, in the Notes field.
+#
+# The first submission was rejected under Guideline 2.1 (Information Needed) asking for the
+# app's functions, target audience, setup/demo instructions, external services, regional
+# differences and regulated-industry status. Keeping the answers here means every future
+# submission carries them automatically instead of relying on someone remembering.
+#
+# Apple also asks for a screen recording made on a physical device. That cannot be produced
+# from CI and has to be attached by a human in the App Review conversation.
+def app_review_notes
+  devices = ENV["APP_REVIEW_TEST_DEVICES"] || "iPhone (physical device) running iOS 26, via TestFlight"
+
+  <<~NOTES
+    WHAT SOLSTICE IS
+    An intermittent fasting timer. The user starts a fast, the app counts elapsed time against
+    a target duration (12:12, 14:10, 16:8, 18:6, 20:4 or 23:1 OMAD), and saves completed fasts
+    to a local history with streaks and a monthly calendar heatmap.
+
+    ATTACHED SCREEN RECORDING
+    Solstice has none of the flows below, so the recording does not include them:
+    - Account registration, login, or account deletion: none, the app has no accounts.
+    - Paid content, purchases, or subscriptions: none, the app is free with no in-app purchases.
+    - User-generated content, reporting, or blocking: none, there is no shared or user-generated
+      content of any kind — all data is private and local to the device.
+    - Prompts for sensitive data or device capabilities: none. Solstice never requests location,
+      contacts, camera, or App Tracking Transparency. The only permission it can ever prompt for
+      is local notifications, and only if the user turns on reminders in Settings.
+
+    TARGET AUDIENCE
+    Adults who practise time-restricted eating and want a simple, private timer and habit
+    tracker. This is a general wellness app. It gives no medical advice, makes no diagnostic or
+    treatment claims, and shows a medical disclaimer in Settings.
+
+    NO ACCOUNT, NO PURCHASES
+    There is no sign-up, sign-in or account of any kind, and no paid content, subscriptions or
+    in-app purchases. Every feature is available immediately on first launch. There are no demo
+    credentials to supply because there is nothing to log in to.
+
+    HOW TO EXERCISE EVERY FEATURE
+    1. Fast tab: tap "Start Fast". The ring shows progress. Tap the centre to cycle between
+       Elapsed / Remaining / Percentage. Drag the knob on the ring to adjust the start time in
+       5-minute steps. Tap the badge under the ring for the metabolic stage explanations.
+    2. Tap "End Fast" to finish, then choose "Save Fast" to record it or "Discard Fast" to
+       throw it away.
+    3. History tab: completed fasts, current and best streak, and a monthly heatmap. Tap any
+       row to edit its start/end times or delete it.
+    4. Settings tab: change the fasting protocol, switch appearance (light/dark/system),
+       enable notification reminders, read the medical disclaimer, erase all data.
+
+    DEVICES AND OS TESTED
+    #{devices}. Also exercised on the iOS 26 Simulator across iPhone 17 Pro, 17 Pro Max and
+    13 Pro Max, with automated unit and UI test suites run on every commit.
+
+    EXTERNAL SERVICES
+    None. Solstice makes no network requests. There is no backend, no accounts, no analytics,
+    no advertising and no third-party tracking SDKs. All data is stored on-device using Core
+    Data. The only outbound links are ordinary Safari links to public health articles (Johns
+    Hopkins, Harvard Health, Mayo Clinic) and a mailto: feedback link, all inside Settings.
+
+    PERMISSIONS
+    Local notifications only, and only if the user turns reminders on in Settings. The app does
+    not request location, camera, microphone, contacts, photos, or App Tracking Transparency.
+
+    REGIONAL DIFFERENCES
+    None. Behaviour is identical in every territory. The app ships in English (U.S.) and uses
+    the device locale only for formatting dates and times.
+
+    REGULATED INDUSTRY
+    Not applicable. Solstice is a general wellness timer, not a medical device, and provides no
+    protected or third-party regulated content.
+  NOTES
+end
+
 platform :ios do
   desc "Run full test suite (Unit & UI tests)"
   lane :test do
     run_tests(
       project: "Fasted.xcodeproj",
       scheme: "FastedTests",
-      devices: ["iPhone 17 Pro"],
+      devices: ["iPhone 17 Pro Max"],
       clean: true
     )
   end
 
   desc "Capture production App Store screenshots"
   lane :screenshots do
-    sh("../scripts/generate_screenshots.sh 'iPhone 17 Pro'")
+    # No device argument: the script's own defaults capture every display size App Store
+    # Connect requires (6.9" and 6.5"). Passing one device here would silently fill only one
+    # slot and the submission would be rejected for a missing size.
+    sh("../scripts/generate_screenshots.sh")
+  end
+
+  desc "Replace App Store screenshots only - no build, no metadata, no resubmission"
+  lane :screenshots_upload do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_KEY_CONTENT"],
+      is_key_content_base64: true
+    )
+
+    # deliver seeds its per-slot "already uploaded" counter from App Store Connect *before*
+    # overwrite_screenshots runs its delete, so within a single invocation the counter stays
+    # stale and it starts refusing uploads once the pre-delete count is reached — silently
+    # dropping the last screenshots and leaving a mix of old and new on the listing.
+    #
+    # Running the upload twice works around it: the first pass clears the slots, and the
+    # second pass starts from an accurate (lower) count and gets the full set through.
+    2.times do |attempt|
+      UI.message("Screenshot upload pass #{attempt + 1} of 2...")
+      deliver(
+        api_key: api_key,
+        force: true,
+        screenshots_path: "./fastlane/screenshots",
+        overwrite_screenshots: true,
+        skip_screenshots: false,
+        skip_binary_upload: true,
+        skip_metadata: true,
+        submit_for_review: false,
+        precheck_include_in_app_purchases: false
+      )
+    end
   end
 
   desc "Build and upload to TestFlight (Beta)"
@@ -271,7 +379,7 @@ platform :ios do
         last_name: ENV["APP_REVIEW_LAST_NAME"] || "Grusy",
         phone_number: review_phone,
         email_address: ENV["APP_REVIEW_EMAIL"] || "jagrusy@gmail.com",
-        notes: "Solstice has no accounts or sign-in — every feature is reachable immediately."
+        notes: app_review_notes
         # No demo_user/demo_password: nothing to log into (no accounts in the app at all).
       }
     )

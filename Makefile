@@ -4,8 +4,12 @@ SCHEME_WATCH = FastedWatch
 SCHEME_TESTS = FastedTests
 SCHEME_UI_TESTS = FastedUITests
 
-# Dynamically discover first available iPhone simulator on the machine
+# Prefer iPhone 17 Pro Max (the device App Store screenshots are captured on, so local runs
+# match what ships), falling back to whatever iPhone simulator this machine actually has.
+SIM_NAME := $(shell xcrun simctl list devices available -j 2>/dev/null | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name == "iPhone 17 Pro Max")) | .name' | head -n 1)
+ifeq ($(SIM_NAME),)
 SIM_NAME := $(shell xcrun simctl list devices available -j 2>/dev/null | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
+endif
 ifeq ($(SIM_NAME),)
 SIM_NAME := iPhone 16
 endif

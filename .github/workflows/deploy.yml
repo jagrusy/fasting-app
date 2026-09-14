@@ -16,6 +16,7 @@ on:
           - ''
           - beta
           - release
+          - screenshots_upload
       skip_tests:
         description: 'Skip the pre-deploy test run (for iterating on signing/deploy config)'
         required: false

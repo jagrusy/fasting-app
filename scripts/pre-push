@@ -18,7 +18,12 @@ echo "✅ [pre-push] SwiftLint passed (0 violations)"
 # 2. Discover active simulator dynamically, falling back to a known device name instead of
 #    silently skipping all checks if `jq` is missing or its output is empty for any reason
 #    (matches the fallback already used in the Makefile).
-SIM_NAME=$(xcrun simctl list devices available -j 2>/dev/null | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' 2>/dev/null | head -n 1)
+# Prefer iPhone 17 Pro Max so local runs match the device App Store screenshots ship from,
+# falling back to any available iPhone.
+SIM_NAME=$(xcrun simctl list devices available -j 2>/dev/null | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name == "iPhone 17 Pro Max")) | .name' 2>/dev/null | head -n 1)
+if [ -z "$SIM_NAME" ]; then
+    SIM_NAME=$(xcrun simctl list devices available -j 2>/dev/null | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' 2>/dev/null | head -n 1)
+fi
 if [ -z "$SIM_NAME" ]; then
     SIM_NAME="iPhone 16"
 fi
