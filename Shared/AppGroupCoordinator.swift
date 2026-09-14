@@ -8,7 +8,9 @@ public final class AppGroupCoordinator: @unchecked Sendable {
     public static let shared = AppGroupCoordinator()
 
     private let userDefaults: UserDefaults
+    private let fileManager: FileManager
     private let appGroupId: String
+    private let commandsDirectory: URL
     private let lock = NSLock()
 
     /// False when the App Group container could not be opened and this instance fell back to a
@@ -23,19 +25,39 @@ public final class AppGroupCoordinator: @unchecked Sendable {
     public static let snapshotKey = "fasting_state_snapshot"
     public static let pendingCommandsKey = "pending_fasting_commands"
 
-    public init(userDefaults: UserDefaults? = nil, appGroupId: String = defaultAppGroupId) {
+    public init(
+        userDefaults: UserDefaults? = nil,
+        fileManager: FileManager = .default,
+        appGroupId: String = defaultAppGroupId,
+        commandsDirectory: URL? = nil
+    ) {
         self.appGroupId = appGroupId
+        self.fileManager = fileManager
+
+        let containerURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: appGroupId)
+        if let explicitDir = commandsDirectory {
+            self.commandsDirectory = explicitDir
+        } else if let container = containerURL {
+            self.commandsDirectory = container.appendingPathComponent("pending_commands", isDirectory: true)
+        } else {
+            self.commandsDirectory = fileManager.temporaryDirectory
+                .appendingPathComponent(appGroupId, isDirectory: true)
+                .appendingPathComponent("pending_commands", isDirectory: true)
+        }
+
         if let defaults = userDefaults {
             self.userDefaults = defaults
             self.isUsingSharedContainer = true
-        } else if let groupDefaults = UserDefaults(suiteName: appGroupId) {
+        } else if let groupDefaults = UserDefaults(suiteName: appGroupId), containerURL != nil {
             self.userDefaults = groupDefaults
             self.isUsingSharedContainer = true
         } else {
-            self.userDefaults = .standard
-            self.isUsingSharedContainer = false
-            NSLog("[Solstice] App Group \(appGroupId) unavailable — widget and watch commands "
-                + "will not reach the app. Check the App Group entitlement and provisioning profile.")
+            self.userDefaults = UserDefaults(suiteName: appGroupId) ?? .standard
+            self.isUsingSharedContainer = containerURL != nil
+            if containerURL == nil {
+                NSLog("[Solstice] App Group \(appGroupId) unavailable — widget and watch commands "
+                    + "will not reach the app. Check the App Group entitlement and provisioning profile.")
+            }
         }
     }
 
@@ -70,16 +92,18 @@ public final class AppGroupCoordinator: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
 
-        var commands: [PendingCommandEnvelope] = []
-        if let data = userDefaults.data(forKey: Self.pendingCommandsKey),
-           let existing = try? JSONDecoder().decode([PendingCommandEnvelope].self, from: data) {
-            commands = existing
-        }
+        ensureCommandsDirectoryExists()
 
-        commands.append(envelope)
+        let timestampStr = String(format: "%.6f", envelope.timestamp.timeIntervalSince1970)
+        let filename = "\(timestampStr)_\(envelope.id.uuidString).json"
+        let fileURL = commandsDirectory.appendingPathComponent(filename)
 
-        if let encoded = try? JSONEncoder().encode(commands) {
-            userDefaults.set(encoded, forKey: Self.pendingCommandsKey)
+        if let encoded = try? JSONEncoder().encode(envelope) {
+            do {
+                try encoded.write(to: fileURL, options: .atomic)
+            } catch {
+                NSLog("[Solstice] Failed to write pending command envelope: \(error)")
+            }
         }
         DarwinNotificationCenter.shared.post()
     }
@@ -88,12 +112,42 @@ public final class AppGroupCoordinator: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
 
-        guard let data = userDefaults.data(forKey: Self.pendingCommandsKey),
-              let commands = try? JSONDecoder().decode([PendingCommandEnvelope].self, from: data) else {
-            return []
+        var envelopes: [PendingCommandEnvelope] = []
+
+        if let fileURLs = try? fileManager.contentsOfDirectory(
+            at: commandsDirectory,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        ) {
+            let jsonFiles = fileURLs.filter { $0.pathExtension == "json" }
+            for url in jsonFiles {
+                if let data = try? Data(contentsOf: url),
+                   let envelope = try? JSONDecoder().decode(PendingCommandEnvelope.self, from: data) {
+                    envelopes.append(envelope)
+                }
+                try? fileManager.removeItem(at: url)
+            }
         }
-        userDefaults.removeObject(forKey: Self.pendingCommandsKey)
-        return commands
+
+        // Drain any legacy commands stored in UserDefaults for backward compatibility
+        if let data = userDefaults.data(forKey: Self.pendingCommandsKey),
+           let legacyCommands = try? JSONDecoder().decode([PendingCommandEnvelope].self, from: data) {
+            envelopes.append(contentsOf: legacyCommands)
+            userDefaults.removeObject(forKey: Self.pendingCommandsKey)
+        }
+
+        return envelopes.sorted { lhs, rhs in
+            if lhs.timestamp != rhs.timestamp {
+                return lhs.timestamp < rhs.timestamp
+            }
+            return lhs.id.uuidString < rhs.id.uuidString
+        }
+    }
+
+    private func ensureCommandsDirectoryExists() {
+        if !fileManager.fileExists(atPath: commandsDirectory.path) {
+            try? fileManager.createDirectory(at: commandsDirectory, withIntermediateDirectories: true)
+        }
     }
 
     public func notifyWidgetsOfUpdate() {
