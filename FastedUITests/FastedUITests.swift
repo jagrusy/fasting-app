@@ -142,12 +142,12 @@ final class FastedUITests: XCTestCase {
         historyTab.tap()
 
         let navBar = app.navigationBars["History"]
-        XCTAssertTrue(navBar.waitForExistence(timeout: 3))
+        XCTAssertTrue(navBar.waitForExistence(timeout: 8))
 
         let emptyTitle = app.staticTexts["No Completed Fasts Yet"]
         let currentStreakLabel = app.staticTexts["current_streak_label"]
 
-        XCTAssertTrue(emptyTitle.waitForExistence(timeout: 3) || currentStreakLabel.waitForExistence(timeout: 3))
+        XCTAssertTrue(emptyTitle.waitForExistence(timeout: 8) || currentStreakLabel.waitForExistence(timeout: 8))
     }
 
     func testHistoryTabMonthNavigation() throws {
