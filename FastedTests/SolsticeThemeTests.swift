@@ -4,16 +4,14 @@ import SwiftUI
 
 final class SolsticeThemeTests: XCTestCase {
 
-    func testAppAppearanceColorSchemes() throws {
-        XCTAssertNil(AppAppearance.system.colorScheme)
-        XCTAssertEqual(AppAppearance.light.colorScheme, .light)
-        XCTAssertEqual(AppAppearance.dark.colorScheme, .dark)
-    }
-
-    func testAppAppearanceIcons() throws {
-        for mode in AppAppearance.allCases {
-            XCTAssertFalse(mode.iconName.isEmpty)
-            XCTAssertFalse(mode.rawValue.isEmpty)
-        }
+    func testSolsticeColorsAndGradients() throws {
+        XCTAssertNotNil(SolsticeColors.solarGold)
+        XCTAssertNotNil(SolsticeColors.solarAmber)
+        XCTAssertNotNil(SolsticeColors.solarFlame)
+        XCTAssertNotNil(SolsticeColors.emeraldGlow)
+        XCTAssertNotNil(SolsticeColors.tealGlow)
+        XCTAssertNotNil(SolsticeColors.solarGradient)
+        XCTAssertNotNil(SolsticeColors.goalMetGradient)
+        XCTAssertNotNil(SolsticeColors.idleGradient)
     }
 }

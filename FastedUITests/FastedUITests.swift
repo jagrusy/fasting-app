@@ -253,28 +253,6 @@ final class FastedUITests: XCTestCase {
         XCTAssertFalse(stagesTitle.exists)
     }
 
-    func testSettingsTabAppearanceSelection() throws {
-        let app = XCUIApplication()
-        app.launch()
-
-        let settingsTab = app.tabBars.buttons["Settings"]
-        XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
-        settingsTab.tap()
-
-        let appearancePicker = app.segmentedControls["appearance_picker"]
-        XCTAssertTrue(appearancePicker.waitForExistence(timeout: 3))
-
-        let darkButton = appearancePicker.buttons["Dark"]
-        if darkButton.waitForExistence(timeout: 2) {
-            darkButton.tap()
-        }
-
-        let systemButton = appearancePicker.buttons["System"]
-        if systemButton.waitForExistence(timeout: 2) {
-            systemButton.tap()
-        }
-    }
-
     func testSettingsTabFeedbackButtonsExist() throws {
         let app = XCUIApplication()
         app.launch()
