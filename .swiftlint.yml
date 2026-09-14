@@ -13,10 +13,12 @@ line_length:
 
 included:
   - Fasted
+  - Shared
   - FastedTests
   - FastedUITests
+  - FastedWidgets
   - FastedWatch
-  - FastedWatchTests
+  - FastedWatchWidgets
 
 excluded:
   - Fasted.xcodeproj

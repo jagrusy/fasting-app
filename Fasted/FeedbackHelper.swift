@@ -68,7 +68,7 @@ public enum FeedbackHelper {
         if let windowScene = UIApplication.shared.connectedScenes.first(
             where: { $0.activationState == .foregroundActive }
         ) as? UIWindowScene {
-            SKStoreReviewController.requestReview(in: windowScene)
+            AppStore.requestReview(in: windowScene)
         }
     }
 }
