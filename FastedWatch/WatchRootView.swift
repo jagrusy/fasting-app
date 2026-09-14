@@ -2,17 +2,18 @@ import SwiftUI
 
 struct WatchRootView: View {
     @ObservedObject var coordinator = WatchSessionCoordinator.shared
-    @State private var currentDate = Date()
 
     var body: some View {
-        ScrollView {
-            let snapshot = coordinator.snapshot
-            if snapshot.isFasting, let start = snapshot.startDate, let target = snapshot.targetDuration {
-                let goal = start.addingTimeInterval(target)
-                let isGoalMet = snapshot.isGoalMet(at: currentDate)
-                let stage = snapshot.currentStage(at: currentDate)
+        TimelineView(.periodic(from: .now, by: 1.0)) { timeline in
+            let currentDate = timeline.date
+            ScrollView {
+                let snapshot = coordinator.snapshot
+                if snapshot.isFasting, let start = snapshot.startDate, let target = snapshot.targetDuration {
+                    let goal = start.addingTimeInterval(target)
+                    let isGoalMet = snapshot.isGoalMet(at: currentDate)
+                    let stage = snapshot.currentStage(at: currentDate)
 
-                VStack(spacing: 8) {
+                    VStack(spacing: 8) {
                     HStack {
                         if let proto = snapshot.protocolType {
                             Text(proto)
@@ -97,4 +98,5 @@ struct WatchRootView: View {
             }
         }
     }
+}
 }

@@ -18,6 +18,8 @@ final class AppGroupCoordinatorTests: XCTestCase {
     override func tearDown() {
         if let suite = testSuiteName {
             testDefaults?.removePersistentDomain(forName: suite)
+            let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(suite, isDirectory: true)
+            try? FileManager.default.removeItem(at: tempDir)
         }
         testDefaults = nil
         coordinator = nil
@@ -82,5 +84,53 @@ final class AppGroupCoordinatorTests: XCTestCase {
         // Verify queue is now empty
         let drainedAgain = coordinator.drainPendingCommands()
         XCTAssertTrue(drainedAgain.isEmpty)
+    }
+
+    func testLegacyUserDefaultsDrain() {
+        guard let coordinator = coordinator, let testDefaults = testDefaults else {
+            XCTFail("Coordinator or defaults not initialized")
+            return
+        }
+
+        let start = Date(timeIntervalSince1970: 1700000000)
+        let legacyEnvelope = PendingCommandEnvelope(
+            timestamp: start,
+            command: .snoozeFast(extensionSeconds: 1800)
+        )
+
+        if let encoded = try? JSONEncoder().encode([legacyEnvelope]) {
+            testDefaults.set(encoded, forKey: AppGroupCoordinator.pendingCommandsKey)
+        }
+
+        let newEnvelope = PendingCommandEnvelope(
+            timestamp: start.addingTimeInterval(60),
+            command: .endFast(endDate: start.addingTimeInterval(3600))
+        )
+        coordinator.enqueueEnvelope(newEnvelope)
+
+        let drained = coordinator.drainPendingCommands()
+        XCTAssertEqual(drained.count, 2)
+        XCTAssertEqual(drained[0].command, legacyEnvelope.command)
+        XCTAssertEqual(drained[1].command, newEnvelope.command)
+
+        XCTAssertNil(testDefaults.data(forKey: AppGroupCoordinator.pendingCommandsKey))
+        XCTAssertTrue(coordinator.drainPendingCommands().isEmpty)
+    }
+
+    func testConcurrentEnqueues() {
+        guard let coordinator = coordinator else {
+            XCTFail("Coordinator not initialized")
+            return
+        }
+
+        let count = 25
+        DispatchQueue.concurrentPerform(iterations: count) { index in
+            let cmd = FastingActionCommand.snoozeFast(extensionSeconds: TimeInterval((index + 1) * 60))
+            coordinator.enqueueCommand(cmd)
+        }
+
+        let drained = coordinator.drainPendingCommands()
+        XCTAssertEqual(drained.count, count)
+        XCTAssertTrue(coordinator.drainPendingCommands().isEmpty)
     }
 }
