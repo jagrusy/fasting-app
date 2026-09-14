@@ -97,7 +97,7 @@ Two things that are *already* handled and won't ask you anything:
   `APP_REVIEW_PHONE`/`APP_REVIEW_EMAIL`/etc. above; Solstice has no accounts, so there's no demo
   login to provide either.
 - **Privacy Manifest** — `Fasted/PrivacyInfo.xcprivacy` declares the app's `UserDefaults` usage
-  (used only for the appearance setting and a fast's snooze delay, never shared). This is a
+  (used only for preferences like a fast's snooze delay, never shared). This is a
   separate, newer Apple requirement from the App Privacy page above — it's a file in the app
   binary that Apple's automated binary validation checks, catching apps that skip it before a
   human ever reviews the submission.

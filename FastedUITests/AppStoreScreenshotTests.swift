@@ -50,7 +50,7 @@ final class AppStoreScreenshotTests: XCTestCase {
             app80.navigationBars.buttons.element(boundBy: 0).tap()
         }
 
-        // 5. Settings & Appearance Controls
+        // 5. Settings Screen
         saveScreenshot(name: "06_Settings_DarkMode", in: app80)
 
         // Part 2: Fast at 100%+ Goal Reached in Dark Mode
