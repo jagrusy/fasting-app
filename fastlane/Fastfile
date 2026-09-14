@@ -300,7 +300,8 @@ platform :ios do
       clean: true,
       export_method: "app-store",
       xcargs: "-allowProvisioningUpdates -allowProvisioningDeviceRegistration " \
-              "CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=#{team_id}",
+              "CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=#{team_id} " \
+              "CODE_SIGN_IDENTITY=\"Apple Development\"",
       export_xcargs: "-allowProvisioningUpdates"
     )
 
