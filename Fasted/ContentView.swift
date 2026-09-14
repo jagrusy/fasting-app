@@ -6,7 +6,6 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var fastManager: FastManager
     @State private var selectedTab: Tab = .fast
-    @AppStorage("app_appearance") private var appearanceRaw: String = AppAppearance.dark.rawValue
 
     init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
         _fastManager = StateObject(wrappedValue: FastManager(context: context))
@@ -48,11 +47,8 @@ struct ContentView: View {
                 }
                 .tag(Tab.settings)
         }
-        .preferredColorScheme(AppAppearance(rawValue: appearanceRaw)?.colorScheme)
+        .preferredColorScheme(ProcessInfo.processInfo.arguments.contains("-forceDarkMode") ? .dark : nil)
         .onAppear {
-            if ProcessInfo.processInfo.arguments.contains("-forceDarkMode") {
-                appearanceRaw = AppAppearance.dark.rawValue
-            }
             if ProcessInfo.processInfo.arguments.contains("-seedScreenshots80") {
                 fastManager.seedMockDataForScreenshots(progress: 0.80)
             } else if ProcessInfo.processInfo.arguments.contains("-seedScreenshots100") {

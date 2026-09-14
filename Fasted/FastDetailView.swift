@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct FastDetailView: View {
     @ObservedObject var fastManager: FastManager
-    public let fast: Fast
+    @ObservedObject public var fast: Fast
 
     @Environment(\.dismiss) private var dismiss
     @State private var startDate: Date
@@ -73,7 +73,7 @@ public struct FastDetailView: View {
 
     private var summaryHeaderCard: some View {
         VStack(spacing: 8) {
-            Text(formatDuration(duration))
+            Text(FastDurationFormatter.formatDuration(duration))
                 .font(.system(size: 38, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.primary)
 
@@ -113,11 +113,16 @@ public struct FastDetailView: View {
                 DatePicker(
                     "Fast Started",
                     selection: $startDate,
-                    in: ...min(endDate, Date()),
+                    in: ...Date(),
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 .datePickerStyle(.compact)
-                .onChange(of: startDate) { hasChanges = true }
+                .onChange(of: startDate) { _, newStart in
+                    if endDate < newStart {
+                        endDate = newStart
+                    }
+                    hasChanges = true
+                }
                 .accessibilityIdentifier("edit_start_date_picker")
             }
             .padding(16)
@@ -132,11 +137,16 @@ public struct FastDetailView: View {
                 DatePicker(
                     "Fast Ended",
                     selection: $endDate,
-                    in: startDate...Date(),
+                    in: ...Date(),
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 .datePickerStyle(.compact)
-                .onChange(of: endDate) { hasChanges = true }
+                .onChange(of: endDate) { _, newEnd in
+                    if startDate > newEnd {
+                        startDate = newEnd
+                    }
+                    hasChanges = true
+                }
                 .accessibilityIdentifier("edit_end_date_picker")
             }
             .padding(16)
@@ -179,18 +189,5 @@ public struct FastDetailView: View {
         fastManager.updateCompletedFast(fast, startDate: startDate, endDate: endDate)
         hasChanges = false
         dismiss()
-    }
-
-    private func formatDuration(_ interval: TimeInterval) -> String {
-        let totalMinutes = Int(interval / 60)
-        let hours = totalMinutes / 60
-        let minutes = totalMinutes % 60
-        if hours == 0 {
-            return "\(minutes)m"
-        } else if minutes == 0 {
-            return "\(hours)h"
-        } else {
-            return "\(hours)h \(minutes)m"
-        }
     }
 }

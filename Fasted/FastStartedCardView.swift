@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct FastStartedCardView: View {
-    public let fast: Fast
+    @ObservedObject public var fast: Fast
     public let now: Date
     /// Start time to display instead of the stored one while a ring drag is in progress — the
     /// drag isn't written to Core Data until release, so `fast.startDate` is stale until then.
@@ -81,7 +81,7 @@ public struct FastStartedCardView: View {
     private func timeButton(startDate: Date) -> some View {
         Button(action: onSelectTime) {
             HStack(spacing: 4) {
-                Text(formatTime(startDate))
+                Text(FastDurationFormatter.formatTime(startDate))
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 Image(systemName: "pencil")
@@ -120,18 +120,12 @@ public struct FastStartedCardView: View {
                     .lineLimit(1)
             }
 
-            Text(formatTime(targetDate))
+            Text(FastDurationFormatter.formatTime(targetDate))
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color.primary)
                 .lineLimit(1)
         }
         .padding(.vertical, dayLabel == nil ? 6 : 0)
         .fixedSize(horizontal: true, vertical: false)
-    }
-
-    private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
     }
 }

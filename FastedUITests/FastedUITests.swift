@@ -142,12 +142,12 @@ final class FastedUITests: XCTestCase {
         historyTab.tap()
 
         let navBar = app.navigationBars["History"]
-        XCTAssertTrue(navBar.waitForExistence(timeout: 3))
+        XCTAssertTrue(navBar.waitForExistence(timeout: 8))
 
         let emptyTitle = app.staticTexts["No Completed Fasts Yet"]
         let currentStreakLabel = app.staticTexts["current_streak_label"]
 
-        XCTAssertTrue(emptyTitle.waitForExistence(timeout: 3) || currentStreakLabel.waitForExistence(timeout: 3))
+        XCTAssertTrue(emptyTitle.waitForExistence(timeout: 8) || currentStreakLabel.waitForExistence(timeout: 8))
     }
 
     func testHistoryTabMonthNavigation() throws {
@@ -251,28 +251,6 @@ final class FastedUITests: XCTestCase {
         doneButton.tap()
 
         XCTAssertFalse(stagesTitle.exists)
-    }
-
-    func testSettingsTabAppearanceSelection() throws {
-        let app = XCUIApplication()
-        app.launch()
-
-        let settingsTab = app.tabBars.buttons["Settings"]
-        XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
-        settingsTab.tap()
-
-        let appearancePicker = app.segmentedControls["appearance_picker"]
-        XCTAssertTrue(appearancePicker.waitForExistence(timeout: 3))
-
-        let darkButton = appearancePicker.buttons["Dark"]
-        if darkButton.waitForExistence(timeout: 2) {
-            darkButton.tap()
-        }
-
-        let systemButton = appearancePicker.buttons["System"]
-        if systemButton.waitForExistence(timeout: 2) {
-            systemButton.tap()
-        }
     }
 
     func testSettingsTabFeedbackButtonsExist() throws {

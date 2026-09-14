@@ -1,35 +1,5 @@
 import SwiftUI
 
-public enum AppAppearance: String, CaseIterable, Identifiable {
-    case system = "System"
-    case light = "Light"
-    case dark = "Dark"
-
-    public var id: String { rawValue }
-
-    public var colorScheme: ColorScheme? {
-        switch self {
-        case .system:
-            return nil
-        case .light:
-            return .light
-        case .dark:
-            return .dark
-        }
-    }
-
-    public var iconName: String {
-        switch self {
-        case .system:
-            return "circle.righthalf.filled"
-        case .light:
-            return "sun.max.fill"
-        case .dark:
-            return "moon.stars.fill"
-        }
-    }
-}
-
 public enum SolsticeColors {
     // Solar Gold to Amber palette matching the Solstice app icon
     public static let solarGold = Color(red: 1.0, green: 0.82, blue: 0.35)
