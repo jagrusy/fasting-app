@@ -32,14 +32,11 @@ public struct StreakCalculator {
         relativeTo now: Date = Date()
     ) -> StreakInfo {
         let completedFasts = fasts.filter { fast in
-            guard let start = fast.startDate, let end = fast.endDate else { return false }
-            let duration = end.timeIntervalSince(start)
-            return fast.isCompleted || (duration >= fast.targetDuration)
+            fast.endDate != nil && fast.isGoalMet(relativeTo: now)
         }
 
         let totalSeconds = fasts.reduce(0.0) { acc, fast in
-            guard let start = fast.startDate, let end = fast.endDate else { return acc }
-            return acc + max(0, end.timeIntervalSince(start))
+            acc + fast.duration(relativeTo: now)
         }
 
         let completedDaysSet = Set(completedFasts.compactMap { fast -> Date? in
@@ -119,11 +116,8 @@ public struct StreakCalculator {
         var hasGoalMet = false
 
         for fast in dayFasts {
-            let start = fast.startDate ?? Date()
-            let end = fast.endDate ?? start
-            let duration = max(0, end.timeIntervalSince(start))
-            totalSeconds += duration
-            if fast.isCompleted || duration >= fast.targetDuration {
+            totalSeconds += fast.duration()
+            if fast.isGoalMet() {
                 hasGoalMet = true
             }
         }

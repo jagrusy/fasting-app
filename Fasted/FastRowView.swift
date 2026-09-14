@@ -1,46 +1,30 @@
 import SwiftUI
 
 public struct FastRowView: View {
-    public let fast: Fast
+    @ObservedObject public var fast: Fast
 
     public init(fast: Fast) {
         self.fast = fast
-    }
-
-    private var startDate: Date {
-        fast.startDate ?? Date()
-    }
-
-    private var endDate: Date {
-        fast.endDate ?? Date()
-    }
-
-    private var elapsedSeconds: TimeInterval {
-        endDate.timeIntervalSince(startDate)
-    }
-
-    private var isCompletedGoal: Bool {
-        fast.isCompleted || (elapsedSeconds >= fast.targetDuration)
     }
 
     public var body: some View {
         HStack(spacing: 16) {
             // Status Icon badge
             ZStack {
-                let badgeColor = isCompletedGoal ? Color.green : Color.orange
+                let badgeColor = fast.isGoalMet ? Color.green : Color.orange
                 Circle()
                     .fill(badgeColor.opacity(0.15))
                     .frame(width: 44, height: 44)
 
-                Image(systemName: isCompletedGoal ? "checkmark.seal.fill" : "timer")
+                Image(systemName: fast.isGoalMet ? "checkmark.seal.fill" : "timer")
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(isCompletedGoal ? Color.green : Color.orange)
+                    .foregroundStyle(fast.isGoalMet ? Color.green : Color.orange)
             }
 
             // Fast details
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
-                    Text(formatDuration(elapsedSeconds))
+                    Text(fast.formattedDuration)
                         .font(.headline.weight(.bold))
 
                     Text(FastingProtocol.label(forTargetDuration: fast.targetDuration, protocolType: fast.protocolType))
@@ -51,7 +35,7 @@ public struct FastRowView: View {
                         .clipShape(Capsule())
                 }
 
-                Text(formatDateRange(start: startDate, end: endDate))
+                Text(fast.formattedDateRange)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -60,13 +44,13 @@ public struct FastRowView: View {
 
             // Completion percentage / target
             VStack(alignment: .trailing, spacing: 4) {
-                let pct = Int((elapsedSeconds / max(1, fast.targetDuration)) * 100)
+                let pct = Int(fast.progress * 100)
 
                 Text("\(pct)%")
                     .font(.subheadline.weight(.bold))
-                    .foregroundStyle(isCompletedGoal ? Color.green : Color.primary)
+                    .foregroundStyle(fast.isGoalMet ? Color.green : Color.primary)
 
-                Text("of \(formatGoal(fast.targetDuration)) goal")
+                Text("of \(fast.formattedGoal) goal")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -74,36 +58,5 @@ public struct FastRowView: View {
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("fast_row_\(fast.id?.uuidString ?? "")")
-    }
-
-    private func formatDuration(_ interval: TimeInterval) -> String {
-        let totalMinutes = Int(max(0, interval) / 60)
-        let hours = totalMinutes / 60
-        let minutes = totalMinutes % 60
-        if hours == 0 {
-            return "\(minutes)m"
-        } else if minutes == 0 {
-            return "\(hours)h"
-        } else {
-            return "\(hours)h \(minutes)m"
-        }
-    }
-
-    private func formatGoal(_ interval: TimeInterval) -> String {
-        formatDuration(interval)
-    }
-
-    private func formatDateRange(start: Date, end: Date) -> String {
-        let dayFormatter = DateFormatter()
-        dayFormatter.dateFormat = "EEE, MMM d"
-
-        let timeFormatter = DateFormatter()
-        timeFormatter.timeStyle = .short
-
-        let dayStr = dayFormatter.string(from: start)
-        let startTimeStr = timeFormatter.string(from: start)
-        let endTimeStr = timeFormatter.string(from: end)
-
-        return "\(dayStr) · \(startTimeStr) – \(endTimeStr)"
     }
 }

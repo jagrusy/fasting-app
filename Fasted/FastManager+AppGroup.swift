@@ -93,8 +93,7 @@ extension FastManager {
     ) {
         fast.startDate = startDate
         fast.endDate = endDate
-        let elapsed = endDate.timeIntervalSince(startDate)
-        fast.isCompleted = (elapsed >= fast.targetDuration)
+        fast.isCompleted = fast.isGoalMet()
         fast.updatedAt = Date()
 
         do {

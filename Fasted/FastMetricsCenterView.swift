@@ -68,7 +68,7 @@ public struct FastMetricsCenterView: View {
         protocolType: String?
     ) -> some View {
         VStack(spacing: 4) {
-            Text(formatDuration(elapsed))
+            Text(FastDurationFormatter.formatClock(elapsed))
                 .font(.system(size: 36, weight: .bold, design: .monospaced))
                 .foregroundStyle(Color.primary)
                 .accessibilityIdentifier("elapsed_time_text")
@@ -83,14 +83,14 @@ public struct FastMetricsCenterView: View {
 
     private func remainingContent(startDate: Date, duration: TimeInterval, remaining: TimeInterval) -> some View {
         VStack(spacing: 4) {
-            let remainingText = remaining > 0 ? formatDuration(remaining) : "Goal Met!"
+            let remainingText = remaining > 0 ? FastDurationFormatter.formatClock(remaining) : "Goal Met!"
             Text(remainingText)
                 .font(.system(size: 34, weight: .bold, design: .monospaced))
                 .foregroundStyle(remaining > 0 ? Color.primary : Color.green)
                 .accessibilityIdentifier("remaining_time_text")
 
             let targetEndDate = startDate.addingTimeInterval(duration)
-            Text("Goal: \(formatTime(targetEndDate))")
+            Text("Goal: \(FastDurationFormatter.formatTime(targetEndDate))")
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
         }
@@ -103,7 +103,9 @@ public struct FastMetricsCenterView: View {
                 .foregroundStyle(progress >= 1.0 ? Color.green : Color.primary)
                 .accessibilityIdentifier("percentage_display_text")
 
-            Text("\(formatDuration(elapsed)) of \(formatGoal(targetDuration))")
+            let clock = FastDurationFormatter.formatClock(elapsed)
+            let goal = FastDurationFormatter.formatDuration(targetDuration)
+            Text("\(clock) of \(goal)")
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
         }
@@ -126,26 +128,5 @@ public struct FastMetricsCenterView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
         }
-    }
-
-    private func formatDuration(_ interval: TimeInterval) -> String {
-        let totalSeconds = Int(max(0, interval))
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
-    private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
-    }
-
-    private func formatGoal(_ duration: TimeInterval) -> String {
-        let totalMinutes = Int(max(0, duration) / 60)
-        let hours = totalMinutes / 60
-        let minutes = totalMinutes % 60
-        return minutes == 0 ? "\(hours)h" : "\(hours)h \(minutes)m"
     }
 }

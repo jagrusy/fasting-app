@@ -214,7 +214,7 @@ public struct SettingsView: View {
             HStack {
                 Text("Version")
                 Spacer()
-                Text("1.0.0")
+                Text(appVersion)
                     .foregroundStyle(.secondary)
             }
 
@@ -231,6 +231,10 @@ public struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1"
     }
 
     private func loadSettings() {
