@@ -22,9 +22,14 @@ extension Fast {
         duration()
     }
 
+    /// Whether the elapsed duration met or exceeded the target goal duration.
+    public func hasReachedTarget(relativeTo now: Date = Date()) -> Bool {
+        duration(relativeTo: now) >= targetDuration
+    }
+
     /// Whether this fast met its goal duration or was explicitly marked completed.
     public func isGoalMet(relativeTo now: Date = Date()) -> Bool {
-        isCompleted || (duration(relativeTo: now) >= targetDuration)
+        isCompleted || hasReachedTarget(relativeTo: now)
     }
 
     /// Property shortcut for completed fasts.

@@ -93,7 +93,7 @@ extension FastManager {
     ) {
         fast.startDate = startDate
         fast.endDate = endDate
-        fast.isCompleted = fast.isGoalMet()
+        fast.isCompleted = fast.hasReachedTarget()
         fast.updatedAt = Date()
 
         do {

@@ -185,7 +185,7 @@ public final class FastManager: ObservableObject {
         guard let fast = activeFast else { return }
 
         fast.endDate = endDate
-        fast.isCompleted = fast.isGoalMet()
+        fast.isCompleted = fast.hasReachedTarget()
         if let mood = moodRating {
             fast.moodRating = mood
         }

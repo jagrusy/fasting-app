@@ -26,26 +26,14 @@ public enum FastDurationFormatter {
 
     /// Formats a date range: "Mon, Sep 14 · 8:00 PM – 12:00 PM".
     public static func formatDateRange(start: Date, end: Date) -> String {
-        let dayStr = dayDateFormatter.string(from: start)
-        let startTimeStr = timeDateFormatter.string(from: start)
-        let endTimeStr = timeDateFormatter.string(from: end)
+        let dayStr = start.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
+        let startTimeStr = formatTime(start)
+        let endTimeStr = formatTime(end)
         return "\(dayStr) · \(startTimeStr) – \(endTimeStr)"
     }
 
     /// Formats a time: "8:00 PM".
     public static func formatTime(_ date: Date) -> String {
-        timeDateFormatter.string(from: date)
+        date.formatted(date: .omitted, time: .shortened)
     }
-
-    private static let dayDateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEE, MMM d"
-        return formatter
-    }()
-
-    private static let timeDateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter
-    }()
 }

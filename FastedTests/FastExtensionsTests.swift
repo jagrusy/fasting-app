@@ -3,6 +3,7 @@ import CoreData
 import Combine
 @testable import Fasted
 
+@MainActor
 final class FastExtensionsTests: XCTestCase {
     private var context: NSManagedObjectContext {
         PersistenceController.preview.container.viewContext
@@ -93,5 +94,28 @@ final class FastExtensionsTests: XCTestCase {
         )
         XCTAssertEqual(fast.formattedDuration, "18h")
         XCTAssertTrue(fast.isGoalMet)
+    }
+
+    func testShortenedFastClearsCompletion() {
+        let fastManager = FastManager(context: context)
+        let fast = Fast(context: context)
+        fast.id = UUID()
+        let start = Date(timeIntervalSince1970: 100000)
+        fast.startDate = start
+        fast.endDate = start.addingTimeInterval(16 * 3600)
+        fast.targetDuration = 16 * 3600
+        fast.isCompleted = true
+
+        XCTAssertTrue(fast.isGoalMet)
+        XCTAssertTrue(fast.hasReachedTarget())
+
+        // User shortens fast in detail view to 12h
+        let shortenedEnd = start.addingTimeInterval(12 * 3600)
+        fastManager.updateCompletedFast(fast, startDate: start, endDate: shortenedEnd)
+
+        XCTAssertFalse(fast.hasReachedTarget())
+        XCTAssertFalse(fast.isCompleted, "Shortening a fast below target duration must clear isCompleted")
+        XCTAssertFalse(fast.isGoalMet)
+        XCTAssertEqual(fast.formattedDuration, "12h")
     }
 }
