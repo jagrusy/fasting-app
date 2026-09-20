@@ -10,6 +10,7 @@ extension FastManager {
 
         let streakInfo = StreakCalculator.calculate(from: completedFasts)
         let lastCompletedDate = completedFasts.first?.endDate
+        let lastCompletedStartDate = completedFasts.first?.startDate
 
         let snapshot: FastingStateSnapshot
         if let fast = activeFast, let start = fast.startDate {
@@ -21,6 +22,7 @@ extension FastManager {
                 currentStreak: streakInfo.currentStreak,
                 longestStreak: streakInfo.bestStreak,
                 lastCompletedFastDate: lastCompletedDate,
+                lastCompletedFastStartDate: lastCompletedStartDate,
                 updatedAt: Date()
             )
         } else {
@@ -32,6 +34,7 @@ extension FastManager {
                 currentStreak: streakInfo.currentStreak,
                 longestStreak: streakInfo.bestStreak,
                 lastCompletedFastDate: lastCompletedDate,
+                lastCompletedFastStartDate: lastCompletedStartDate,
                 updatedAt: Date()
             )
         }

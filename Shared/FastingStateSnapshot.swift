@@ -8,6 +8,11 @@ public struct FastingStateSnapshot: Codable, Sendable, Equatable {
     public var currentStreak: Int
     public var longestStreak: Int
     public var lastCompletedFastDate: Date?
+    /// Start date of the most recent completed fast. `StreakCalculator` keys streak days off when a
+    /// fast *started*, so this is what an optimistic streak bump has to compare against;
+    /// `lastCompletedFastDate` holds an end date and can land on a different calendar day.
+    /// Absent from payloads written by older builds, hence optional.
+    public var lastCompletedFastStartDate: Date?
     public var updatedAt: Date
 
     public init(
@@ -18,6 +23,7 @@ public struct FastingStateSnapshot: Codable, Sendable, Equatable {
         currentStreak: Int = 0,
         longestStreak: Int = 0,
         lastCompletedFastDate: Date? = nil,
+        lastCompletedFastStartDate: Date? = nil,
         updatedAt: Date = Date()
     ) {
         self.isFasting = isFasting
@@ -27,6 +33,7 @@ public struct FastingStateSnapshot: Codable, Sendable, Equatable {
         self.currentStreak = currentStreak
         self.longestStreak = longestStreak
         self.lastCompletedFastDate = lastCompletedFastDate
+        self.lastCompletedFastStartDate = lastCompletedFastStartDate
         self.updatedAt = updatedAt
     }
 
