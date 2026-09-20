@@ -49,21 +49,24 @@ struct FastLiveActivity: Widget {
                             .monospacedDigit()
                             EndFastButton()
                         } else {
-                            // No button here, so the whole block can link out.
+                            // No button here, so the whole block can link out. The VStack is load
+                            // bearing: a multi-view Link label has no defined stacking axis.
                             Link(destination: DeepLink.fastTracker.url) {
-                                FastElapsedText(
-                                    startDate: context.state.startDate,
-                                    goalDate: context.state.goalDate,
-                                    isCompleted: context.state.isGoalMet
-                                )
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .monospacedDigit()
+                                VStack(spacing: 2) {
+                                    FastElapsedText(
+                                        startDate: context.state.startDate,
+                                        goalDate: context.state.goalDate,
+                                        isCompleted: context.state.isGoalMet
+                                    )
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .monospacedDigit()
 
-                                if let stage = context.state.stage {
-                                    Text(stage.title)
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
+                                    if let stage = context.state.stage {
+                                        Text(stage.title)
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
                             }
                         }
