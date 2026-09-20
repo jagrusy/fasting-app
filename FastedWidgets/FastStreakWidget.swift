@@ -22,17 +22,20 @@ struct FastStreakWidgetEntryView: View {
     let entry: FastStatusWidgetEntry
 
     var body: some View {
-        switch family {
-        case .accessoryCircular:
-            StreakGaugeView(
-                currentStreak: entry.snapshot.currentStreak,
-                longestStreak: entry.snapshot.longestStreak
-            )
-        case .accessoryRectangular:
-            StreakRectangularView(snapshot: entry.snapshot)
-        default:
-            StreakSmallView(snapshot: entry.snapshot)
+        Group {
+            switch family {
+            case .accessoryCircular:
+                StreakGaugeView(
+                    currentStreak: entry.snapshot.currentStreak,
+                    longestStreak: entry.snapshot.longestStreak
+                )
+            case .accessoryRectangular:
+                StreakRectangularView(snapshot: entry.snapshot)
+            default:
+                StreakSmallView(snapshot: entry.snapshot)
+            }
         }
+        .widgetURL(DeepLink.forWidgetTap(isFasting: entry.snapshot.isFasting).url)
     }
 }
 

@@ -12,61 +12,88 @@ struct FastLiveActivity: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    FastGoalGaugeView(
-                        progress: context.state.progress,
-                        isCompleted: context.state.isGoalMet
-                    ) {
-                        Image(systemName: context.state.stage?.systemIcon ?? "flame.fill")
-                            .font(.system(size: 13))
+                    Link(destination: DeepLink.fastTracker.url) {
+                        FastGoalGaugeView(
+                            progress: context.state.progress,
+                            isCompleted: context.state.isGoalMet
+                        ) {
+                            Image(systemName: context.state.stage?.systemIcon ?? "flame.fill")
+                                .font(.system(size: 13))
+                        }
+                        .frame(width: 54, height: 54)
                     }
-                    .frame(width: 54, height: 54)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(context.state.isGoalMet ? "Goal Met ✨" : "Target")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                        Text(context.state.goalDate, style: .time)
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                        StreakLabelView(streak: context.state.currentStreak)
+                    Link(destination: DeepLink.fastTracker.url) {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(context.state.isGoalMet ? "Goal Met ✨" : "Target")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            Text(context.state.goalDate, style: .time)
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                            StreakLabelView(streak: context.state.currentStreak)
+                        }
                     }
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(spacing: 2) {
-                        FastElapsedText(
-                            startDate: context.state.startDate,
-                            goalDate: context.state.goalDate,
-                            isCompleted: context.state.isGoalMet
-                        )
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .monospacedDigit()
+                        if context.state.isGoalMet {
+                            FastElapsedText(
+                                startDate: context.state.startDate,
+                                goalDate: context.state.goalDate,
+                                isCompleted: context.state.isGoalMet
+                            )
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .monospacedDigit()
+                            EndFastButton()
+                        } else {
+                            // No button here, so the whole block can link out.
+                            Link(destination: DeepLink.fastTracker.url) {
+                                FastElapsedText(
+                                    startDate: context.state.startDate,
+                                    goalDate: context.state.goalDate,
+                                    isCompleted: context.state.isGoalMet
+                                )
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .monospacedDigit()
 
-                        if let stage = context.state.stage {
-                            Text(stage.title)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                if let stage = context.state.stage {
+                                    Text(stage.title)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
                         }
                     }
                 }
             } compactLeading: {
-                Image(systemName: context.state.stage?.systemIcon ?? "flame.fill")
-                    .foregroundColor(SolsticeColors.solarAmber)
+                // The Dynamic Island has no widgetURL equivalent for the whole presentation — each
+                // non-button region that should open the app wraps itself in a Link instead.
+                Link(destination: DeepLink.fastTracker.url) {
+                    Image(systemName: context.state.stage?.systemIcon ?? "flame.fill")
+                        .foregroundColor(SolsticeColors.solarAmber)
+                }
             } compactTrailing: {
-                FastElapsedText(
-                    startDate: context.state.startDate,
-                    goalDate: context.state.goalDate,
-                    isCompleted: context.state.isGoalMet
-                )
-                .font(.caption2)
-                .monospacedDigit()
-                .frame(maxWidth: 52)
+                Link(destination: DeepLink.fastTracker.url) {
+                    FastElapsedText(
+                        startDate: context.state.startDate,
+                        goalDate: context.state.goalDate,
+                        isCompleted: context.state.isGoalMet
+                    )
+                    .font(.caption2)
+                    .monospacedDigit()
+                    .frame(maxWidth: 52)
+                }
             } minimal: {
-                FastGoalGaugeView(
-                    progress: context.state.progress,
-                    isCompleted: context.state.isGoalMet
-                )
+                Link(destination: DeepLink.fastTracker.url) {
+                    FastGoalGaugeView(
+                        progress: context.state.progress,
+                        isCompleted: context.state.isGoalMet
+                    )
+                }
             }
             .keylineTint(SolsticeColors.solarAmber)
         }
@@ -117,6 +144,7 @@ struct FastLiveActivityLockScreenView: View {
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(SolsticeColors.emeraldGlow)
+                    EndFastButton()
                 } else if let stage = context.state.stage {
                     Text("\(stage.title) · target \(context.state.goalDate, style: .time)")
                         .font(.caption2)

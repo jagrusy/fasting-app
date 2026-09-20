@@ -31,6 +31,7 @@
 		203C8F4DEC49656BCE19B8FD /* WidgetTimelineBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3CE3910952492A92BB64DD0 /* WidgetTimelineBuilderTests.swift */; };
 		2147F4597BB69318961F014D /* FastActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8048A8C02F2041D8A847E20B /* FastActivityAttributes.swift */; };
 		2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFF304C7359306211445686 /* NotificationSchedule.swift */; };
+		225990CB5BDA1CA63EBD5F00 /* OpenFastTrackerIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3AE31ACC9B80F3421BA782 /* OpenFastTrackerIntent.swift */; };
 		250B6E2DE094437E20F3DC66 /* FastManagerValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776385FA5C186C9AFB85A306 /* FastManagerValidationTests.swift */; };
 		26C19A5BD6BDB1553F38F4C1 /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
 		281063BCF8438C5CECA4B923 /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
@@ -83,16 +84,20 @@
 		67F7593024E306184CEB9657 /* FastManager+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */; };
 		680301A03BB0BED727DFF532 /* FastedDialMathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */; };
 		6841D4A6B7C49C45ABDB9A67 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
+		6927B96B7A95AA40711BF981 /* OpenFastTrackerIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3AE31ACC9B80F3421BA782 /* OpenFastTrackerIntent.swift */; };
 		6BE827D1FD3E26B857FB9C7C /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
 		6C164C0151D5ECB7A647B3D8 /* FastControlWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7EE8D5EE638B61DA187E53A /* FastControlWidget.swift */; };
 		6DE2700B0F22827A12AF6DC4 /* FastProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */; };
 		6E790B99791A62C8AAF4DB1F /* WatchSessionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251507DCB0C4DAB1638C849C /* WatchSessionManagerTests.swift */; };
 		70A1E82B96E8466B544F780D /* FastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B49461E82EC597415611F11 /* FastManager.swift */; };
+		710308E2CE005B75385FDA32 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1455AA140C0695813955B378 /* DeepLink.swift */; };
 		71446816ECFD1B3B44A4D52C /* AppGroupCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F6EB86FD0EE011CBF07654B /* AppGroupCoordinatorTests.swift */; };
 		73B5FF9FD0E9363FCC6A241D /* FastTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */; };
 		75312F18463E489F7246ED00 /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
 		78B975439882F6B9107E507D /* ProgressRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFE18784C941F2701C8C5C3 /* ProgressRingView.swift */; };
+		7B698110CF27FC88E8E9FEC8 /* OpenFastTrackerIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3AE31ACC9B80F3421BA782 /* OpenFastTrackerIntent.swift */; };
 		7D7E4E7BB19DCAE3CC48218E /* FastDurationFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 451A59AE22137ED94C1A12D3 /* FastDurationFormatterTests.swift */; };
+		80C56E1FB8BE6855AC3EAA4A /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1455AA140C0695813955B378 /* DeepLink.swift */; };
 		830AB177EA6601337FCA6524 /* AppStoreScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */; };
 		83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */; };
 		8343AF3A1CFD480B1A021E44 /* FastingActionCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */; };
@@ -103,6 +108,7 @@
 		8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */; };
 		8FDA62E522C2C964409F5B64 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 48B2569387B61EDED4A6712E /* PrivacyInfo.xcprivacy */; };
 		9225E0C3F751197B4854559E /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */; };
+		93F168A3253A77541DC9D477 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1455AA140C0695813955B378 /* DeepLink.swift */; };
 		94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8810ED7037826FE830C9 /* FastedUITests.swift */; };
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
 		98548E8AD56DF8EE3923EC20 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
@@ -133,6 +139,7 @@
 		BAC60C4DD062EAB06EA240E2 /* MedicalDisclaimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */; };
 		BC2CF35F91EA9AC368E7444F /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
 		BD7B9EA2D7B7CB3207FC128C /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
+		BF2F556E68B0CEFA2BF7F3A7 /* OpenFastTrackerIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3AE31ACC9B80F3421BA782 /* OpenFastTrackerIntent.swift */; };
 		C16FE1D2D9A43E674540AC0D /* FastComplications.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23249B6FE33FC0540C9DE9B /* FastComplications.swift */; };
 		C3798D8BCAAE1F1B30E50E4E /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
 		C599741E6A0988A4ED07D94E /* FastProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */; };
@@ -150,6 +157,7 @@
 		D48B0A4D04512F7E3D7B0977 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
 		D4F2AFBE8351BC02953E6CA4 /* AppGroupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */; };
 		DD2A1F1E7D941774BADAAAAA /* PendingCommandReconciliationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18C07DDCC7D9F2D9FB5D6B8 /* PendingCommandReconciliationTests.swift */; };
+		DE1AB550E15F0FD3FE38F435 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1455AA140C0695813955B378 /* DeepLink.swift */; };
 		DEFA541DB7379B894DDBE400 /* FastStartedCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */; };
 		DF3FF48801379EB3905E6F77 /* FastedWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2861876CC85284102739ACA4 /* FastedWidgetsBundle.swift */; };
 		E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47F0F9EAF3379520543128F /* FastedTests.swift */; };
@@ -244,6 +252,7 @@
 /* Begin PBXFileReference section */
 		0B49461E82EC597415611F11 /* FastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManager.swift; sourceTree = "<group>"; };
 		133D5524D58FDC210D137DE4 /* WatchSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSessionManager.swift; sourceTree = "<group>"; };
+		1455AA140C0695813955B378 /* DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLink.swift; sourceTree = "<group>"; };
 		145B081A157492E5B631A378 /* ProtocolCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolCardView.swift; sourceTree = "<group>"; };
 		15A78317288959CA1D370A02 /* FastManager+Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Notifications.swift"; sourceTree = "<group>"; };
 		15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStageBadgeView.swift; sourceTree = "<group>"; };
@@ -303,6 +312,7 @@
 		86E15E656E2E7D8428685987 /* FastLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastLiveActivityController.swift; sourceTree = "<group>"; };
 		8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialHeaderCardView.swift; sourceTree = "<group>"; };
 		8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedApp.swift; sourceTree = "<group>"; };
+		8F3AE31ACC9B80F3421BA782 /* OpenFastTrackerIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenFastTrackerIntent.swift; sourceTree = "<group>"; };
 		963166C19485453DFD344BCF /* FastedWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FastedWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		96DB5DCAC3C45A6B9DB04467 /* FastedWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FastedWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9703687703B4FF485009663A /* Fasted.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Fasted.xcdatamodel; sourceTree = "<group>"; };
@@ -364,6 +374,7 @@
 			isa = PBXGroup;
 			children = (
 				5093F93825789F6E237BD2A2 /* EndFastIntent.swift */,
+				8F3AE31ACC9B80F3421BA782 /* OpenFastTrackerIntent.swift */,
 				AAA87A58AA38A6EC7409FE5F /* SetFastingIntent.swift */,
 				1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */,
 				C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */,
@@ -435,6 +446,7 @@
 			children = (
 				D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */,
 				84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */,
+				1455AA140C0695813955B378 /* DeepLink.swift */,
 				8048A8C02F2041D8A847E20B /* FastActivityAttributes.swift */,
 				F3450BE8B5B0F980D4687D09 /* FastDurationFormatter.swift */,
 				53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */,
@@ -772,6 +784,7 @@
 			files = (
 				D4F2AFBE8351BC02953E6CA4 /* AppGroupCoordinator.swift in Sources */,
 				9225E0C3F751197B4854559E /* DarwinNotificationCenter.swift in Sources */,
+				DE1AB550E15F0FD3FE38F435 /* DeepLink.swift in Sources */,
 				75312F18463E489F7246ED00 /* EndFastIntent.swift in Sources */,
 				D3DBC6AE64CD13151D6202AC /* FastActivityAttributes.swift in Sources */,
 				1FE8AA08F4C17F9DF6C267FE /* FastDurationFormatter.swift in Sources */,
@@ -782,6 +795,7 @@
 				02E2B44BF8D1A49309056806 /* FastingProtocol.swift in Sources */,
 				E8A5B963DF26327D10D275D0 /* FastingStateSnapshot.swift in Sources */,
 				D38F2D85CD0BA970935C2573 /* MetabolicStage.swift in Sources */,
+				7B698110CF27FC88E8E9FEC8 /* OpenFastTrackerIntent.swift in Sources */,
 				EDE4E6FC88BB4C19DD5D6DEA /* SetFastingIntent.swift in Sources */,
 				BD7B9EA2D7B7CB3207FC128C /* SnoozeFastIntent.swift in Sources */,
 				C7A0AE6139079DA758A59AD8 /* SolsticeTheme.swift in Sources */,
@@ -831,6 +845,7 @@
 				043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */,
 				F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */,
 				6642F8D9E27AE3956A132F16 /* DarwinNotificationCenter.swift in Sources */,
+				80C56E1FB8BE6855AC3EAA4A /* DeepLink.swift in Sources */,
 				48FB0D427459DB6A18EF8ADB /* DialFaceView.swift in Sources */,
 				3D385853457F9BE5FE7B2073 /* DialHeaderCardView.swift in Sources */,
 				0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */,
@@ -869,6 +884,7 @@
 				5E28F103B04991B5DC71121C /* NotificationManager.swift in Sources */,
 				2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */,
 				83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */,
+				6927B96B7A95AA40711BF981 /* OpenFastTrackerIntent.swift in Sources */,
 				65BCCE113DE373261E9D27CF /* PersistenceController.swift in Sources */,
 				78B975439882F6B9107E507D /* ProgressRingView.swift in Sources */,
 				CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */,
@@ -893,6 +909,7 @@
 			files = (
 				37B8A9BBE8451FE77AF2539F /* AppGroupCoordinator.swift in Sources */,
 				FB277731465C3AE2B319DC6F /* DarwinNotificationCenter.swift in Sources */,
+				93F168A3253A77541DC9D477 /* DeepLink.swift in Sources */,
 				360CFB21C3156EAD7E510477 /* EndFastIntent.swift in Sources */,
 				028C87C0AEB47555BF1BA84F /* FastActivityAttributes.swift in Sources */,
 				C16FE1D2D9A43E674540AC0D /* FastComplications.swift in Sources */,
@@ -903,6 +920,7 @@
 				BC2CF35F91EA9AC368E7444F /* FastingProtocol.swift in Sources */,
 				D48B0A4D04512F7E3D7B0977 /* FastingStateSnapshot.swift in Sources */,
 				1C2D0A64D8220A8783332DCF /* MetabolicStage.swift in Sources */,
+				BF2F556E68B0CEFA2BF7F3A7 /* OpenFastTrackerIntent.swift in Sources */,
 				13AFB3B30007E6BB4426F6EB /* SetFastingIntent.swift in Sources */,
 				1120760C163B6A1E33297FDB /* SnoozeFastIntent.swift in Sources */,
 				2CB054D80FFCB722E8DCD81A /* SolsticeTheme.swift in Sources */,
@@ -918,6 +936,7 @@
 			files = (
 				531868EFC09E78273AEE5663 /* AppGroupCoordinator.swift in Sources */,
 				6671A715865B552AFA906692 /* DarwinNotificationCenter.swift in Sources */,
+				710308E2CE005B75385FDA32 /* DeepLink.swift in Sources */,
 				036A390AB6E5DFEE9CCB4F4F /* EatingWindowWidget.swift in Sources */,
 				E4961D7D9EDBBE71BB479A7B /* EndFastIntent.swift in Sources */,
 				B2582AE639A0ADF170F5B726 /* FastActivityAttributes.swift in Sources */,
@@ -935,6 +954,7 @@
 				9BE30CD05FF60B9801D9FE66 /* FastingProtocol.swift in Sources */,
 				6841D4A6B7C49C45ABDB9A67 /* FastingStateSnapshot.swift in Sources */,
 				C3798D8BCAAE1F1B30E50E4E /* MetabolicStage.swift in Sources */,
+				225990CB5BDA1CA63EBD5F00 /* OpenFastTrackerIntent.swift in Sources */,
 				A7CB4AE6B4B374CE0561A354 /* SetFastingIntent.swift in Sources */,
 				1D42DAA75426B7751F9AA21A /* SnoozeFastIntent.swift in Sources */,
 				6731DABAFE89191832089A9C /* SolsticeTheme.swift in Sources */,

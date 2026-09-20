@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 extension FastingStateSnapshot {
     public func startingNow(
@@ -65,5 +66,45 @@ extension FastingStateSnapshot {
 public struct FastCommandFactory {
     public static func shouldDirectlyEnd(snapshot: FastingStateSnapshot, at date: Date = Date()) -> Bool {
         snapshot.isGoalMet(at: date)
+    }
+}
+
+/// Three-way state behind the Control Center tile, replacing a plain on/off toggle.
+///
+/// A toggle implies a symmetric, reversible action, but ending a fast early isn't reversible the
+/// way starting one is — it writes a partial fast to history and breaks the streak, and a control
+/// can't show a confirmation dialog. `.active` therefore opens the app instead of ending anything;
+/// only `.complete`, where `shouldDirectlyEnd` already says an end is safe, acts directly.
+public enum FastControlState: String, Sendable, Equatable {
+    case idle
+    case active
+    case complete
+
+    public static func from(snapshot: FastingStateSnapshot, at date: Date = Date()) -> FastControlState {
+        guard snapshot.isFasting else { return .idle }
+        return FastCommandFactory.shouldDirectlyEnd(snapshot: snapshot, at: date) ? .complete : .active
+    }
+
+    public var label: String {
+        switch self {
+        case .idle: return "Start Fast"
+        case .active: return "Fasting"
+        case .complete: return "Fasting Complete"
+        }
+    }
+
+    public var systemImage: String {
+        switch self {
+        case .idle: return "timer"
+        case .active: return "flame.fill"
+        case .complete: return "checkmark.circle.fill"
+        }
+    }
+
+    public var tintColor: Color {
+        switch self {
+        case .idle, .active: return SolsticeColors.solarAmber
+        case .complete: return SolsticeColors.emeraldGlow
+        }
     }
 }

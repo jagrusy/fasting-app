@@ -26,14 +26,17 @@ struct FastStageWidgetEntryView: View {
     let entry: FastStatusWidgetEntry
 
     var body: some View {
-        switch family {
-        case .accessoryCircular:
-            FastStageGaugeView(snapshot: entry.snapshot, currentDate: entry.date)
-        case .accessoryRectangular:
-            StageRectangularView(snapshot: entry.snapshot, currentDate: entry.date)
-        default:
-            StageSmallView(snapshot: entry.snapshot, currentDate: entry.date)
+        Group {
+            switch family {
+            case .accessoryCircular:
+                FastStageGaugeView(snapshot: entry.snapshot, currentDate: entry.date)
+            case .accessoryRectangular:
+                StageRectangularView(snapshot: entry.snapshot, currentDate: entry.date)
+            default:
+                StageSmallView(snapshot: entry.snapshot, currentDate: entry.date)
+            }
         }
+        .widgetURL(DeepLink.forWidgetTap(isFasting: entry.snapshot.isFasting).url)
     }
 }
 

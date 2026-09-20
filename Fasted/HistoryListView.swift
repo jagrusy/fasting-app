@@ -22,6 +22,19 @@ public struct HistoryListView: View {
         StreakCalculator.calculate(from: Array(completedFasts))
     }
 
+    private var heatmapSignature: Int {
+        var hasher = Hasher()
+        for fast in completedFasts {
+            hasher.combine(fast.objectID)
+            hasher.combine(fast.startDate)
+            hasher.combine(fast.endDate)
+            hasher.combine(fast.isCompleted)
+            hasher.combine(fast.targetDuration)
+            hasher.combine(fast.updatedAt)
+        }
+        return hasher.finalize()
+    }
+
     private var monthFasts: [Fast] {
         let calendar = Calendar.current
         return completedFasts.filter { fast in
@@ -49,6 +62,7 @@ public struct HistoryListView: View {
                         fasts: Array(completedFasts),
                         currentMonthDate: $currentMonthDate
                     )
+                    .id(heatmapSignature)
                 }
             }
             .listRowInsets(EdgeInsets())
