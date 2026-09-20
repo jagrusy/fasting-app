@@ -18,9 +18,13 @@ extension FastingStateSnapshot {
         )
     }
 
-    public func endingNow(at endDate: Date = Date()) -> FastingStateSnapshot {
+    public func endingNow(at endDate: Date = Date(), calendar: Calendar = .current) -> FastingStateSnapshot {
         let isComplete = isGoalMet(at: endDate)
-        let newStreak = isComplete ? currentStreak + 1 : currentStreak
+        // `StreakCalculator` counts distinct days, so a second completed fast on a day that already
+        // counts adds nothing. Incrementing unconditionally showed an inflated streak until the app
+        // next republished the authoritative value.
+        let countsAsNewDay = isComplete && startsAnUncountedDay(calendar: calendar)
+        let newStreak = countsAsNewDay ? currentStreak + 1 : currentStreak
         let newLongest = max(longestStreak, newStreak)
         return FastingStateSnapshot(
             isFasting: false,
@@ -30,8 +34,17 @@ extension FastingStateSnapshot {
             currentStreak: newStreak,
             longestStreak: newLongest,
             lastCompletedFastDate: endDate,
+            lastCompletedFastStartDate: isComplete ? startDate : lastCompletedFastStartDate,
             updatedAt: Date()
         )
+    }
+
+    private func startsAnUncountedDay(calendar: Calendar) -> Bool {
+        guard let start = startDate else { return false }
+        // No prior completion recorded, or a payload from a build predating the field — assume the
+        // day is new. Over-counting here is corrected on the next publish, same as before.
+        guard let previous = lastCompletedFastStartDate else { return true }
+        return !calendar.isDate(start, inSameDayAs: previous)
     }
 
     public func snoozed(by extensionSeconds: TimeInterval) -> FastingStateSnapshot {

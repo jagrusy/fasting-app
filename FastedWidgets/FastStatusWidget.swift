@@ -17,6 +17,7 @@ struct FastStatusWidget: Widget {
         .supportedFamilies([
             .systemSmall,
             .systemMedium,
+            .systemLarge,
             .accessoryCircular,
             .accessoryRectangular,
             .accessoryInline
@@ -43,14 +44,8 @@ struct FastStatusTimelineProvider: TimelineProvider {
             FastStatusWidgetEntry(date: entry.date, snapshot: entry.snapshot)
         }
 
-        let reloadPolicy: TimelineReloadPolicy
-        if let nextDate = WidgetTimelineBuilder.nextReloadDate(entries: entries, now: now) {
-            reloadPolicy = .after(nextDate)
-        } else {
-            reloadPolicy = .never
-        }
-
-        completion(Timeline(entries: widgetEntries, policy: reloadPolicy))
+        let nextDate = WidgetTimelineBuilder.nextReloadDate(entries: entries, now: now)
+        completion(Timeline(entries: widgetEntries, policy: .after(nextDate)))
     }
 }
 
@@ -69,6 +64,8 @@ struct FastStatusWidgetEntryView: View {
             SmallFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
         case .systemMedium:
             MediumFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
+        case .systemLarge:
+            LargeFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
         case .accessoryCircular:
             AccessoryCircularFastView(snapshot: entry.snapshot, currentDate: entry.date)
         case .accessoryRectangular:

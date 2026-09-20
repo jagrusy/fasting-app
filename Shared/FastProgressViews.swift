@@ -46,6 +46,125 @@ public struct FastElapsedText: View {
     }
 }
 
+/// Goal progress as a capacity gauge.
+///
+/// The value is fixed for the lifetime of a timeline entry — unlike `Text` and `ProgressView`,
+/// `Gauge` has no `timerInterval` form that WidgetKit re-renders on its own. `WidgetTimelineBuilder`
+/// compensates by spacing entries about a percent of the goal apart; pair this with a live
+/// `FastElapsedText` wherever the exact time matters, so the digits keep ticking between entries.
+public struct FastGoalGaugeView<Center: View>: View {
+    public let progress: Double
+    public let isCompleted: Bool
+    private let center: Center
+
+    public init(progress: Double, isCompleted: Bool, @ViewBuilder center: () -> Center) {
+        self.progress = progress
+        self.isCompleted = isCompleted
+        self.center = center()
+    }
+
+    public var body: some View {
+        Gauge(value: progress, in: 0...1) {
+            EmptyView()
+        } currentValueLabel: {
+            center
+        }
+        .gaugeStyle(.accessoryCircularCapacity)
+        .tint(isCompleted ? SolsticeColors.emeraldGlow : SolsticeColors.solarAmber)
+    }
+}
+
+extension FastGoalGaugeView where Center == EmptyView {
+    public init(progress: Double, isCompleted: Bool) {
+        self.init(progress: progress, isCompleted: isCompleted) { EmptyView() }
+    }
+}
+
+/// Progress through the current metabolic stage, tinted with that stage's colour.
+public struct FastStageGaugeView: View {
+    public let snapshot: FastingStateSnapshot
+    public let currentDate: Date
+    public var showsIcon: Bool
+
+    public init(snapshot: FastingStateSnapshot, currentDate: Date, showsIcon: Bool = true) {
+        self.snapshot = snapshot
+        self.currentDate = currentDate
+        self.showsIcon = showsIcon
+    }
+
+    public var body: some View {
+        let stage = snapshot.currentStage(at: currentDate)
+        Gauge(value: snapshot.stageProgress(at: currentDate) ?? 0, in: 0...1) {
+            EmptyView()
+        } currentValueLabel: {
+            if showsIcon {
+                Image(systemName: stage?.systemIcon ?? "flame.fill")
+                    .font(.system(size: 12))
+            }
+        }
+        .gaugeStyle(.accessoryCircularCapacity)
+        .tint(stage?.color ?? SolsticeColors.solarAmber)
+    }
+}
+
+/// Current streak measured against the personal best.
+///
+/// A first-ever streak has no best to compare against yet, so the gauge fills against the current
+/// value itself rather than dividing by zero.
+public struct StreakGaugeView: View {
+    public let currentStreak: Int
+    public let longestStreak: Int
+
+    public init(currentStreak: Int, longestStreak: Int) {
+        self.currentStreak = currentStreak
+        self.longestStreak = longestStreak
+    }
+
+    private var fraction: Double {
+        let best = max(longestStreak, currentStreak)
+        guard best > 0 else { return 0 }
+        return min(1.0, Double(currentStreak) / Double(best))
+    }
+
+    public var body: some View {
+        Gauge(value: fraction, in: 0...1) {
+            EmptyView()
+        } currentValueLabel: {
+            Text("\(currentStreak)")
+                .font(.system(size: 14, weight: .bold))
+                .minimumScaleFactor(0.6)
+        }
+        .gaugeStyle(.accessoryCircularCapacity)
+        .tint(SolsticeColors.solarFlame)
+    }
+}
+
+public struct EatingWindowGaugeView: View {
+    public let snapshot: FastingStateSnapshot
+    public let currentDate: Date
+
+    public init(snapshot: FastingStateSnapshot, currentDate: Date) {
+        self.snapshot = snapshot
+        self.currentDate = currentDate
+    }
+
+    public var body: some View {
+        if let progress = snapshot.eatingWindowProgress(at: currentDate) {
+            Gauge(value: progress, in: 0...1) {
+                EmptyView()
+            } currentValueLabel: {
+                Image(systemName: "fork.knife")
+                    .font(.system(size: 12))
+            }
+            .gaugeStyle(.accessoryCircularCapacity)
+            .tint(SolsticeColors.tealGlow)
+        } else {
+            Image(systemName: snapshot.isFasting ? "flame.fill" : "fork.knife")
+                .font(.title3)
+        }
+    }
+}
+
 public struct FastProgressRingView: View {
     public let startDate: Date
     public let goalDate: Date
@@ -111,23 +230,14 @@ public struct AccessoryCircularFastView: View {
     }
 
     public var body: some View {
-        if snapshot.isFasting, let start = snapshot.startDate, let target = snapshot.targetDuration {
-            let goal = start.addingTimeInterval(target)
-            ProgressView(
-                timerInterval: start...goal,
-                countsDown: false,
-                label: { EmptyView() },
-                currentValueLabel: {
-                    if let stage = snapshot.currentStage(at: currentDate) {
-                        Image(systemName: stage.systemIcon)
-                            .font(.system(size: 12))
-                    } else {
-                        Image(systemName: "flame.fill")
-                            .font(.system(size: 12))
-                    }
-                }
-            )
-            .progressViewStyle(.circular)
+        if snapshot.isFasting {
+            FastGoalGaugeView(
+                progress: snapshot.clampedProgress(at: currentDate),
+                isCompleted: snapshot.isGoalMet(at: currentDate)
+            ) {
+                Image(systemName: snapshot.currentStage(at: currentDate)?.systemIcon ?? "flame.fill")
+                    .font(.system(size: 12))
+            }
         } else {
             Image(systemName: "sun.max.fill")
                 .font(.title3)
@@ -167,16 +277,26 @@ public struct AccessoryRectangularFastView: View {
                     .font(.headline)
                     .monospacedDigit()
 
-                ProgressView(timerInterval: start...goal, countsDown: false)
+                Gauge(value: snapshot.clampedProgress(at: currentDate), in: 0...1) {
+                    EmptyView()
+                }
+                .gaugeStyle(.accessoryLinearCapacity)
+                .tint(isGoalMet ? SolsticeColors.emeraldGlow : SolsticeColors.solarAmber)
             }
         } else {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Solstice Fast")
                     .font(.caption)
                     .fontWeight(.bold)
-                Text("Ready to Fast")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                if let windowEnd = snapshot.eatingWindowEnd(), windowEnd > currentDate {
+                    Text("Eating window ends \(windowEnd, style: .time)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Ready to Fast")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }
@@ -210,6 +330,10 @@ public struct AccessoryInlineFastView: View {
     }
 }
 
+/// Corner complications invert the usual layout intuition: the view itself occupies a cramped
+/// corner slot, while `widgetLabel` gets the long curved run along the bezel. Text of any real
+/// length belongs in the label — an elapsed timer placed in the corner renders unreadably small.
+/// A `Gauge` in the label is drawn as an arc following the face edge.
 public struct AccessoryCornerFastView: View {
     public let snapshot: FastingStateSnapshot
     public let currentDate: Date
@@ -220,22 +344,21 @@ public struct AccessoryCornerFastView: View {
     }
 
     public var body: some View {
-        if snapshot.isFasting, let start = snapshot.startDate, let target = snapshot.targetDuration {
-            let goal = start.addingTimeInterval(target)
-            FastElapsedText(
-                startDate: start,
-                goalDate: goal,
-                isCompleted: snapshot.isGoalMet(at: currentDate)
-            )
+        if snapshot.isFasting {
+            let isGoalMet = snapshot.isGoalMet(at: currentDate)
+            Image(systemName: snapshot.currentStage(at: currentDate)?.systemIcon ?? "flame.fill")
+                .font(.title2)
+                .foregroundColor(isGoalMet ? SolsticeColors.emeraldGlow : SolsticeColors.solarAmber)
                 .widgetLabel {
-                    if let stage = snapshot.currentStage(at: currentDate) {
-                        Text(stage.shortTitle)
-                    } else {
-                        Text("Fast")
+                    Gauge(value: snapshot.clampedProgress(at: currentDate), in: 0...1) {
+                        EmptyView()
                     }
+                    .tint(isGoalMet ? SolsticeColors.emeraldGlow : SolsticeColors.solarAmber)
                 }
         } else {
             Image(systemName: "sun.max.fill")
+                .font(.title2)
+                .foregroundColor(SolsticeColors.solarGold)
                 .widgetLabel("Solstice")
         }
     }
