@@ -1,0 +1,27 @@
+# Issue handoff: GRU-33 (DRAFT-10)
+
+- **Issue / task**: GRU-33 (DRAFT-10: Validate the contrast app's difficult-session workflow)
+- **Branch / worktree / base SHA**: `codex/gru-33-contrast-validation` in `/Users/grusy/.codex/worktrees/bd36/fasting-app`; Base SHA: `99f0e2d93eef250914d79d6e5c8e23f05d5c0e44` (`origin/main`)
+- **Claimed paths and concurrent-work check**: `planning/research/contrast-discovery/` and `planning/agent-handoffs/GRU-33.md`. Verified isolated ownership; no conflicts with active native Fasted work.
+- **Prerequisites**: None blocked. Base commit includes merged PR #57 (canonical guidance, testing contracts, and release guardrails).
+- **Changed behavior and rationale**: Produced the required research deliverable (`planning/research/contrast-discovery/GRU-33-contrast-workflow-validation.md`) analyzing wet-screen completion, older Apple Watch (Series 7) baseline support, sauna thermal limits, and locker separation. Audited 5 competitor apps and workarounds, separating advertised claims from observed behavior. Created a neutral interview guide and usability script. Evaluated Android demand and contrary evidence.
+- **Changed contracts/schema/identities**: None (research-only lane).
+- **Tests**:
+  - Markdown syntax & link integrity checks: Passed.
+  - Pre-commit SwiftLint: Passed (0 violations across 99 files).
+  - Release policy test suite: Passed (35/35 tests).
+- **First failures and resolution**: None.
+- **Acceptance checklist**:
+  - [x] Competitor workflow comparison distinguishing observed behavior from store claims (Pass)
+  - [x] Older watch baseline (Series 7 lacks water temp sensor; manual baseline required) (Pass)
+  - [x] Sauna thermal boundary (Apple Watch 32°–95°F operating limit vs 150°–195°F sauna) (Pass)
+  - [x] Neutral, non-leading user interview protocol & failure-point questions (Pass)
+  - [x] Tester profile matrix and unvalidated Android demand analysis (Pass)
+  - [x] Contrary evidence and conditional recommendation for DRAFT-15 (Pass)
+  - [ ] Live human interviews (Marked Pending owner execution)
+  - [ ] Physical device in-session tests (Marked Pending owner execution)
+- **Remaining blockers, risk and recovery/compatibility notes**:
+  - DRAFT-15 (Prototype the contrast session workflow on iOS) is gated in `AGENT_TICKETS.md`. Do not start prototype implementation until owner approves this research and records the go decision.
+  - Apple Watch Series 7 has no water temp sensor; any contrast prototype must treat temperature as an optional/manual input.
+  - Apple Watch must not be required inside traditional saunas to avoid device damage and thermal shutdown.
+- **Downstream handoff**: Hand off to repository owner for review, interview execution, and decision on ungating DRAFT-15.
