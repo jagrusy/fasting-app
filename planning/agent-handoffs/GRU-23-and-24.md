@@ -20,9 +20,11 @@ Both preflight and pre-signing checks require the selected `testflight` or `prod
 - `ruby fastlane/tests/release_guard_test.rb`: 5 tests / 7 assertions passed.
 - `ruby -c fastlane/Fastfile`: syntax OK.
 - Actionlint 1.7.12 on `.github/workflows/ci.yml` and `deploy.yml`: passed. Tool archive was checksum-verified during preparation.
-- Both symlinks resolve to exactly `AGENTS.md`; Git records mode `120000`. Local guide links and diff whitespace checks pass. Pre-commit SwiftLint passed.
-- Independent review found no actionable defects in the final environment-policy fix. Earlier credential-placement and private-history findings were addressed in this review branch.
-- No native test suite was run for this policy/guidance-only change. Current main's newer native, screenshot and UI-test changes are preserved.
+- Both symlinks (`CLAUDE.md`, `GEMINI.md`) and `agent.md` resolve to exactly `AGENTS.md`; Git records mode `120000`. Local guide links and diff whitespace checks pass. Pre-commit SwiftLint passed (0 violations across 99 files).
+- Merged `origin/main` (commit `c56594c`) resolving conflicts in `deploy.yml` to support automated version resolution (`resolve_version.sh`), optional manual `version_override`, and git build tagging with permissions while maintaining the release admission gate.
+- Configured XcodeGen `options.fileTypes.md.buildPhase: none` in `project.yml` to prevent duplicate resource copy collisions for scoped `AGENTS.md` files while keeping them visible in Xcode.
+- Native builds verified: `Fasted` (iOS), `FastedWidgets` (iOS Widget Extension), `FastedWatch` (watchOS), and `FastedWatchWidgets` (watchOS Widget Extension) compiled cleanly with warnings-as-errors.
+- Native test suite verified: 132/132 unit tests (`FastedTests`) and 15/15 UI tests (`FastedUITests`) passed on iOS 26.1 Simulator.
 
 ## Acceptance and remaining gates
 
