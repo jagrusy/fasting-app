@@ -81,6 +81,28 @@ final class AppGroupResilienceTests: XCTestCase {
         XCTAssertTrue(coordinator.drainPendingCommands().isEmpty)
     }
 
+    /// The Control Center tile opens the app and leaves this behind to say which tab to land on.
+    func testPendingDeepLinkRoundTripsAndIsConsumedOnce() {
+        let coordinator = makeCoordinator()
+        XCTAssertNil(coordinator.consumePendingDeepLink())
+
+        coordinator.writePendingDeepLink(.fastTracker)
+        XCTAssertEqual(coordinator.consumePendingDeepLink(), .fastTracker)
+
+        // Consuming clears it, so a later unrelated foreground doesn't yank the user to a tab
+        // they never asked for.
+        XCTAssertNil(coordinator.consumePendingDeepLink())
+    }
+
+    func testPendingDeepLinkOverwritesRatherThanQueues() {
+        let coordinator = makeCoordinator()
+        coordinator.writePendingDeepLink(.fastTracker)
+        coordinator.writePendingDeepLink(.history)
+
+        XCTAssertEqual(coordinator.consumePendingDeepLink(), .history)
+        XCTAssertNil(coordinator.consumePendingDeepLink())
+    }
+
     func testValidCommandsAreStillRemovedAfterDraining() {
         let coordinator = makeCoordinator()
         coordinator.enqueueCommand(.endFast(endDate: Date(timeIntervalSince1970: 1700000000)))

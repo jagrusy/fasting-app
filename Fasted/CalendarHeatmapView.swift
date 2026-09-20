@@ -138,9 +138,7 @@ public struct CalendarHeatmapView: View {
         return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 7), spacing: 6) {
             ForEach(0..<days.count, id: \.self) { index in
                 if let date = days[index] {
-                    let status = StreakCalculator.fastStatus(for: date, in: fasts, calendar: calendar)
                     dayCell(for: date)
-                        .id("\(date.timeIntervalSince1970)_\(status)")
                 } else {
                     Color.clear
                         .frame(height: 34)

@@ -1,11 +1,12 @@
+#if os(iOS)
 import AppIntents
 import Foundation
 
-/// Foregrounds the app without changing any state.
+/// Foregrounds the app on the active fast.
 ///
-/// Backs the Control Center tile while a fast is in progress but not yet at goal: ending early has
-/// no undo and needs the in-app confirmation dialog, which a control can't present itself, so
-/// tapping the tile opens the app instead of running `EndFastIntent` directly.
+/// Exists to be handed to `IntentResult.result(opensIntent:)` so that only some invocations of
+/// `FastControlActionIntent` open the app — `openAppWhenRun` is static, so a single intent type
+/// can't make that choice at runtime on its own.
 public struct OpenFastTrackerIntent: AppIntent {
     public static var title: LocalizedStringResource = "Open Fast Tracker"
     public static var description = IntentDescription("Opens Solstice to the active fast.")
@@ -18,3 +19,4 @@ public struct OpenFastTrackerIntent: AppIntent {
         return .result()
     }
 }
+#endif

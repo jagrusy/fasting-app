@@ -281,4 +281,51 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(reportButton.waitForExistence(timeout: 3))
         XCTAssertTrue(rateButton.waitForExistence(timeout: 3))
     }
+
+    // MARK: - Deep links
+
+    /// Exercises the real scheme registration end to end: the system resolves `solstice://` from
+    /// `CFBundleURLTypes`, launches the app, and `onOpenURL` picks the tab. A unit test can only
+    /// check the URL parsing, not that any of that plumbing is actually connected.
+    func testDeepLinkOpensHistoryTab() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        // The app opens on Fast, so landing on History proves the link moved it.
+        XCTAssertTrue(app.navigationBars["Solstice"].waitForExistence(timeout: 5))
+
+        XCUIDevice.shared.system.open(URL(string: "solstice://history")!)
+
+        XCTAssertTrue(app.navigationBars["History"].waitForExistence(timeout: 10))
+    }
+
+    func testDeepLinkOpensFastTrackerFromAnotherTab() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let historyTab = app.tabBars.buttons["History"]
+        XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
+        historyTab.tap()
+        XCTAssertTrue(app.navigationBars["History"].waitForExistence(timeout: 8))
+
+        XCUIDevice.shared.system.open(URL(string: "solstice://fastTracker")!)
+
+        XCTAssertTrue(app.navigationBars["Solstice"].waitForExistence(timeout: 10))
+    }
+
+    /// An unrecognised host must be ignored rather than moving the user somewhere arbitrary.
+    func testUnknownDeepLinkLeavesTheCurrentTabAlone() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let historyTab = app.tabBars.buttons["History"]
+        XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
+        historyTab.tap()
+        XCTAssertTrue(app.navigationBars["History"].waitForExistence(timeout: 8))
+
+        XCUIDevice.shared.system.open(URL(string: "solstice://nonsense")!)
+
+        XCTAssertTrue(app.navigationBars["History"].waitForExistence(timeout: 8))
+        XCTAssertFalse(app.navigationBars["Solstice"].exists)
+    }
 }
