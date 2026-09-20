@@ -38,6 +38,9 @@ extension FastManager {
 
         coordinator.writeSnapshot(snapshot)
         WatchSessionManager.shared.syncSnapshotToWatch(snapshot)
+        #if canImport(ActivityKit)
+        FastLiveActivityController.shared.sync(with: snapshot)
+        #endif
     }
 
     /// Applies commands enqueued by the widget, Control Center, a notification action, or the

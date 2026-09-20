@@ -23,6 +23,22 @@ struct FastControlWidget: ControlWidget {
     }
 }
 
+/// `SnoozeFastIntent` already existed but was reachable only from a notification action.
+struct FastSnoozeControlWidget: ControlWidget {
+    static let kind: String = "com.grusy.SolsticeFast.FastSnoozeControlWidget"
+
+    var body: some ControlWidgetConfiguration {
+        StaticControlConfiguration(kind: Self.kind) {
+            ControlWidgetButton(action: SnoozeFastIntent(minutes: 60)) {
+                Label("Extend Fast", systemImage: "plus.circle.fill")
+            }
+            .tint(SolsticeColors.solarGold)
+        }
+        .displayName("Extend Fast")
+        .description("Add an hour to your active fasting goal.")
+    }
+}
+
 struct FastControlValueProvider: ControlValueProvider {
     var previewValue: Bool {
         false
