@@ -17,6 +17,7 @@ struct FastStatusWidget: Widget {
         .supportedFamilies([
             .systemSmall,
             .systemMedium,
+            .systemLarge,
             .accessoryCircular,
             .accessoryRectangular,
             .accessoryInline
@@ -43,14 +44,8 @@ struct FastStatusTimelineProvider: TimelineProvider {
             FastStatusWidgetEntry(date: entry.date, snapshot: entry.snapshot)
         }
 
-        let reloadPolicy: TimelineReloadPolicy
-        if let nextDate = WidgetTimelineBuilder.nextReloadDate(entries: entries, now: now) {
-            reloadPolicy = .after(nextDate)
-        } else {
-            reloadPolicy = .never
-        }
-
-        completion(Timeline(entries: widgetEntries, policy: reloadPolicy))
+        let nextDate = WidgetTimelineBuilder.nextReloadDate(entries: entries, now: now)
+        completion(Timeline(entries: widgetEntries, policy: .after(nextDate)))
     }
 }
 
@@ -64,19 +59,26 @@ struct FastStatusWidgetEntryView: View {
     let entry: FastStatusWidgetEntry
 
     var body: some View {
-        switch family {
-        case .systemSmall:
-            SmallFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
-        case .systemMedium:
-            MediumFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
-        case .accessoryCircular:
-            AccessoryCircularFastView(snapshot: entry.snapshot, currentDate: entry.date)
-        case .accessoryRectangular:
-            AccessoryRectangularFastView(snapshot: entry.snapshot, currentDate: entry.date)
-        case .accessoryInline:
-            AccessoryInlineFastView(snapshot: entry.snapshot, currentDate: entry.date)
-        default:
-            SmallFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
+        // A tap on the Start Fast button (or, once shipped, End Fast) is handled by that button's
+        // own intent and takes priority within its bounds; this only fires for the surrounding area.
+        Group {
+            switch family {
+            case .systemSmall:
+                SmallFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
+            case .systemMedium:
+                MediumFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
+            case .systemLarge:
+                LargeFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
+            case .accessoryCircular:
+                AccessoryCircularFastView(snapshot: entry.snapshot, currentDate: entry.date)
+            case .accessoryRectangular:
+                AccessoryRectangularFastView(snapshot: entry.snapshot, currentDate: entry.date)
+            case .accessoryInline:
+                AccessoryInlineFastView(snapshot: entry.snapshot, currentDate: entry.date)
+            default:
+                SmallFastWidgetView(snapshot: entry.snapshot, currentDate: entry.date)
+            }
         }
+        .widgetURL(DeepLink.forWidgetTap(isFasting: entry.snapshot.isFasting).url)
     }
 }

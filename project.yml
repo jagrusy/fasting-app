@@ -2,10 +2,13 @@ name: Fasted
 options:
   bundleIdPrefix: com.grusy
   deploymentTarget:
-    iOS: "18.0"
+    iOS: "18.2"
     watchOS: "11.0"
   xcodeVersion: "16.0"
   createIntermediateGroups: true
+  fileTypes:
+    md:
+      buildPhase: none
 
 settings:
   base:
@@ -16,7 +19,7 @@ settings:
     # Every bundle in the archive must carry the same version pair, or App Store validation
     # rejects the upload. All four Info.plists read these, and CI overrides
     # CURRENT_PROJECT_VERSION per build with the next unused TestFlight build number.
-    MARKETING_VERSION: "1.1"
+    MARKETING_VERSION: "1.1.55"
     CURRENT_PROJECT_VERSION: "1"
     # Per-target provisioning profile, supplied by fastlane at archive time (see the
     # SIGNED_BUNDLE_IDS map in fastlane/Fastfile). A single global
@@ -37,7 +40,7 @@ targets:
   Fasted:
     type: application
     platform: iOS
-    deploymentTarget: "18.0"
+    deploymentTarget: "18.2"
     sources:
       - path: Fasted
       - path: Shared
@@ -56,7 +59,7 @@ targets:
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         SUPPORTS_MACCATALYST: "NO"
         TARGETED_DEVICE_FAMILY: "1"
-        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.2"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
       configs:
         Debug:
@@ -67,7 +70,7 @@ targets:
   FastedWidgets:
     type: app-extension
     platform: iOS
-    deploymentTarget: "18.0"
+    deploymentTarget: "18.2"
     sources:
       - path: FastedWidgets
       - path: Shared
@@ -84,7 +87,7 @@ targets:
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         SUPPORTS_MACCATALYST: "NO"
         TARGETED_DEVICE_FAMILY: "1"
-        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.2"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
       configs:
         Debug:
@@ -151,7 +154,7 @@ targets:
   FastedTests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: "18.0"
+    deploymentTarget: "18.2"
     sources:
       - path: FastedTests
     dependencies:
@@ -164,13 +167,13 @@ targets:
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         SUPPORTS_MACCATALYST: "NO"
         TARGETED_DEVICE_FAMILY: "1"
-        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.2"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
 
   FastedUITests:
     type: bundle.ui-testing
     platform: iOS
-    deploymentTarget: "18.0"
+    deploymentTarget: "18.2"
     sources:
       - path: FastedUITests
     dependencies:
@@ -183,7 +186,7 @@ targets:
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         SUPPORTS_MACCATALYST: "NO"
         TARGETED_DEVICE_FAMILY: "1"
-        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.2"
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
 
 # Schemes were previously not defined anywhere, so Xcode auto-created them implicitly. The

@@ -29,7 +29,8 @@ public enum FeedbackHelper {
     public static let supportEmail = "jagrusy+solstice@gmail.com"
 
     public static func sendFeedback(type: FeedbackType, fastManager: FastManager) {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+            ?? BuildMetadata.marketingVersion
         let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
         let systemVersion = UIDevice.current.systemVersion
         let model = UIDevice.current.model
@@ -41,6 +42,7 @@ public enum FeedbackHelper {
 
         --- Device Diagnostics (Please do not delete) ---
         App Version: \(appVersion) (\(buildNumber))
+        Build Commit: \(BuildMetadata.gitCommit)
         iOS Version: \(systemVersion)
         Device Model: \(model)
         Selected Protocol: \(protocolName)

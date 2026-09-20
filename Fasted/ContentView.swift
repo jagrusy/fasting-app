@@ -25,6 +25,13 @@ struct ContentView: View {
             case .settings: return "gearshape"
             }
         }
+
+        init?(deepLink: DeepLink) {
+            switch deepLink {
+            case .fastTracker: self = .fast
+            case .history: self = .history
+            }
+        }
     }
 
     var body: some View {
@@ -59,6 +66,7 @@ struct ContentView: View {
             }
             fastManager.refresh()
             fastManager.syncNotifications()
+            applyPendingDeepLink()
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
@@ -66,7 +74,21 @@ struct ContentView: View {
                 // watch enqueued while the app was backgrounded or terminated.
                 fastManager.refresh()
                 fastManager.syncNotifications()
+                applyPendingDeepLink()
             }
+        }
+        .onOpenURL { url in
+            if let link = DeepLink(url: url), let tab = Tab(deepLink: link) {
+                selectedTab = tab
+            }
+        }
+    }
+
+    /// Picks up a tab switch a Control Center intent requested while the app wasn't in the
+    /// foreground to receive a `widgetURL`-style open directly.
+    private func applyPendingDeepLink() {
+        if let link = fastManager.coordinator.consumePendingDeepLink(), let tab = Tab(deepLink: link) {
+            selectedTab = tab
         }
     }
 }

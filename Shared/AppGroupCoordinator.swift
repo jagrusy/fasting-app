@@ -24,6 +24,7 @@ public final class AppGroupCoordinator: @unchecked Sendable {
 
     public static let snapshotKey = "fasting_state_snapshot"
     public static let pendingCommandsKey = "pending_fasting_commands"
+    public static let pendingDeepLinkKey = "pending_deep_link"
 
     public init(
         userDefaults: UserDefaults? = nil,
@@ -52,12 +53,13 @@ public final class AppGroupCoordinator: @unchecked Sendable {
             self.userDefaults = groupDefaults
             self.isUsingSharedContainer = true
         } else {
+            // Only reachable when the suite defaults or the container is missing, so neither half
+            // of the shared setup can be trusted — including the case where the container exists
+            // but `UserDefaults(suiteName:)` handed back nil and reads fall through to `.standard`.
             self.userDefaults = UserDefaults(suiteName: appGroupId) ?? .standard
-            self.isUsingSharedContainer = containerURL != nil
-            if containerURL == nil {
-                NSLog("[Solstice] App Group \(appGroupId) unavailable — widget and watch commands "
-                    + "will not reach the app. Check the App Group entitlement and provisioning profile.")
-            }
+            self.isUsingSharedContainer = false
+            NSLog("[Solstice] App Group \(appGroupId) unavailable — widget and watch commands "
+                + "will not reach the app. Check the App Group entitlement and provisioning profile.")
         }
     }
 
@@ -81,6 +83,27 @@ public final class AppGroupCoordinator: @unchecked Sendable {
             return .idle
         }
         return snapshot
+    }
+
+    /// Requests a tab switch the next time the app comes to the foreground.
+    ///
+    /// Control Center intents can foreground the app via `openAppWhenRun`, but that flag carries no
+    /// destination and offers no reliable guarantee about exactly when `perform()` runs relative to
+    /// the view hierarchy coming up. Relaying through the App Group instead reuses the same
+    /// foreground-drain point `processPendingCommands` already relies on, so there is no race to
+    /// reason about.
+    public func writePendingDeepLink(_ link: DeepLink) {
+        lock.lock()
+        defer { lock.unlock() }
+        userDefaults.set(link.rawValue, forKey: Self.pendingDeepLinkKey)
+    }
+
+    public func consumePendingDeepLink() -> DeepLink? {
+        lock.lock()
+        defer { lock.unlock() }
+        guard let raw = userDefaults.string(forKey: Self.pendingDeepLinkKey) else { return nil }
+        userDefaults.removeObject(forKey: Self.pendingDeepLinkKey)
+        return DeepLink(rawValue: raw)
     }
 
     public func enqueueCommand(_ command: FastingActionCommand) {
@@ -121,10 +144,19 @@ public final class AppGroupCoordinator: @unchecked Sendable {
         ) {
             let jsonFiles = fileURLs.filter { $0.pathExtension == "json" }
             for url in jsonFiles {
-                if let data = try? Data(contentsOf: url),
-                   let envelope = try? JSONDecoder().decode(PendingCommandEnvelope.self, from: data) {
-                    envelopes.append(envelope)
+                guard let data = try? Data(contentsOf: url) else {
+                    // Unreadable now rather than invalid — most likely data protection while the
+                    // device is locked. Leave it queued so the next drain can pick it up.
+                    continue
                 }
+                guard let envelope = try? JSONDecoder().decode(
+                    PendingCommandEnvelope.self,
+                    from: data
+                ) else {
+                    quarantine(url)
+                    continue
+                }
+                envelopes.append(envelope)
                 try? fileManager.removeItem(at: url)
             }
         }
@@ -141,6 +173,23 @@ public final class AppGroupCoordinator: @unchecked Sendable {
                 return lhs.timestamp < rhs.timestamp
             }
             return lhs.id.uuidString < rhs.id.uuidString
+        }
+    }
+
+    /// Moves a malformed command out of the queue without destroying it.
+    ///
+    /// Deleting outright discards the only record of a tap the user made, while leaving it in place
+    /// makes it a poison pill re-read on every drain. The renamed file no longer matches the `json`
+    /// filter, so it stays available for diagnosis without being reprocessed.
+    private func quarantine(_ url: URL) {
+        let destination = url.appendingPathExtension("quarantined")
+        try? fileManager.removeItem(at: destination)
+        do {
+            try fileManager.moveItem(at: url, to: destination)
+            NSLog("[Solstice] Quarantined undecodable pending command \(url.lastPathComponent)")
+        } catch {
+            NSLog("[Solstice] Could not quarantine \(url.lastPathComponent), discarding: \(error)")
+            try? fileManager.removeItem(at: url)
         }
     }
 

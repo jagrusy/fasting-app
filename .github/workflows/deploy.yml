@@ -21,6 +21,11 @@ on:
         description: 'Full 40-character SHA of the current main commit verified by CI'
         required: true
         type: string
+      version_override:
+        description: 'Optional marketing version override (e.g. 1.2.0). Leave blank to resolve automatically.'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -66,6 +71,8 @@ jobs:
     needs: verify
     runs-on: macos-26
     timeout-minutes: 60
+    permissions:
+      contents: write
     # Signing/publishing credentials belong only in these main-restricted environments,
     # never repository secrets. Both policy passes validate the selected environment.
     environment:
@@ -89,7 +96,7 @@ jobs:
         with:
           ref: ${{ needs.verify.outputs.sha }}
           path: app
-          persist-credentials: false
+          persist-credentials: true
       - name: Select Xcode
         run: |
           ls /Applications | grep -i '^Xcode' || true
@@ -108,6 +115,12 @@ jobs:
 
       - name: Install XcodeGen
         run: brew install xcodegen
+      - name: Resolve Version & Build Metadata
+        id: version
+        working-directory: app
+        env:
+          VERSION_OVERRIDE: ${{ github.event.inputs.version_override }}
+        run: ./scripts/resolve_version.sh
       - name: Generate Xcode Project
         working-directory: app
         run: xcodegen generate
@@ -163,6 +176,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
           APP_REVIEW_PHONE: ${{ secrets.APP_REVIEW_PHONE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bundle exec fastlane "$SOLSTICE_VERIFIED_LANE"
       - name: Remove temporary signing material
         if: always()

@@ -30,6 +30,19 @@ public struct CalendarHeatmapView: View {
         return displayedMonthStart > minMonthStart
     }
 
+    private var fastsSignature: Int {
+        var hasher = Hasher()
+        for fast in fasts {
+            hasher.combine(fast.objectID)
+            hasher.combine(fast.startDate)
+            hasher.combine(fast.endDate)
+            hasher.combine(fast.isCompleted)
+            hasher.combine(fast.targetDuration)
+            hasher.combine(fast.updatedAt)
+        }
+        return hasher.finalize()
+    }
+
     public var body: some View {
         VStack(spacing: 12) {
             monthHeader
@@ -37,6 +50,7 @@ public struct CalendarHeatmapView: View {
             daysGrid
             legendView
         }
+        .id(fastsSignature)
         .padding(14)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -131,6 +145,7 @@ public struct CalendarHeatmapView: View {
                 }
             }
         }
+        .id("\(currentMonthDate.timeIntervalSince1970)_\(fastsSignature)")
     }
 
     private func cellFillColor(status: DayFastStatus) -> Color {
