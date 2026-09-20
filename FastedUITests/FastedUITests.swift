@@ -52,22 +52,30 @@ final class FastedUITests: XCTestCase {
             XCTAssertTrue(statusHeader.waitForExistence(timeout: 2))
 
             endButton.tap()
-            let alert = app.alerts.firstMatch
-            if alert.waitForExistence(timeout: 2) {
-                alert.buttons["End Fast"].tap()
-            } else if app.buttons["End Fast"].exists {
-                app.buttons["End Fast"].firstMatch.tap()
-            }
-            XCTAssertTrue(startButton.waitForExistence(timeout: 4))
+            dismissEndFastConfirmationIfNeeded(in: app)
+            XCTAssertTrue(startButton.waitForExistence(timeout: 5))
         } else if endButton.waitForExistence(timeout: 3) {
             endButton.tap()
-            let alert = app.alerts.firstMatch
-            if alert.waitForExistence(timeout: 2) {
+            dismissEndFastConfirmationIfNeeded(in: app)
+            XCTAssertTrue(startButton.waitForExistence(timeout: 5))
+        }
+    }
+
+    private func dismissEndFastConfirmationIfNeeded(in app: XCUIApplication) {
+        let saveButton = app.buttons["Save Fast"]
+        let discardButton = app.buttons["Discard Fast"]
+        let alert = app.alerts.firstMatch
+
+        if saveButton.waitForExistence(timeout: 3) {
+            saveButton.tap()
+        } else if discardButton.waitForExistence(timeout: 2) {
+            discardButton.tap()
+        } else if alert.waitForExistence(timeout: 2) {
+            if alert.buttons["End Fast"].exists {
                 alert.buttons["End Fast"].tap()
-            } else if app.buttons["End Fast"].exists {
-                app.buttons["End Fast"].firstMatch.tap()
+            } else if alert.buttons.element(boundBy: 0).exists {
+                alert.buttons.element(boundBy: 0).tap()
             }
-            XCTAssertTrue(startButton.waitForExistence(timeout: 4))
         }
     }
 
