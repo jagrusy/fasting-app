@@ -195,8 +195,15 @@ public struct SettingsView: View {
             HStack {
                 Text("Version")
                 Spacer()
-                Text(appVersion)
+                Text(displayVersion)
                     .foregroundStyle(.secondary)
+            }
+            .contextMenu {
+                Button {
+                    UIPasteboard.general.string = displayVersion
+                } label: {
+                    Label("Copy Version", systemImage: "doc.on.doc")
+                }
             }
 
             HStack {
@@ -215,7 +222,15 @@ public struct SettingsView: View {
     }
 
     private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1"
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? BuildMetadata.marketingVersion
+    }
+
+    private var buildNumber: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+    }
+
+    private var displayVersion: String {
+        "\(appVersion) (\(buildNumber))"
     }
 
     private func loadSettings() {

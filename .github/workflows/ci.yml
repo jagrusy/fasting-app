@@ -44,6 +44,10 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Resolve Version & Build Metadata
+        id: version
+        run: ./scripts/resolve_version.sh
+
       - name: Generate Xcode Project
         run: xcodegen generate
 

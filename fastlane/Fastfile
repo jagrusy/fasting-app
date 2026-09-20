@@ -95,19 +95,34 @@ def fetch_appstore_profiles(api_key)
 end
 
 # Build settings for a manually-signed App Store archive of all four bundles.
-def manual_signing_xcargs(uuids, team_id, build_number)
+def manual_signing_xcargs(uuids, team_id, build_number, marketing_version = nil)
   per_target = SIGNED_BUNDLE_IDS.map do |setting, bundle_id|
     "#{setting}=#{uuids.fetch(bundle_id)}"
   end
 
-  [
+  args = [
     "CODE_SIGN_STYLE=Manual",
     "CODE_SIGN_IDENTITY=\"Apple Distribution\"",
     "DEVELOPMENT_TEAM=#{team_id}",
     # Every bundle reads this for CFBundleVersion; App Store validation rejects an upload whose
     # extension versions don't match the app's.
     "CURRENT_PROJECT_VERSION=#{build_number}"
-  ].concat(per_target).join(" ")
+  ]
+  args << "MARKETING_VERSION=#{marketing_version}" if marketing_version && !marketing_version.empty?
+  args.concat(per_target).join(" ")
+end
+
+def resolve_marketing_version
+  output = sh("../scripts/resolve_version.sh").strip
+  version_line = output.lines.find { |line| line.start_with?("MARKETING_VERSION=") }
+  version_line ? version_line.split("=").last.strip : "1.1.0"
+end
+
+def tag_build_in_git(build_number, marketing_version)
+  tag_name = "build/#{build_number}"
+  UI.message("Tagging commit with #{tag_name}...")
+  system("git tag -a '#{tag_name}' -m 'Build #{build_number} (v#{marketing_version})' 2>/dev/null || true")
+  system("git push origin '#{tag_name}' 2>/dev/null || true")
 end
 
 # Answers the questions App Review asks of every new app up front, in the Notes field.
@@ -259,14 +274,15 @@ platform :ios do
       app_identifier: "com.grusy.SolsticeFast",
       initial_build_number: 0
     ) + 1
-    UI.message("Building as build number #{build_number}")
+    marketing_version = resolve_marketing_version
+    UI.message("Building as version #{marketing_version}, build number #{build_number}")
 
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: manual_signing_xcargs(profile_uuids, team_id, build_number),
+      xcargs: manual_signing_xcargs(profile_uuids, team_id, build_number, marketing_version),
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: profile_uuids
@@ -277,6 +293,8 @@ platform :ios do
       api_key: api_key,
       skip_waiting_for_build_processing: true
     )
+
+    tag_build_in_git(build_number, marketing_version)
   end
 
   desc "Build and upload to TestFlight using your local Xcode signing (no CI secrets needed)"
@@ -335,14 +353,15 @@ platform :ios do
       app_identifier: "com.grusy.SolsticeFast",
       initial_build_number: 0
     ) + 1
-    UI.message("Building as build number #{build_number}")
+    marketing_version = resolve_marketing_version
+    UI.message("Building as version #{marketing_version}, build number #{build_number}")
 
     build_app(
       project: "Fasted.xcodeproj",
       scheme: "Fasted",
       clean: true,
       export_method: "app-store",
-      xcargs: manual_signing_xcargs(profile_uuids, team_id, build_number),
+      xcargs: manual_signing_xcargs(profile_uuids, team_id, build_number, marketing_version),
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: profile_uuids
@@ -384,5 +403,7 @@ platform :ios do
         # No demo_user/demo_password: nothing to log into (no accounts in the app at all).
       }
     )
+
+    tag_build_in_git(build_number, marketing_version)
   end
 end
