@@ -7,12 +7,12 @@ final class AppStoreScreenshotTests: XCTestCase {
     }
 
     func testCaptureAppStoreScreenshots() throws {
-        // Part 1: Fast at 80% progress in Dark Mode
+        // Part 1: Fast at 80% progress in Light Mode
         let app80 = XCUIApplication()
-        app80.launchArguments = ["-forceDarkMode", "-seedScreenshots80"]
+        app80.launchArguments = ["-forceLightMode", "-seedScreenshots80"]
         app80.launch()
 
-        // 1. Fast Timer Hero (80% Progress with Solar Gold Glow)
+        // 1. Fast Timer Hero (80% Progress in Light Mode)
         let fastTab = app80.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
         fastTab.tap()
@@ -50,12 +50,9 @@ final class AppStoreScreenshotTests: XCTestCase {
             app80.navigationBars.buttons.element(boundBy: 0).tap()
         }
 
-        // 5. Settings Screen
-        saveScreenshot(name: "06_Settings_DarkMode", in: app80)
-
-        // Part 2: Fast at 100%+ Goal Reached in Dark Mode
+        // Part 2: Fast at 100%+ Goal Reached in Light Mode
         let app100 = XCUIApplication()
-        app100.launchArguments = ["-forceDarkMode", "-seedScreenshots100"]
+        app100.launchArguments = ["-forceLightMode", "-seedScreenshots100"]
         app100.launch()
 
         let fastTab100 = app100.tabBars.buttons["Fast"]
@@ -63,6 +60,17 @@ final class AppStoreScreenshotTests: XCTestCase {
         fastTab100.tap()
 
         saveScreenshot(name: "02_FastTimer_GoalReached_Glow", in: app100)
+
+        // Part 3: Dark Mode Hero - Showcases that the app supports dark mode
+        let appDark = XCUIApplication()
+        appDark.launchArguments = ["-forceDarkMode", "-seedScreenshots80"]
+        appDark.launch()
+
+        let fastTabDark = appDark.tabBars.buttons["Fast"]
+        XCTAssertTrue(fastTabDark.waitForExistence(timeout: 5))
+        fastTabDark.tap()
+
+        saveScreenshot(name: "06_FastTimer_DarkMode", in: appDark)
     }
 
     private func saveScreenshot(name: String, in app: XCUIApplication) {

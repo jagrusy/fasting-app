@@ -1,0 +1,5 @@
+Welcome to Solstice 1.1! In this release:
+• Apple Watch Companion App: Start, view, and end your fasts directly from your wrist.
+• Home Screen & Lock Screen Widgets: Track your fasting progress and current metabolic stage at a glance.
+• Automatic System Appearance: Seamlessly matches your device's Light or Dark mode setting.
+• Performance improvements and refined animations.

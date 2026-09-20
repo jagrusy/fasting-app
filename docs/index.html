@@ -3,20 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solstice — Intermittent Fasting Tracker & Circadian Rhythm</title>
-  <meta name="description" content="A private, battery-efficient intermittent fasting tracker with 5 metabolic stages, custom protocols, and zero subscriptions.">
+  <title>Solstice — Native, Private Intermittent Fasting for iPhone & Apple Watch</title>
+  <meta name="description" content="A 100% free, private intermittent fasting tracker for iOS 18+ and Apple Watch. StandBy nightstand mode, 5 metabolic stages, widgets, and zero subscriptions.">
+  <meta name="keywords" content="intermittent fasting, fasting tracker, fasting app, autophagy, 16:8 timer, zero alternative, iOS 18 standby, apple watch complication, private fasting">
   <link rel="icon" type="image/png" href="assets/icon.png">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Solstice — The Anti-Subscription Fasting Tracker">
+  <meta property="og:description" content="Track fasts with zero subscriptions, 100% on-device privacy, 5 metabolic stages, and ambient StandBy & Watch support.">
+  <meta property="og:image" content="assets/icon.png">
+  <meta property="og:url" content="https://jagrusy.github.io/fasting-app/">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Solstice — Zero Paywalls, Pure Fasting Utility">
+  <meta name="twitter:description" content="100% free, on-device intermittent fasting tracker with iOS 18 StandBy nightstand mode and Apple Watch complications.">
+  <meta name="twitter:image" content="assets/icon.png">
+
+  <!-- Structured Data (Schema.org) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Solstice Fasting Tracker",
+    "operatingSystem": "iOS 18.0+, watchOS 11.0+",
+    "applicationCategory": "HealthApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "A minimal, privacy-first intermittent fasting tracker for iOS and watchOS featuring StandBy mode, Apple Watch complications, and metabolic stage tracking."
+  }
+  </script>
+
   <style>
     :root {
-      --bg: #0B0F19;
-      --card-bg: #131B2E;
-      --card-border: #1E293B;
+      --bg: #070B14;
+      --card-bg: rgba(19, 27, 46, 0.7);
+      --card-bg-solid: #111827;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-glow: rgba(245, 158, 11, 0.25);
       --text: #F8FAFC;
       --text-muted: #94A3B8;
+      --text-dim: #64748B;
       --solar-gold: #F59E0B;
       --solar-amber: #D97706;
       --solar-flame: #EF4444;
       --emerald: #10B981;
+      --cyan: #38BDF8;
+      --purple: #A855F7;
     }
 
     * {
@@ -26,17 +63,50 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       background-color: var(--bg);
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(245, 158, 11, 0.15), transparent),
+        radial-gradient(circle 600px at 90% 20%, rgba(239, 68, 68, 0.06), transparent),
+        radial-gradient(circle 600px at 10% 60%, rgba(56, 189, 248, 0.05), transparent);
       color: var(--text);
       line-height: 1.6;
       overflow-x: hidden;
+      min-height: 100vh;
     }
 
+    /* Ambient Glow Accents */
+    .glow-bg {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.03) 50%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Navigation */
     nav {
-      max-width: 1100px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .nav-container {
+      max-width: 1140px;
       margin: 0 auto;
-      padding: 24px 20px;
+      padding: 16px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -54,15 +124,16 @@
     }
 
     .brand img {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 9px;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
     }
 
     .nav-links {
       display: flex;
-      gap: 24px;
+      gap: 28px;
+      align-items: center;
     }
 
     .nav-links a {
@@ -77,91 +148,178 @@
       color: var(--text);
     }
 
-    .hero {
-      max-width: 1100px;
-      margin: 40px auto 80px;
-      padding: 0 20px;
-      text-align: center;
+    .nav-btn-sm {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: var(--solar-gold) !important;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-weight: 600 !important;
+      transition: all 0.2s !important;
     }
 
-    .badge {
-      display: inline-block;
-      padding: 6px 14px;
-      background: rgba(245, 158, 11, 0.12);
+    .nav-btn-sm:hover {
+      background: rgba(245, 158, 11, 0.25);
+      transform: translateY(-1px);
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      max-width: 1080px;
+      margin: 60px auto 60px;
+      padding: 0 24px;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      background: rgba(245, 158, 11, 0.1);
       border: 1px solid rgba(245, 158, 11, 0.3);
       color: var(--solar-gold);
       border-radius: 999px;
       font-size: 0.85rem;
       font-weight: 600;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      margin-bottom: 24px;
+      letter-spacing: 0.2px;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
     }
 
     h1 {
-      font-size: 3.2rem;
+      font-size: 3.6rem;
       font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -1px;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, #FFFFFF 40%, #FBBF24 100%);
+      line-height: 1.12;
+      letter-spacing: -1.5px;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #FFFFFF 30%, #FBBF24 85%, #F59E0B 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .hero p {
-      font-size: 1.25rem;
+    .hero-p {
+      font-size: 1.3rem;
       color: var(--text-muted);
-      max-width: 680px;
-      margin: 0 auto 36px;
+      max-width: 760px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
     }
 
-    .btn-download {
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .btn-primary {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      background: linear-gradient(135deg, var(--solar-gold), var(--solar-amber));
-      color: #0B0F19;
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: #070B14;
       font-weight: 700;
       font-size: 1.1rem;
-      padding: 16px 32px;
+      padding: 16px 34px;
       border-radius: 14px;
       text-decoration: none;
-      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 28px rgba(245, 158, 11, 0.4);
+      transition: all 0.2s ease;
     }
 
-    .btn-download:hover {
+    .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.5);
+      box-shadow: 0 14px 36px rgba(245, 158, 11, 0.55);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 1.05rem;
+      padding: 15px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Trust Highlights */
+    .trust-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding-top: 10px;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trust-item span.icon {
+      color: var(--emerald);
+    }
+
+    /* Screenshots Showcase */
+    .screenshots-container {
+      max-width: 1240px;
+      margin: 40px auto 80px;
+      padding: 0 20px;
     }
 
     .screenshots-row {
       display: flex;
-      justify-content: center;
-      gap: 20px;
+      justify-content: flex-start;
+      gap: 22px;
       overflow-x: auto;
-      padding: 40px 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      scrollbar-width: none;
+      padding: 24px 12px 36px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(245, 158, 11, 0.3) transparent;
     }
 
     .screenshots-row::-webkit-scrollbar {
-      display: none;
+      height: 6px;
+    }
+
+    .screenshots-row::-webkit-scrollbar-thumb {
+      background: rgba(245, 158, 11, 0.3);
+      border-radius: 999px;
     }
 
     .screenshot-card {
-      flex: 0 0 260px;
-      border-radius: 24px;
+      flex: 0 0 270px;
+      border-radius: 28px;
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      border: 1px solid var(--card-border);
-      transition: transform 0.3s;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65), 0 0 1px 1px var(--card-border);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+      background: #000;
     }
 
     .screenshot-card:hover {
-      transform: translateY(-6px);
+      transform: translateY(-8px);
+      box-shadow: 0 28px 55px rgba(0, 0, 0, 0.8), 0 0 25px rgba(245, 158, 11, 0.2);
     }
 
     .screenshot-card img {
@@ -170,281 +328,1076 @@
       display: block;
     }
 
+    /* Section Structure */
     .section {
       max-width: 1100px;
-      margin: 80px auto;
-      padding: 0 20px;
+      margin: 100px auto;
+      padding: 0 24px;
+      position: relative;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-tag {
+      color: var(--solar-gold);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      display: block;
     }
 
     .section-title {
-      text-align: center;
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-bottom: 12px;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      margin-bottom: 16px;
     }
 
     .section-subtitle {
-      text-align: center;
       color: var(--text-muted);
-      font-size: 1.1rem;
-      margin-bottom: 48px;
+      font-size: 1.15rem;
+      max-width: 680px;
+      margin: 0 auto;
     }
 
-    .grid {
+    /* Apple Companion Surfaces Showcase */
+    .surfaces-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 24px;
     }
 
-    .card {
+    .surface-card {
       background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 30px;
+      border-radius: 20px;
+      padding: 32px 24px;
+      transition: transform 0.25s, border-color 0.25s;
     }
 
-    .card-icon {
-      font-size: 2rem;
-      margin-bottom: 16px;
-      display: inline-block;
+    .surface-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--card-border-glow);
     }
 
-    .card h3 {
+    .surface-icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(245, 158, 11, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      margin-bottom: 20px;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .surface-card h3 {
       font-size: 1.25rem;
       margin-bottom: 10px;
+      font-weight: 700;
     }
 
-    .card p {
+    .surface-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Interactive Metabolic Simulator */
+    .simulator-container {
+      background: linear-gradient(180deg, rgba(19, 27, 46, 0.85) 0%, rgba(11, 15, 25, 0.95) 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 44px 36px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .simulator-container::before {
+      content: '';
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.15), transparent 70%);
+      pointer-events: none;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .hour-display {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--solar-gold);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hour-label {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .stage-pills-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .stage-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .stage-pill:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+
+    .stage-pill.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--solar-gold);
+      color: var(--solar-gold);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+    }
+
+    /* Range Input Slider */
+    .slider-wrapper {
+      margin-bottom: 36px;
+    }
+
+    input[type="range"].metabolic-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;
+      background: #1E293B;
+      outline: none;
+      transition: background 0.2s;
+    }
+
+    input[type="range"].metabolic-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--solar-gold);
+      cursor: pointer;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.8), 0 0 0 4px #0B0F19;
+      transition: transform 0.15s;
+    }
+
+    input[type="range"].metabolic-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* Active Stage Details Card */
+    .active-stage-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 24px;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .stage-large-icon {
+      font-size: 3.5rem;
+      line-height: 1;
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--card-border);
+    }
+
+    .stage-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stage-timing-badge {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--solar-gold);
+    }
+
+    .stage-info p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* Comparison Table */
+    .comparison-table-wrap {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+    }
+
+    table.comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    table.comparison-table th, table.comparison-table td {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    table.comparison-table th {
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    table.comparison-table th.highlight, table.comparison-table td.highlight {
+      background: rgba(245, 158, 11, 0.06);
+      border-left: 1px solid rgba(245, 158, 11, 0.2);
+      border-right: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    table.comparison-table th.highlight {
+      color: var(--solar-gold);
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .check-icon {
+      color: var(--emerald);
+      font-weight: 800;
+      margin-right: 6px;
+    }
+
+    .cross-icon {
+      color: var(--solar-flame);
+      font-weight: 800;
+      margin-right: 6px;
+    }
+
+    /* Upcoming AI Section */
+    .ai-preview-section {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 28px;
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #C084FC;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .ai-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      margin-top: 36px;
+    }
+
+    .ai-features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .ai-feature-item {
+      display: flex;
+      gap: 16px;
+    }
+
+    .ai-feature-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    .ai-feature-item h4 {
+      font-size: 1.15rem;
+      margin-bottom: 4px;
+      color: #FFFFFF;
+    }
+
+    .ai-feature-item p {
       color: var(--text-muted);
       font-size: 0.95rem;
     }
 
-    .stages-list {
+    /* Waitlist Form Card */
+    .waitlist-card {
+      background: var(--card-bg-solid);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 22px;
+      padding: 36px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+
+    .waitlist-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
+
+    .waitlist-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .form-group input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #FFFFFF;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--solar-gold);
+    }
+
+    .btn-waitlist {
+      background: linear-gradient(135deg, var(--solar-gold), var(--solar-amber));
+      border: none;
+      color: #070B14;
+      font-weight: 700;
+      padding: 14px 22px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      white-space: nowrap;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-waitlist:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    }
+
+    .waitlist-success {
+      display: none;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34D399;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    /* FAQ Accordion */
+    .faq-list {
+      max-width: 800px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      max-width: 720px;
-      margin: 0 auto;
+      gap: 14px;
     }
 
-    .stage-item {
+    .faq-item {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 14px;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .faq-item:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .faq-question {
+      width: 100%;
       padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
-
-    .stage-badge {
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      background: rgba(255, 255, 255, 0.08);
-      white-space: nowrap;
-    }
-
-    .support-box {
-      background: linear-gradient(180deg, var(--card-bg), #0E1626);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 48px 30px;
-      text-align: center;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .btn-support {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--card-border);
-      color: var(--text);
+      background: transparent;
+      border: none;
+      text-align: left;
+      font-size: 1.1rem;
       font-weight: 600;
-      padding: 12px 24px;
-      border-radius: 10px;
-      text-decoration: none;
-      margin: 8px;
-      transition: background 0.2s;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
     }
 
-    .btn-support:hover {
-      background: rgba(255, 255, 255, 0.15);
+    .faq-chevron {
+      color: var(--solar-gold);
+      font-size: 1.2rem;
+      transition: transform 0.25s ease;
     }
 
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 24px;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      line-height: 1.7;
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 250px;
+      padding: 0 24px 20px;
+    }
+
+    .faq-item.active .faq-chevron {
+      transform: rotate(180deg);
+    }
+
+    /* Final CTA Box */
+    .final-cta {
+      text-align: center;
+      background: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.15), transparent 70%), var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 64px 30px;
+      max-width: 900px;
+      margin: 100px auto;
+    }
+
+    .final-cta h2 {
+      font-size: 2.4rem;
+      margin-bottom: 16px;
+    }
+
+    .final-cta p {
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 36px;
+      font-size: 1.1rem;
+    }
+
+    /* Footer */
     footer {
       border-top: 1px solid var(--card-border);
-      padding: 40px 20px;
+      padding: 50px 24px 40px;
       text-align: center;
-      color: var(--text-muted);
+      color: var(--text-dim);
       font-size: 0.9rem;
     }
 
-    footer a {
-      color: var(--solar-gold);
-      text-decoration: none;
-      margin: 0 10px;
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    @media (max-width: 768px) {
-      h1 { font-size: 2.3rem; }
-      .hero p { font-size: 1.05rem; }
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--solar-gold);
+    }
+
+    .disclaimer {
+      font-size: 0.8rem;
+      max-width: 650px;
+      margin: 20px auto 0;
+      line-height: 1.5;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 860px) {
+      h1 { font-size: 2.6rem; }
+      .hero-p { font-size: 1.15rem; }
+      .ai-grid { grid-template-columns: 1fr; }
+      .active-stage-card { grid-template-columns: 1fr; text-align: center; }
+      .stage-large-icon { margin: 0 auto; }
+      .stage-info h3 { justify-content: center; }
+      .nav-links a:not(.nav-btn-sm) { display: none; }
+    }
+
+    @media (max-width: 540px) {
+      h1 { font-size: 2.1rem; }
+      .form-group { flex-direction: column; }
+      .trust-bar { flex-direction: column; gap: 12px; }
+      .simulator-container { padding: 28px 18px; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
     }
   </style>
 </head>
 <body>
 
+  <div class="glow-bg"></div>
+
+  <!-- Navigation -->
   <nav>
-    <a href="#" class="brand">
-      <img src="assets/icon.png" alt="Solstice Icon">
-      <span>Solstice</span>
-    </a>
-    <div class="nav-links">
-      <a href="#features">Features</a>
-      <a href="#stages">Stages</a>
-      <a href="support.html">Support</a>
-      <a href="privacy.html">Privacy</a>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <img src="assets/icon.png" alt="Solstice Icon">
+        <span>Solstice</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Surfaces</a>
+        <a href="#science">Metabolic Science</a>
+        <a href="#compare">Why Solstice</a>
+        <a href="#ai-preview">AI Meal Tracker</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://apps.apple.com" class="nav-btn-sm">Download Free</a>
+      </div>
     </div>
   </nav>
 
+  <!-- Hero Section -->
   <header class="hero">
-    <div class="badge">☀️ 100% Free & Private</div>
-    <h1>Circadian Fasting &<br>Metabolic Rhythm</h1>
-    <p>Track your intermittent fasts with elegance, biological precision, and zero clutter. Understand what happens in your body at every hour.</p>
-    <a href="https://apps.apple.com" class="btn-download">
-      <span>📲 Download on the App Store</span>
-    </a>
+    <div class="pill-badge">
+      <span>☀️</span>
+      <span>100% Free Forever • Zero Subscriptions • On-Device Privacy</span>
+    </div>
+
+    <h1>Intermittent Fasting,<br>Perfected for Apple Devices.</h1>
+
+    <p class="hero-p">
+      Stop paying $80/year for a timer. Solstice tracks your fast with zero paywalls, 5 biological metabolic stages, and ambient displays on your Nightstand, Lock Screen, and Apple Watch.
+    </p>
+
+    <div class="hero-actions">
+      <a href="https://apps.apple.com" class="btn-primary">
+        <span>📲 Download on the App Store</span>
+      </a>
+      <a href="#ai-preview" class="btn-secondary">
+        <span>✨ Solstice AI Pro Waitlist</span>
+      </a>
+    </div>
+
+    <div class="trust-bar">
+      <div class="trust-item">
+        <span class="icon">✓</span>
+        <span>No Account or Sign-in Required</span>
+      </div>
+      <div class="trust-item">
+        <span class="icon">✓</span>
+        <span>100% Local Core Data Privacy</span>
+      </div>
+      <div class="trust-item">
+        <span class="icon">✓</span>
+        <span>Zero Advertisements or Telemetry</span>
+      </div>
+      <div class="trust-item">
+        <span class="icon">✓</span>
+        <span>Native SwiftUI · Zero Battery Drain</span>
+      </div>
+    </div>
   </header>
 
-  <section class="screenshots-row">
-    <div class="screenshot-card">
-      <img src="assets/screenshots/01_FastTimer_80Percent_Hero.png" alt="Solstice Fasting Timer">
-    </div>
-    <div class="screenshot-card">
-      <img src="assets/screenshots/02_FastTimer_GoalReached_Glow.png" alt="Goal Reached Glow">
-    </div>
-    <div class="screenshot-card">
-      <img src="assets/screenshots/03_MetabolicStages_Autophagy.png" alt="Metabolic Fasting Stages">
-    </div>
-    <div class="screenshot-card">
-      <img src="assets/screenshots/04_History_Calendar_Heatmap.png" alt="Calendar Streak Heatmap">
-    </div>
-    <div class="screenshot-card">
-      <img src="assets/screenshots/05_ProtocolPicker_CustomDial.png" alt="24 Hour Protocol Dial">
+  <!-- Live Screenshots Carousel -->
+  <section class="screenshots-container">
+    <div class="screenshots-row">
+      <div class="screenshot-card">
+        <img src="assets/screenshots/01_FastTimer_80Percent_Hero.png" alt="Solstice Fasting Timer Dial">
+      </div>
+      <div class="screenshot-card">
+        <img src="assets/screenshots/02_FastTimer_GoalReached_Glow.png" alt="Goal Reached Glow State">
+      </div>
+      <div class="screenshot-card">
+        <img src="assets/screenshots/03_MetabolicStages_Autophagy.png" alt="5 Metabolic Stages Autophagy">
+      </div>
+      <div class="screenshot-card">
+        <img src="assets/screenshots/04_History_Calendar_Heatmap.png" alt="Calendar Streak Heatmap">
+      </div>
+      <div class="screenshot-card">
+        <img src="assets/screenshots/05_ProtocolPicker_CustomDial.png" alt="24-Hour Custom Protocol Dial">
+      </div>
+      <div class="screenshot-card">
+        <img src="assets/screenshots/06_FastTimer_DarkMode.png" alt="Midnight OLED Dark Mode">
+      </div>
     </div>
   </section>
 
+  <!-- Ambient Companion Surfaces (iOS 18 + Watch) -->
   <section id="features" class="section">
-    <h2 class="section-title">Built for Mindfulness & Discipline</h2>
-    <p class="section-subtitle">Everything you need to master your fasting window, and nothing you don't.</p>
+    <div class="section-header">
+      <span class="section-tag">Zero Launch Friction</span>
+      <h2 class="section-title">Designed to Live on All Your Surfaces</h2>
+      <p class="section-subtitle">You shouldn't have to unlock your phone and launch a heavy app just to know if you're burning fat. Solstice lives quietly in your peripheral vision.</p>
+    </div>
 
-    <div class="grid">
-      <div class="card">
-        <div class="card-icon">☀️</div>
-        <h3>5 Metabolic Stages</h3>
-        <p>Real-time biological timeline tracking when your body reaches Blood Sugar Reset, Glycogen Depletion, Fat Burning, Autophagy, and Deep Ketosis.</p>
+    <div class="surfaces-grid">
+      <div class="surface-card">
+        <div class="surface-icon-wrap">🌙</div>
+        <h3>StandBy Nightstand Mode</h3>
+        <p>Snap your iPhone horizontally on MagSafe while sleeping. Solstice displays your current metabolic stage and time to goal in luminous OLED amber tones all night long.</p>
       </div>
 
-      <div class="card">
-        <div class="card-icon">🔒</div>
-        <h3>100% On-Device & Private</h3>
-        <p>No accounts, no sign-in, and zero analytics tracking. Your health and fasting records stay strictly on your device.</p>
+      <div class="surface-card">
+        <div class="surface-icon-wrap">⌚</div>
+        <h3>Apple Watch Complications</h3>
+        <p>Start or stop your fast right from your wrist. View circular and rectangular progress complications across your favorite watch faces with seamless background syncing.</p>
       </div>
 
-      <div class="card">
-        <div class="card-icon">⏱️</div>
-        <h3>Adaptive Dial Wheel</h3>
-        <p>Choose standard presets (16:8, 18:6, 20:4, OMAD) or adjust your target with an interactive 24-hour dial.</p>
+      <div class="surface-card">
+        <div class="surface-icon-wrap">🔘</div>
+        <h3>Control Center & Action Button</h3>
+        <p>One-tap toggle directly in iOS 18 Control Center, Lock Screen quick-action slots, or mapped to the iPhone 15/16 Action Button for zero-friction fast logging.</p>
       </div>
 
-      <div class="card">
-        <div class="card-icon">📊</div>
-        <h3>Streak & Calendar Heatmap</h3>
-        <p>Glanceable monthly heatmap to celebrate consecutive daily milestones and build permanent wellness habits.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-icon">🌙</div>
-        <h3>OLED Dark Theme</h3>
-        <p>Engineered with deep midnight tones and radiant solar gradients that feel effortless to check morning and night.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-icon">🚫</div>
-        <h3>No Paywalls or Subscriptions</h3>
-        <p>Enjoy a clean, undisturbed fasting experience without popup advertisements or locked feature walls.</p>
+      <div class="surface-card">
+        <div class="surface-icon-wrap">📱</div>
+        <h3>Interactive Lock & Home Widgets</h3>
+        <p>Glanceable metabolic countdowns powered by native WidgetKit timelines. Zero continuous battery drain, no servers, and no background location tracking.</p>
       </div>
     </div>
   </section>
 
-  <section id="stages" class="section">
-    <h2 class="section-title">The Science of Your Fast</h2>
-    <p class="section-subtitle">Solstice calculates your body's biological transitions in real time.</p>
+  <!-- Interactive Metabolic Simulator -->
+  <section id="science" class="section">
+    <div class="section-header">
+      <span class="section-tag">Biological Timeline</span>
+      <h2 class="section-title">Interactive Metabolic Stage Simulator</h2>
+      <p class="section-subtitle">Drag the slider or click a milestone to explore what happens inside your cells as fasting hours progress.</p>
+    </div>
 
-    <div class="stages-list">
-      <div class="stage-item">
-        <span class="stage-badge" style="color: #38BDF8;">0 – 4 Hours</span>
+    <div class="simulator-container">
+      <div class="slider-header">
         <div>
-          <h4>🩸 Blood Sugar Reset</h4>
-          <p style="color: var(--text-muted); font-size: 0.9rem;">Insulin levels fall, digestion completes, and blood glucose stabilizes.</p>
+          <div class="hour-display" id="hourDisplay">18 Hours</div>
+          <div class="hour-label">Fasting Duration Milestone</div>
+        </div>
+        <div class="stage-pills-row" id="stagePills">
+          <button class="stage-pill" data-hours="4">4h</button>
+          <button class="stage-pill" data-hours="12">12h</button>
+          <button class="stage-pill" data-hours="16">16h</button>
+          <button class="stage-pill active" data-hours="18">18h</button>
+          <button class="stage-pill" data-hours="24">24h</button>
+          <button class="stage-pill" data-hours="36">36h+</button>
         </div>
       </div>
 
-      <div class="stage-item">
-        <span class="stage-badge" style="color: #FBBF24;">4 – 12 Hours</span>
-        <div>
-          <h4>⚡️ Glycogen Depletion</h4>
-          <p style="color: var(--text-muted); font-size: 0.9rem;">Liver stores are consumed as energy sources shift toward fat stores.</p>
-        </div>
+      <div class="slider-wrapper">
+        <input type="range" min="0" max="36" step="1" value="18" class="metabolic-slider" id="metabolicSlider" aria-label="Fasting Hours Slider">
       </div>
 
-      <div class="stage-item">
-        <span class="stage-badge" style="color: #F97316;">12 – 18 Hours</span>
-        <div>
-          <h4>🔥 Fat Burning & Ketosis</h4>
-          <p style="color: var(--text-muted); font-size: 0.9rem;">Fatty acids are broken down into ketones for clean mental and physical fuel.</p>
-        </div>
-      </div>
-
-      <div class="stage-item">
-        <span class="stage-badge" style="color: #10B981;">18 – 24 Hours</span>
-        <div>
-          <h4>🧬 Autophagy & Renewal</h4>
-          <p style="color: var(--text-muted); font-size: 0.9rem;">Cellular cleanup initiates, recycling damaged proteins and organelles.</p>
-        </div>
-      </div>
-
-      <div class="stage-item">
-        <span class="stage-badge" style="color: #A855F7;">24+ Hours</span>
-        <div>
-          <h4>🧠 Deep Ketosis & HGH</h4>
-          <p style="color: var(--text-muted); font-size: 0.9rem;">Growth hormone surges and systemic inflammation markers drop.</p>
+      <div class="active-stage-card" id="stageCard">
+        <div class="stage-large-icon" id="stageIcon">🧬</div>
+        <div class="stage-info">
+          <h3 id="stageTitle">
+            Autophagy & Cellular Renewal
+            <span class="stage-timing-badge" id="stageBadge">18 – 24 Hours</span>
+          </h3>
+          <p id="stageDescription">
+            Your cells initiate an intracellular cleaning process called autophagy. Damaged mitochondria, misfolded proteins, and senescent cells are broken down and recycled into fresh cellular energy.
+          </p>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="support" class="section">
-    <div class="support-box">
-      <h2 style="margin-bottom: 12px;">Need Help or Have an Idea?</h2>
-      <p style="color: var(--text-muted); margin-bottom: 24px;">We build Solstice for the community. Let us know how we can make your fasting journey even better.</p>
-      <div>
-        <a href="mailto:jagrusy+solstice@gmail.com?subject=[Solstice%20Feature%20Request]" class="btn-support">💡 Suggest a Feature</a>
-        <a href="mailto:jagrusy+solstice@gmail.com?subject=[Solstice%20Bug%20Report]" class="btn-support">🐛 Report a Bug</a>
-        <a href="support.html" class="btn-support">📖 FAQ & Help Center</a>
+  <!-- Solstice vs The $80 Fasting Apps -->
+  <section id="compare" class="section">
+    <div class="section-header">
+      <span class="section-tag">Transparent Utility</span>
+      <h2 class="section-title">The Anti-Subscription Difference</h2>
+      <p class="section-subtitle">Why thousands of fasters are ditching bloated subscription apps in favor of Solstice.</p>
+    </div>
+
+    <div class="comparison-table-wrap">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th class="highlight">☀️ Solstice</th>
+            <th>Zero / Simple / Fastic</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Subscription Price</strong></td>
+            <td class="highlight"><strong style="color: var(--emerald);">$0 (Free Forever Core)</strong></td>
+            <td><span class="cross-icon">✗</span> $69.99 – $99.99 / year</td>
+          </tr>
+          <tr>
+            <td><strong>User Privacy & Accounts</strong></td>
+            <td class="highlight"><span class="check-icon">✓</span> 100% On-Device, No Account</td>
+            <td><span class="cross-icon">✗</span> Data sold to ad brokers</td>
+          </tr>
+          <tr>
+            <td><strong>5 Metabolic Stages</strong></td>
+            <td class="highlight"><span class="check-icon">✓</span> 100% Unlocked for Everyone</td>
+            <td><span class="cross-icon">✗</span> Paywalled behind Pro tier</td>
+          </tr>
+          <tr>
+            <td><strong>Onboarding Experience</strong></td>
+            <td class="highlight"><span class="check-icon">✓</span> Instant Launch (Tap & Fast)</td>
+            <td><span class="cross-icon">✗</span> 15-minute quiz & paywall traps</td>
+          </tr>
+          <tr>
+            <td><strong>iOS 18 StandBy Nightstand</strong></td>
+            <td class="highlight"><span class="check-icon">✓</span> Native Overnight Display</td>
+            <td><span class="cross-icon">✗</span> Not supported</td>
+          </tr>
+          <tr>
+            <td><strong>Apple Watch Complications</strong></td>
+            <td class="highlight"><span class="check-icon">✓</span> Standalone Watch App included</td>
+            <td><span class="cross-icon">✗</span> Requires premium subscription</td>
+          </tr>
+          <tr>
+            <td><strong>Battery Impact</strong></td>
+            <td class="highlight"><span class="check-icon">✓</span> Native Swift (Negligible)</td>
+            <td><span class="cross-icon">✗</span> Heavy WebView battery drain</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Upcoming Premium Teaser: Solstice AI Pro -->
+  <section id="ai-preview" class="section">
+    <div class="ai-preview-section">
+      <div class="ai-badge">✨ COMING SOON: SOLSTICE AI PRO</div>
+      <h2 class="section-title" style="text-align: left; margin-bottom: 12px;">Mastering The Feeding Window</h2>
+      <p style="color: var(--text-muted); font-size: 1.15rem; max-width: 650px;">
+        Fasting is only half the equation. How you break your fast determines your energy, digestion, and long-term metabolism. Meet your intelligent break-fast companion.
+      </p>
+
+      <div class="ai-grid">
+        <div class="ai-features-list">
+          <div class="ai-feature-item">
+            <div class="ai-feature-icon">📸</div>
+            <div>
+              <h4>Photo-to-Macros Meal Scanner</h4>
+              <p>Snap a photo of your break-fast plate. Multimodal AI instantly breaks down protein, healthy fats, and net carbs without tedious manual logging.</p>
+            </div>
+          </div>
+
+          <div class="ai-feature-item">
+            <div class="ai-feature-icon">🛡️</div>
+            <div>
+              <h4>Break-Fast Gentle Score</h4>
+              <p>Avoid post-fast insulin spikes, brain fog, and digestive cramps with personalized meal safety ratings based on your fasting duration.</p>
+            </div>
+          </div>
+
+          <div class="ai-feature-item">
+            <div class="ai-feature-icon">📓</div>
+            <div>
+              <h4>Smart Fasting Journal</h4>
+              <p>Correlates what you eat during your feeding window with how effortless your next fasting cycle feels.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="waitlist-card">
+          <div style="font-size: 2.2rem; margin-bottom: 10px;">🥑 ⚡️ 🧬</div>
+          <h3>Join the VIP Beta Waitlist</h3>
+          <p>Be the first to test Solstice AI meal tracking with exclusive lifetime founder pricing. Core fasting stays free forever.</p>
+
+          <form id="waitlistForm">
+            <div class="form-group">
+              <input type="email" id="waitlistEmail" placeholder="Enter your email address..." required aria-label="Email address">
+              <button type="submit" class="btn-waitlist">Get VIP Access</button>
+            </div>
+          </form>
+
+          <div class="waitlist-success" id="waitlistSuccess">
+            🎉 You're on the VIP list! We'll notify you as soon as beta spots open up.
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- FAQ Accordion -->
+  <section id="faq" class="section">
+    <div class="section-header">
+      <span class="section-tag">Got Questions?</span>
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <p class="section-subtitle">Everything you need to know about Solstice, fasting science, and our privacy guarantee.</p>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item active">
+        <button class="faq-question">
+          <span>Is Solstice really 100% free with no subscriptions?</span>
+          <span class="faq-chevron">▼</span>
+        </button>
+        <div class="faq-answer">
+          <p>Yes, completely. All core fasting tracking features — including the 24-hour circular dial, 5 metabolic stages, streak calendar heatmap, Apple Watch app, StandBy mode, and interactive widgets — are 100% free with zero paywalls and zero ads forever.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>How does Solstice protect my privacy?</span>
+          <span class="faq-chevron">▼</span>
+        </button>
+        <div class="faq-answer">
+          <p>Solstice operates entirely on your device using Apple's native Core Data framework. We do not require an account, we do not have remote user databases, and we do not bundle any third-party tracking, analytics, or advertising SDKs. What you track stays on your device.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>What is Autophagy and why is it important?</span>
+          <span class="faq-chevron">▼</span>
+        </button>
+        <div class="faq-answer">
+          <p>Autophagy (cellular self-cleaning) is a Nobel Prize-winning biological mechanism that typically kicks in around hour 18 of fasting. When nutrient intake drops, cells clear away damaged mitochondria and misfolded proteins. Solstice calculates your estimated entry into this stage in real time.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>How does StandBy Mode work on my nightstand?</span>
+          <span class="faq-chevron">▼</span>
+        </button>
+        <div class="faq-answer">
+          <p>On iOS 18+, when your iPhone is connected to a MagSafe charger and placed in landscape orientation, iOS activates StandBy mode. Add the Solstice widget to your StandBy screen to see an ambient, low-light display of your fasting progress and countdown to breakfast without blinding your eyes at night.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Will Solstice drain my iPhone battery?</span>
+          <span class="faq-chevron">▼</span>
+        </button>
+        <div class="faq-answer">
+          <p>No. Solstice is built with 100% native Swift and SwiftUI. Unlike apps built with heavy web containers that run background processes, Solstice schedules native WidgetKit timelines that consume zero background battery.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Can I customize my fasting hours (e.g. 16:8, 18:6, OMAD)?</span>
+          <span class="faq-chevron">▼</span>
+        </button>
+        <div class="faq-answer">
+          <p>Yes. Solstice provides one-tap presets for 14:10, 16:8, 18:6, 20:4 (Warrior), and OMAD (23:1), or you can drag the circular dial wheel to customize any target interval up to 72 hours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Call to Action -->
+  <section class="final-cta">
+    <h2>Ready to Reclaim Your Fasting Habit?</h2>
+    <p>Join thousands of mindful fasters enjoying clean, distraction-free fasting with zero subscriptions and complete privacy.</p>
+    <a href="https://apps.apple.com" class="btn-primary" style="font-size: 1.15rem; padding: 18px 40px;">
+      <span>📲 Download Solstice for iOS & Watch</span>
+    </a>
+  </section>
+
+  <!-- Footer -->
   <footer>
-    <p>© 2026 Solstice Fasting. All rights reserved.</p>
-    <div style="margin-top: 10px;">
-      <a href="privacy.html">Privacy Policy</a> •
-      <a href="support.html">Support</a> •
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="support.html">Support & FAQ</a>
       <a href="mailto:jagrusy+solstice@gmail.com">Contact Developer</a>
+      <a href="https://github.com/jagrusy/fasting-app">GitHub Repository</a>
     </div>
+    <p>© 2026 Solstice Fasting. Engineered with SwiftUI for iOS & watchOS. All rights reserved.</p>
+    <p class="disclaimer">
+      <strong>Medical Disclaimer:</strong> Solstice is designed as a wellness habit tracker and educational tool. It is not intended to diagnose, treat, cure, or prevent any disease. Always consult your physician before undertaking any fasting regimen, especially if you have existing health conditions.
+    </p>
   </footer>
 
+  <!-- Interactive Simulator & Waitlist Logic -->
+  <script>
+    // Stages Data
+    const stages = [
+      {
+        minHours: 0,
+        maxHours: 4,
+        title: "Blood Sugar Reset",
+        badge: "0 – 4 Hours",
+        icon: "🩸",
+        desc: "Insulin levels fall rapidly, stomach and digestion work winds down, and blood glucose stabilizes to baseline levels.",
+        color: "#38BDF8"
+      },
+      {
+        minHours: 4,
+        maxHours: 12,
+        title: "Glycogen Depletion",
+        badge: "4 – 12 Hours",
+        icon: "⚡️",
+        desc: "Stored liver glycogen is gradually consumed for fuel. Cellular energy sources begin shifting from carbohydrates toward stored lipids.",
+        color: "#FBBF24"
+      },
+      {
+        minHours: 12,
+        maxHours: 18,
+        title: "Fat Burning & Ketosis",
+        badge: "12 – 18 Hours",
+        icon: "🔥",
+        desc: "Fatty acids are mobilized into ketones for physical and brain fuel. Fat oxidation accelerates sharply as circulating insulin plummets.",
+        color: "#F97316"
+      },
+      {
+        minHours: 18,
+        maxHours: 24,
+        title: "Autophagy & Cellular Renewal",
+        badge: "18 – 24 Hours",
+        icon: "🧬",
+        desc: "Your cells initiate an intracellular cleaning process called autophagy. Damaged mitochondria, misfolded proteins, and senescent cells are broken down and recycled into fresh cellular energy.",
+        color: "#10B981"
+      },
+      {
+        minHours: 24,
+        maxHours: 36,
+        title: "Deep Ketosis & HGH Surge",
+        badge: "24 – 36 Hours",
+        icon: "🧠",
+        desc: "Human Growth Hormone (HGH) levels increase substantially to preserve lean muscle tissue. Systemic inflammatory markers drop significantly.",
+        color: "#A855F7"
+      },
+      {
+        minHours: 36,
+        maxHours: 999,
+        title: "Immune System Reset",
+        badge: "36+ Hours",
+        icon: "🛡️",
+        desc: "Prolonged fasting triggers stem cell-based regeneration of white blood cells, encouraging deep immune system recycling and metabolic cleansing.",
+        color: "#EC4899"
+      }
+    ];
+
+    const slider = document.getElementById('metabolicSlider');
+    const hourDisplay = document.getElementById('hourDisplay');
+    const stageTitle = document.getElementById('stageTitle');
+    const stageBadge = document.getElementById('stageBadge');
+    const stageIcon = document.getElementById('stageIcon');
+    const stageDescription = document.getElementById('stageDescription');
+    const pills = document.querySelectorAll('.stage-pill');
+
+    function updateStage(hours) {
+      hourDisplay.textContent = `${hours} Hour${hours === 1 ? '' : 's'}`;
+      
+      const current = stages.find(s => hours >= s.minHours && hours < s.maxHours) || stages[stages.length - 1];
+      
+      stageTitle.innerHTML = `${current.title} <span class="stage-timing-badge" id="stageBadge" style="color: ${current.color}; background: rgba(255,255,255,0.08);">${current.badge}</span>`;
+      stageIcon.textContent = current.icon;
+      stageDescription.textContent = current.desc;
+      
+      // Update pills active state
+      pills.forEach(pill => {
+        const pillHours = parseInt(pill.getAttribute('data-hours'), 10);
+        if (pillHours === hours) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+    }
+
+    slider.addEventListener('input', (e) => {
+      updateStage(parseInt(e.target.value, 10));
+    });
+
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        const h = parseInt(pill.getAttribute('data-hours'), 10);
+        slider.value = h;
+        updateStage(h);
+      });
+    });
+
+    // FAQ Accordion
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+      const questionBtn = item.querySelector('.faq-question');
+      questionBtn.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        faqItems.forEach(other => other.classList.remove('active'));
+        if (!isActive) {
+          item.classList.add('active');
+        }
+      });
+    });
+
+    // Waitlist Form Handler
+    const waitlistForm = document.getElementById('waitlistForm');
+    const waitlistEmail = document.getElementById('waitlistEmail');
+    const waitlistSuccess = document.getElementById('waitlistSuccess');
+
+    // Check if already registered in local storage
+    if (localStorage.getItem('solstice_waitlist_registered')) {
+      waitlistForm.style.display = 'none';
+      waitlistSuccess.style.display = 'block';
+    }
+
+    waitlistForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = waitlistEmail.value.trim();
+      if (email) {
+        // Save to localStorage
+        const waitlist = JSON.parse(localStorage.getItem('solstice_waitlist_emails') || '[]');
+        waitlist.push({ email, timestamp: new Date().toISOString() });
+        localStorage.setItem('solstice_waitlist_emails', JSON.stringify(waitlist));
+        localStorage.setItem('solstice_waitlist_registered', 'true');
+
+        waitlistForm.style.display = 'none';
+        waitlistSuccess.style.display = 'block';
+      }
+    });
+  </script>
 </body>
 </html>

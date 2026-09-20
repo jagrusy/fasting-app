@@ -55,7 +55,7 @@ public final class WatchSessionManager: NSObject, WCSessionDelegate {
         handleIncomingDictionary(userInfo)
     }
 
-    private func handleIncomingDictionary(_ dict: [String: Any]) {
+    func handleIncomingDictionary(_ dict: [String: Any]) {
         guard let envelope = WatchPayload.decodeCommand(from: dict) else { return }
         AppGroupCoordinator.shared.enqueueEnvelope(envelope)
     }

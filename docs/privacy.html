@@ -3,93 +3,172 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy — Solstice</title>
+  <title>Privacy Policy — Solstice Fasting Tracker</title>
+  <meta name="description" content="Solstice Privacy Policy: 100% on-device storage, zero advertising SDKs, zero data sales, and absolute respect for your health privacy.">
   <link rel="icon" type="image/png" href="assets/icon.png">
   <style>
     :root {
-      --bg: #0B0F19;
-      --card-bg: #131B2E;
-      --card-border: #1E293B;
+      --bg: #070B14;
+      --card-bg: rgba(19, 27, 46, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
       --text: #F8FAFC;
       --text-muted: #94A3B8;
       --solar-gold: #F59E0B;
+      --solar-amber: #D97706;
+      --emerald: #10B981;
     }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", -apple-system, Roboto, sans-serif;
+    }
+
     body {
       background-color: var(--bg);
+      background-image: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.08), transparent 50%);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, sans-serif;
       line-height: 1.7;
       padding: 40px 20px;
     }
+
     .container {
-      max-width: 780px;
+      max-width: 800px;
       margin: 0 auto;
       background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 40px 32px;
+      border-radius: 24px;
+      padding: 48px 36px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
+
+    .nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 28px;
+      color: var(--solar-gold);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: transform 0.15s ease;
+    }
+
+    .nav-back:hover {
+      transform: translateX(-3px);
+    }
+
     h1 {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
       margin-bottom: 8px;
-      color: var(--text);
     }
+
     .updated {
       color: var(--text-muted);
       font-size: 0.9rem;
-      margin-bottom: 30px;
+      margin-bottom: 32px;
     }
+
     h2 {
       font-size: 1.35rem;
-      margin: 28px 0 12px;
+      margin: 32px 0 12px;
       color: var(--solar-gold);
+      font-weight: 700;
     }
+
     p, li {
       color: #CBD5E1;
       margin-bottom: 14px;
+      font-size: 1rem;
     }
+
     ul {
       padding-left: 24px;
+      margin-bottom: 20px;
     }
+
+    li {
+      margin-bottom: 8px;
+    }
+
     a {
       color: var(--solar-gold);
       text-decoration: none;
     }
-    .nav-back {
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .badge-privacy {
       display: inline-block;
-      margin-bottom: 24px;
+      padding: 4px 12px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--emerald);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    footer {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
       color: var(--text-muted);
-      font-weight: 500;
+      font-size: 0.85rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <a href="index.html" class="nav-back">← Back to Solstice</a>
-    <h1>Privacy Policy</h1>
-    <div class="updated">Last updated: August 19, 2026</div>
+    
+    <div>
+      <span class="badge-privacy">🔒 100% LOCAL-FIRST ARCHITECTURE</span>
+      <h1>Privacy Policy</h1>
+      <div class="updated">Last updated: September 2026</div>
+    </div>
 
-    <h2>1. Overview & Commitment</h2>
-    <p>Solstice ("we", "our", or "the App") is built on a fundamental principle: <strong>your health and habit data belongs exclusively to you</strong>. We believe fasting is a personal wellness journey that requires absolute privacy.</p>
+    <h2>1. Our Privacy Philosophy</h2>
+    <p>Solstice ("we", "our", or "the App") was founded on an uncompromising principle: <strong>your fasting, metabolic, and nutrition records belong strictly to you</strong>. Unlike incumbent health apps that monetize by reselling user habits or tracking data to advertisers, Solstice operates without tracking frameworks or remote data harvesting.</p>
 
-    <h2>2. Data Collection & Storage</h2>
+    <h2>2. Data Collection & Local Storage</h2>
     <ul>
-      <li><strong>100% On-Device:</strong> All your fasting timers, historical logs, mood ratings, and preferences are stored locally on your device using Apple Core Data.</li>
-      <li><strong>No Cloud Accounts:</strong> Solstice does not require you to create an account, sign in with an email, or connect any social profile.</li>
-      <li><strong>No Server Collection:</strong> We do not operate remote servers that collect, store, or transmit your fasting data.</li>
+      <li><strong>100% On-Device:</strong> All your fasting timers, biological stage records, history heatmaps, notes, and user settings are stored locally on your device using Apple's Core Data framework.</li>
+      <li><strong>Zero Accounts or Social Logins:</strong> You never need to create an account, register an email address, or link Apple ID to use Solstice's core fasting tools.</li>
+      <li><strong>Zero Central Servers:</strong> We do not operate databases that log when you fast, what protocols you choose, or your health milestones.</li>
     </ul>
 
-    <h2>3. Third-Party Analytics & Tracking</h2>
-    <p>Solstice contains <strong>zero third-party tracking frameworks, advertising SDKs, or behavioral telemetry</strong>. We do not track your location, advertising identifier (IDFA), or device fingerprints.</p>
+    <h2>3. Third-Party Advertising & Telemetry</h2>
+    <p>Solstice contains <strong>zero third-party advertising SDKs, data broker trackers, or behavioral telemetry frameworks</strong> (such as Facebook SDK, Google Firebase Analytics, or Mixpanel). We never request or track your Apple Advertising Identifier (IDFA).</p>
 
-    <h2>4. App Store Connect Analytics</h2>
-    <p>Apple may provide developers with aggregate, anonymized diagnostics (such as crash logs or opt-in app performance metrics) if you have opted in to share analytics with app developers in your iOS settings. This data is fully anonymized by Apple.</p>
+    <h2>4. Solstice AI Features & Future Services</h2>
+    <p>For optional future premium services (such as Solstice AI meal photo scanning and nutritional journaling):</p>
+    <ul>
+      <li>Images and food queries are processed using on-device Apple Intelligence where supported, or ephemeral, privacy-sanitized endpoints without retaining personal identifiers.</li>
+      <li>Your meal logs and photos will never be sold, leased, or utilized to train commercial advertising models.</li>
+    </ul>
 
-    <h2>5. Medical Disclaimer</h2>
-    <p>Solstice is designed for general habit tracking and educational wellness purposes only. It is not intended as medical advice or a diagnostic tool. Consult a qualified physician before starting any fasting regimen.</p>
+    <h2>5. App Store Diagnostic Analytics</h2>
+    <p>If you have voluntarily enabled "Share With App Developers" in your iOS device settings, Apple provides developers with anonymized, aggregate diagnostic information (e.g. crash logs and OS version distribution). This telemetry is completely depersonalized by Apple.</p>
 
-    <h2>6. Contact Us</h2>
-    <p>If you have any questions regarding this Privacy Policy, feel free to contact us at: <a href="mailto:jagrusy+solstice@gmail.com">jagrusy+solstice@gmail.com</a>.</p>
+    <h2>6. Medical Disclaimer</h2>
+    <p>Solstice is designed for general wellness habit tracking and educational purposes. It does not provide medical diagnoses, treatment advice, or clinical evaluations. Always consult a licensed medical physician before initiating prolonged fasting protocols.</p>
+
+    <h2>7. Contact the Developer</h2>
+    <p>If you have questions, feedback, or concerns regarding your privacy, please contact the developer directly at: <a href="mailto:jagrusy+solstice@gmail.com">jagrusy+solstice@gmail.com</a>.</p>
+
+    <footer>
+      <p>© 2026 Solstice Fasting Tracker. All rights reserved.</p>
+    </footer>
   </div>
 </body>
 </html>

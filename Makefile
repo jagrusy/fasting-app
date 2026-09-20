@@ -17,7 +17,7 @@ endif
 DESTINATION_IOS = 'platform=iOS Simulator,name=$(SIM_NAME)'
 DESTINATION_WATCH = 'generic/platform=watchOS Simulator'
 
-.PHONY: all build build-ios build-watch test uitest lint hooks clean beta-local
+.PHONY: all build build-ios build-watch test uitest screenshots lint hooks clean beta-local
 
 all: lint build test
 
@@ -59,6 +59,10 @@ uitest:
 		-scheme $(SCHEME_UI_TESTS) \
 		-destination $(DESTINATION_IOS) \
 		-resultBundlePath TestResults-UI.xcresult
+
+screenshots:
+	@echo "📸 Generating App Store screenshots (iPhone & Watch)..."
+	./scripts/generate_screenshots.sh
 
 lint:
 	@if which swiftlint >/dev/null; then \

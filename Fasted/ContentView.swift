@@ -47,7 +47,10 @@ struct ContentView: View {
                 }
                 .tag(Tab.settings)
         }
-        .preferredColorScheme(ProcessInfo.processInfo.arguments.contains("-forceDarkMode") ? .dark : nil)
+        .preferredColorScheme(
+            ProcessInfo.processInfo.arguments.contains("-forceDarkMode") ? .dark :
+            ProcessInfo.processInfo.arguments.contains("-forceLightMode") ? .light : nil
+        )
         .onAppear {
             if ProcessInfo.processInfo.arguments.contains("-seedScreenshots80") {
                 fastManager.seedMockDataForScreenshots(progress: 0.80)
