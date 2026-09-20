@@ -1,5 +1,6 @@
 import AppIntents
 import Foundation
+import WidgetKit
 
 public struct SetFastingIntent: AppIntent, SetValueIntent {
     public static var title: LocalizedStringResource = "Toggle Fast"
@@ -35,11 +36,13 @@ public struct SetFastingIntent: AppIntent, SetValueIntent {
                 protocolType: proto.ratioString
             )
             coordinator.writeSnapshot(optimistic)
+            WidgetCenter.shared.reloadAllTimelines()
         } else if !value && snapshot.isFasting {
             let now = Date()
             coordinator.enqueueCommand(.endFast(endDate: now))
             let optimistic = snapshot.endingNow(at: now)
             coordinator.writeSnapshot(optimistic)
+            WidgetCenter.shared.reloadAllTimelines()
         }
 
         return .result()

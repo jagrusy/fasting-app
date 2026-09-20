@@ -24,14 +24,17 @@ struct EatingWindowEntryView: View {
     let entry: FastStatusWidgetEntry
 
     var body: some View {
-        switch family {
-        case .accessoryCircular:
-            EatingWindowGaugeView(snapshot: entry.snapshot, currentDate: entry.date)
-        case .accessoryRectangular:
-            EatingWindowRectangularView(snapshot: entry.snapshot, currentDate: entry.date)
-        default:
-            EatingWindowSmallView(snapshot: entry.snapshot, currentDate: entry.date)
+        Group {
+            switch family {
+            case .accessoryCircular:
+                EatingWindowGaugeView(snapshot: entry.snapshot, currentDate: entry.date)
+            case .accessoryRectangular:
+                EatingWindowRectangularView(snapshot: entry.snapshot, currentDate: entry.date)
+            default:
+                EatingWindowSmallView(snapshot: entry.snapshot, currentDate: entry.date)
+            }
         }
+        .widgetURL(DeepLink.forWidgetTap(isFasting: entry.snapshot.isFasting).url)
     }
 }
 

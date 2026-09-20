@@ -24,6 +24,7 @@ public final class AppGroupCoordinator: @unchecked Sendable {
 
     public static let snapshotKey = "fasting_state_snapshot"
     public static let pendingCommandsKey = "pending_fasting_commands"
+    public static let pendingDeepLinkKey = "pending_deep_link"
 
     public init(
         userDefaults: UserDefaults? = nil,
@@ -82,6 +83,27 @@ public final class AppGroupCoordinator: @unchecked Sendable {
             return .idle
         }
         return snapshot
+    }
+
+    /// Requests a tab switch the next time the app comes to the foreground.
+    ///
+    /// Control Center intents can foreground the app via `openAppWhenRun`, but that flag carries no
+    /// destination and offers no reliable guarantee about exactly when `perform()` runs relative to
+    /// the view hierarchy coming up. Relaying through the App Group instead reuses the same
+    /// foreground-drain point `processPendingCommands` already relies on, so there is no race to
+    /// reason about.
+    public func writePendingDeepLink(_ link: DeepLink) {
+        lock.lock()
+        defer { lock.unlock() }
+        userDefaults.set(link.rawValue, forKey: Self.pendingDeepLinkKey)
+    }
+
+    public func consumePendingDeepLink() -> DeepLink? {
+        lock.lock()
+        defer { lock.unlock() }
+        guard let raw = userDefaults.string(forKey: Self.pendingDeepLinkKey) else { return nil }
+        userDefaults.removeObject(forKey: Self.pendingDeepLinkKey)
+        return DeepLink(rawValue: raw)
     }
 
     public func enqueueCommand(_ command: FastingActionCommand) {

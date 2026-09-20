@@ -92,4 +92,33 @@ final class StreakCalculatorTests: XCTestCase {
         let emptyStatus = StreakCalculator.fastStatus(for: emptyDate, in: [goalFast], calendar: calendar)
         XCTAssertEqual(emptyStatus, .none)
     }
+
+    func testDailyFastStatusUpdatesWhenFastIsShortenedOrExtended() throws {
+        let ctx = try XCTUnwrap(context)
+        let manager = FastManager(context: ctx)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let start = today.addingTimeInterval(3600)
+
+        let fast = Fast(context: ctx)
+        fast.id = UUID()
+        fast.createdAt = start
+        fast.startDate = start
+        fast.endDate = start.addingTimeInterval(16 * 3600)
+        fast.targetDuration = 16 * 3600
+        fast.isCompleted = true
+
+        var status = StreakCalculator.fastStatus(for: today, in: [fast], calendar: calendar)
+        XCTAssertEqual(status, .goalMet(hours: 16.0))
+
+        // Shorten to 8h (below target)
+        manager.updateCompletedFast(fast, startDate: start, endDate: start.addingTimeInterval(8 * 3600))
+        status = StreakCalculator.fastStatus(for: today, in: [fast], calendar: calendar)
+        XCTAssertEqual(status, .partial(hours: 8.0))
+
+        // Lengthen to 18h (above target)
+        manager.updateCompletedFast(fast, startDate: start, endDate: start.addingTimeInterval(18 * 3600))
+        status = StreakCalculator.fastStatus(for: today, in: [fast], calendar: calendar)
+        XCTAssertEqual(status, .goalMet(hours: 18.0))
+    }
 }

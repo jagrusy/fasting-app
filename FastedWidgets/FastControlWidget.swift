@@ -2,21 +2,23 @@ import AppIntents
 import SwiftUI
 import WidgetKit
 
+/// A control that toggles fasting status, with its label, icon, and tint adapting dynamically
+/// to the current fasting state (idle, active, complete).
 struct FastControlWidget: ControlWidget {
     static let kind: String = "com.grusy.SolsticeFast.FastControlWidget"
 
     var body: some ControlWidgetConfiguration {
-        StaticControlConfiguration(kind: Self.kind, provider: FastControlValueProvider()) { isFasting in
+        StaticControlConfiguration(kind: Self.kind, provider: FastControlValueProvider()) { state in
             ControlWidgetToggle(
-                isOn: isFasting,
-                action: SetFastingIntent(value: !isFasting)
+                isOn: state != .idle,
+                action: SetFastingIntent(value: state == .idle)
             ) {
                 Label(
-                    isFasting ? "Fasting" : "Start Fast",
-                    systemImage: isFasting ? "flame.fill" : "timer"
+                    state.label,
+                    systemImage: state.systemImage
                 )
             }
-            .tint(SolsticeColors.solarAmber)
+            .tint(state.tintColor)
         }
         .displayName("Fast Tracker")
         .description("Quickly start or end your intermittent fast.")
@@ -40,12 +42,11 @@ struct FastSnoozeControlWidget: ControlWidget {
 }
 
 struct FastControlValueProvider: ControlValueProvider {
-    var previewValue: Bool {
-        false
+    var previewValue: FastControlState {
+        .idle
     }
 
-    func currentValue() async throws -> Bool {
-        let snapshot = AppGroupCoordinator.shared.readSnapshot()
-        return snapshot.isFasting
+    func currentValue() async throws -> FastControlState {
+        FastControlState.from(snapshot: AppGroupCoordinator.shared.readSnapshot())
     }
 }

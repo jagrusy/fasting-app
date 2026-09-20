@@ -66,6 +66,27 @@ struct StartFastButton: View {
     }
 }
 
+/// Only ever rendered once the goal is met — see `FastCommandFactory.shouldDirectlyEnd`, the same
+/// rule `EndFastButtonView` applies in the app.
+///
+/// A widget cannot present a confirmation dialog and there is no undo, so ending early stays behind
+/// the in-app confirmation: it writes a partial fast to history and breaks the streak. Starting a
+/// fast is one tap to reverse, which is why only this direction is gated.
+struct EndFastButton: View {
+    var fillsWidth: Bool = false
+
+    var body: some View {
+        Button(intent: EndFastIntent()) {
+            Label("End Fast", systemImage: "checkmark.circle.fill")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .frame(maxWidth: fillsWidth ? .infinity : nil)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(SolsticeColors.emeraldGlow)
+    }
+}
+
 struct SmallFastWidgetView: View {
     let snapshot: FastingStateSnapshot
     let currentDate: Date
@@ -98,10 +119,7 @@ struct SmallFastWidgetView: View {
                 .font(.callout)
 
             if isGoalMet {
-                Text("Goal Met ✨")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundColor(SolsticeColors.emeraldGlow)
+                EndFastButton()
             } else if let stage = snapshot.currentStage(at: currentDate) {
                 Text(stage.shortTitle)
                     .font(.caption2)
@@ -170,6 +188,7 @@ struct MediumFastWidgetView: View {
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(SolsticeColors.emeraldGlow)
+                    EndFastButton(fillsWidth: true)
                 } else {
                     HStack(spacing: 4) {
                         Text("Target:")
@@ -179,8 +198,8 @@ struct MediumFastWidgetView: View {
                             .font(.caption2)
                             .fontWeight(.semibold)
                     }
+                    StreakLabelView(streak: snapshot.currentStreak)
                 }
-                StreakLabelView(streak: snapshot.currentStreak)
             }
         }
         .padding(2)
@@ -295,6 +314,9 @@ struct LargeFastWidgetView: View {
                         .foregroundStyle(.secondary)
                 }
                 StreakLabelView(streak: snapshot.currentStreak)
+                if isGoalMet {
+                    EndFastButton()
+                }
             }
             Spacer(minLength: 0)
         }
