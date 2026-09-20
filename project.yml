@@ -16,7 +16,7 @@ settings:
     # Every bundle in the archive must carry the same version pair, or App Store validation
     # rejects the upload. All four Info.plists read these, and CI overrides
     # CURRENT_PROJECT_VERSION per build with the next unused TestFlight build number.
-    MARKETING_VERSION: "1.1"
+    MARKETING_VERSION: "1.1.55"
     CURRENT_PROJECT_VERSION: "1"
     # Per-target provisioning profile, supplied by fastlane at archive time (see the
     # SIGNED_BUNDLE_IDS map in fastlane/Fastfile). A single global

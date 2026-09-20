@@ -17,6 +17,11 @@ on:
           - beta
           - release
           - screenshots_upload
+      version_override:
+        description: 'Optional marketing version override (e.g. 1.2.0). Leave blank to resolve automatically.'
+        required: false
+        default: ''
+        type: string
       skip_tests:
         description: 'Skip the pre-deploy test run (for iterating on signing/deploy config)'
         required: false
@@ -30,6 +35,8 @@ concurrency:
 jobs:
   deploy:
     name: Fastlane Deploy
+    permissions:
+      contents: write
     # Apple requires the iOS 26 SDK (Xcode 26+) for App Store Connect uploads; the macos-15
     # image tops out at Xcode 16 / iOS 18.5, which uploads reject with a 409 "SDK version issue".
     runs-on: macos-26
@@ -71,6 +78,12 @@ jobs:
 
       - name: Install XcodeGen
         run: brew install xcodegen
+
+      - name: Resolve Version & Build Metadata
+        id: version
+        env:
+          VERSION_OVERRIDE: ${{ github.event.inputs.version_override }}
+        run: ./scripts/resolve_version.sh
 
       - name: Generate Xcode Project
         run: xcodegen generate
@@ -148,4 +161,5 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
           APP_REVIEW_PHONE: ${{ secrets.APP_REVIEW_PHONE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bundle exec fastlane ${{ steps.lane.outputs.name }}
