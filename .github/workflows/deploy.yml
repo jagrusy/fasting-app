@@ -1,51 +1,102 @@
 name: Deploy to TestFlight & App Store
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       lane:
-        description: 'Fastlane lane to execute (overrides the automatic choice below)'
-        required: false
-        default: ''
+        description: 'Production lanes require protected-environment human approval'
+        required: true
+        default: beta
         type: choice
-        options:
-          - ''
-          - beta
-          - release
-          - screenshots_upload
+        options: [beta, release, screenshots_upload]
+      ci_run_id:
+        description: 'Successful main-push CI run ID for this exact commit'
+        required: true
+        type: string
+      commit_sha:
+        description: 'Full 40-character SHA of the current main commit verified by CI'
+        required: true
+        type: string
       version_override:
         description: 'Optional marketing version override (e.g. 1.2.0). Leave blank to resolve automatically.'
         required: false
         default: ''
         type: string
-      skip_tests:
-        description: 'Skip the pre-deploy test run (for iterating on signing/deploy config)'
-        required: false
-        default: false
-        type: boolean
 
+permissions:
+  contents: read
+  actions: read
+
+# One publisher for this app across automatic and manual runs.
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: solstice-distribution
   cancel-in-progress: false
 
 jobs:
+  verify:
+    name: Verify exact CI commit and release policy
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_repository.full_name == github.repository &&
+        github.event.workflow_run.conclusion == 'success'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      sha: ${{ steps.gate.outputs.sha }}
+      lane: ${{ steps.gate.outputs.lane }}
+      environment: ${{ steps.gate.outputs.environment }}
+    steps:
+      - name: Check out trusted workflow policy only
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+          sparse-checkout: scripts/release_gate.py
+          sparse-checkout-cone-mode: false
+      - name: Verify source and selected environment protection
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ACTORS: ${{ vars.RELEASE_ACTORS || github.repository_owner }}
+        run: python3 scripts/release_gate.py
+
   deploy:
-    name: Fastlane Deploy
+    name: Publish verified source (${{ needs.verify.outputs.lane }})
+    needs: verify
+    runs-on: macos-26
+    timeout-minutes: 60
     permissions:
       contents: write
-    # Apple requires the iOS 26 SDK (Xcode 26+) for App Store Connect uploads; the macos-15
-    # image tops out at Xcode 16 / iOS 18.5, which uploads reject with a 409 "SDK version issue".
-    runs-on: macos-26
+    # Signing/publishing credentials belong only in these main-restricted environments,
+    # never repository secrets. Both policy passes validate the selected environment.
+    environment:
+      name: ${{ needs.verify.outputs.environment }}
     steps:
-      - name: Checkout Repository
+      - name: Check out trusted workflow policy
         uses: actions/checkout@v4
-
-      # Pin the toolchain explicitly rather than trusting the image default, so an image update
-      # can't silently move the SDK back under Apple's minimum.
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: .release-policy
+          persist-credentials: false
+          sparse-checkout: scripts/release_gate.py
+          sparse-checkout-cone-mode: false
+      - name: Recheck CI and verify actual human approval before signing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ACTORS: ${{ vars.RELEASE_ACTORS || github.repository_owner }}
+        run: python3 .release-policy/scripts/release_gate.py --verify-approval
+      - name: Check out the exact verified application commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify.outputs.sha }}
+          path: app
+          persist-credentials: true
       - name: Select Xcode
         run: |
           ls /Applications | grep -i '^Xcode' || true
@@ -60,58 +111,19 @@ jobs:
         with:
           ruby-version: '3.3'
           bundler-cache: true
-
-      # Both steps below exist only to run the pre-deploy test suite, and that suite takes
-      # 6-14 minutes — while the deploy steps after it take seconds. When iterating on signing
-      # or deploy config (where the code is unchanged and CI already tested it on the PR),
-      # dispatch with skip_tests=true to get a ~1 minute feedback loop instead of ~15.
-      - name: Discover iOS Simulator
-        id: sim
-        if: ${{ !inputs.skip_tests }}
-        run: |
-          SIM_NAME=$(xcrun simctl list devices available -j | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
-          if [ -z "$SIM_NAME" ]; then
-            SIM_NAME="iPhone 16"
-          fi
-          echo "Found available iOS Simulator: $SIM_NAME"
-          echo "name=$SIM_NAME" >> $GITHUB_OUTPUT
+          working-directory: app
 
       - name: Install XcodeGen
         run: brew install xcodegen
-
       - name: Resolve Version & Build Metadata
         id: version
+        working-directory: app
         env:
           VERSION_OVERRIDE: ${{ github.event.inputs.version_override }}
         run: ./scripts/resolve_version.sh
-
       - name: Generate Xcode Project
+        working-directory: app
         run: xcodegen generate
-
-      - name: Run Tests Before Deploy
-        if: ${{ !inputs.skip_tests }}
-        run: |
-          xcodebuild test \
-            -project Fasted.xcodeproj \
-            -scheme FastedTests \
-            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
-            -quiet
-
-      - name: Determine lane
-        id: lane
-        run: |
-          # A manual dispatch pick always wins. Otherwise: a `v*` tag push means release
-          # (App Store review); a plain push to main means beta (TestFlight).
-          if [ -n "${{ github.event.inputs.lane }}" ]; then
-            LANE="${{ github.event.inputs.lane }}"
-          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            LANE="release"
-          else
-            LANE="beta"
-          fi
-          echo "Selected lane: $LANE"
-          echo "name=$LANE" >> $GITHUB_OUTPUT
-
       # Imports the App Store distribution certificate into a keychain that exists only for this
       # job — the runner itself is destroyed afterward, so nothing persists. get_provisioning
       # _profile (sigh) in the Fastfile can bind a profile to this certificate via the API key
@@ -153,8 +165,11 @@ jobs:
             exit 1
           fi
 
-      - name: Run Fastlane Deployment
+      - name: Run verified Fastlane lane
+        working-directory: app
         env:
+          SOLSTICE_VERIFIED_SHA: ${{ needs.verify.outputs.sha }}
+          SOLSTICE_VERIFIED_LANE: ${{ needs.verify.outputs.lane }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
@@ -162,4 +177,9 @@ jobs:
           ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
           APP_REVIEW_PHONE: ${{ secrets.APP_REVIEW_PHONE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bundle exec fastlane ${{ steps.lane.outputs.name }}
+        run: bundle exec fastlane "$SOLSTICE_VERIFIED_LANE"
+      - name: Remove temporary signing material
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/deploy-signing.keychain-db" || true
+          rm -f "$RUNNER_TEMP/certificate.p12"

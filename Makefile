@@ -74,8 +74,7 @@ lint:
 clean:
 	rm -rf build DerivedData *.xcresult
 
-# Builds and uploads to TestFlight using YOUR local Xcode signing (Xcode > Settings > Accounts),
-# instead of the GitHub Actions deploy workflow, which currently has no distribution certificate
-# configured. Requires APPLE_TEAM_ID, e.g.: APPLE_TEAM_ID=ABCDE12345 make beta-local
+# Compatibility entry point: Fastlane now rejects local uploads that bypass CI.
+# Use the verified beta workflow described in FASTLANE_SETUP.md.
 beta-local:
 	bundle exec fastlane beta_local

@@ -44,3 +44,9 @@ fastlane/README.md
 *.ipa
 *.dSYM.zip
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+

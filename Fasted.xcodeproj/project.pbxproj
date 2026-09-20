@@ -11,7 +11,6 @@
 		028C87C0AEB47555BF1BA84F /* FastActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8048A8C02F2041D8A847E20B /* FastActivityAttributes.swift */; };
 		02E2B44BF8D1A49309056806 /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
 		036A390AB6E5DFEE9CCB4F4F /* EatingWindowWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794C6683A02015B541909A7E /* EatingWindowWidget.swift */; };
-		03F3712F2C298E85F4192E68 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D0EE0A457EFF011B0258010B /* README.md */; };
 		043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */; };
 		084F697FBF35CB11AABC725E /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		089D9A852E6784E04D5691EF /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
@@ -81,7 +80,6 @@
 		669719083CB80521E2E92B45 /* StartFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */; };
 		6731DABAFE89191832089A9C /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */; };
 		67747AFA11317A45528691C1 /* MetabolicStageBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */; };
-		67AEEAD45BA64231399E9117 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D0EE0A457EFF011B0258010B /* README.md */; };
 		67B1232CA7B93E2F23C217D7 /* FastControlActionIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB494F124427FB1724B45579 /* FastControlActionIntent.swift */; };
 		67F7593024E306184CEB9657 /* FastManager+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */; };
 		680301A03BB0BED727DFF532 /* FastedDialMathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */; };
@@ -149,7 +147,6 @@
 		C3798D8BCAAE1F1B30E50E4E /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
 		C599741E6A0988A4ED07D94E /* FastProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */; };
 		C7A0AE6139079DA758A59AD8 /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */; };
-		C899B9F2E0CE96DDFC63EAF0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D0EE0A457EFF011B0258010B /* README.md */; };
 		CAF9AF507CA760F146E6B2D0 /* StreakCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624342259EC84B9174A4FAE /* StreakCalculatorTests.swift */; };
 		CBBD139EF2899DFF8B24A109 /* FastStreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E793DE11CB215C34D949B9 /* FastStreakWidget.swift */; };
 		CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145B081A157492E5B631A378 /* ProtocolCardView.swift */; };
@@ -169,7 +166,6 @@
 		E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47F0F9EAF3379520543128F /* FastedTests.swift */; };
 		E0C993AB8D2B4405872918E8 /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
 		E4961D7D9EDBBE71BB479A7B /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
-		E7A8BC23F24404937890CB0A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D0EE0A457EFF011B0258010B /* README.md */; };
 		E8A5B963DF26327D10D275D0 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
 		E9AFDD35443083072B92D138 /* BuildMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C95DACC66EF1CE6953C6D0 /* BuildMetadata.swift */; };
 		EAB59149E74AD57EA1933FDA /* FastGaugeMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225FC5D6935A29EA6DD836F1 /* FastGaugeMetricsTests.swift */; };
@@ -290,11 +286,13 @@
 		49AFD758FFD1AFB86BE41633 /* Fasted.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Fasted.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A8D00563B7A100741A574FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolsticeTheme.swift; sourceTree = "<group>"; };
+		4E43C24DC40261440362A348 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		4F6EB86FD0EE011CBF07654B /* AppGroupCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupCoordinatorTests.swift; sourceTree = "<group>"; };
 		50419E8BE341F9BD49A034CD /* FastedWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FastedWidgets.entitlements; sourceTree = "<group>"; };
 		5093F93825789F6E237BD2A2 /* EndFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndFastIntent.swift; sourceTree = "<group>"; };
 		53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingActionCommand.swift; sourceTree = "<group>"; };
 		556AA56BFF312CEBC9395C9D /* FastTimePickerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTimePickerSheetView.swift; sourceTree = "<group>"; };
+		63DC7E46BF688F5ED5A31810 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		66847625426DFA2D05A362D2 /* FastingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingProtocol.swift; sourceTree = "<group>"; };
 		66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingStateSnapshot.swift; sourceTree = "<group>"; };
 		68222DD80B162A582A18EB12 /* DeepLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkTests.swift; sourceTree = "<group>"; };
@@ -342,6 +340,7 @@
 		B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialFaceView.swift; sourceTree = "<group>"; };
 		B7160CB9DE9689FEF2EFEC10 /* FastedUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7EE8D5EE638B61DA187E53A /* FastControlWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastControlWidget.swift; sourceTree = "<group>"; };
+		B9FA29E4E42619EE2FBE10A5 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPayloadTests.swift; sourceTree = "<group>"; };
 		C410780F466CF5987E506477 /* CalendarHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeatmapView.swift; sourceTree = "<group>"; };
 		C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSummaryCardsView.swift; sourceTree = "<group>"; };
@@ -366,6 +365,7 @@
 		E748AAFCB4B3F2DDF13BB549 /* FastWidgetFamilyViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastWidgetFamilyViews.swift; sourceTree = "<group>"; };
 		E95F8810ED7037826FE830C9 /* FastedUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedUITests.swift; sourceTree = "<group>"; };
 		EA12AA8BCBEE6124BC4224F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		EE58434F42AC6CAEFC60420A /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastStartedCardView.swift; sourceTree = "<group>"; };
 		EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStageTests.swift; sourceTree = "<group>"; };
 		EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Mocking.swift"; sourceTree = "<group>"; };
@@ -455,6 +455,7 @@
 		B3038D5CED8DB75F5970CF61 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				63DC7E46BF688F5ED5A31810 /* AGENTS.md */,
 				D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */,
 				95C95DACC66EF1CE6953C6D0 /* BuildMetadata.swift */,
 				84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */,
@@ -490,6 +491,7 @@
 		D69B656B0B03041654851581 /* FastedUITests */ = {
 			isa = PBXGroup;
 			children = (
+				EE58434F42AC6CAEFC60420A /* AGENTS.md */,
 				E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */,
 				E95F8810ED7037826FE830C9 /* FastedUITests.swift */,
 			);
@@ -499,6 +501,7 @@
 		FA2CF958379392EFE41B27EF /* Fasted */ = {
 			isa = PBXGroup;
 			children = (
+				4E43C24DC40261440362A348 /* AGENTS.md */,
 				A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */,
 				C410780F466CF5987E506477 /* CalendarHeatmapView.swift */,
 				3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */,
@@ -551,6 +554,7 @@
 		FF13538E02A928EAD0AA52A2 /* FastedTests */ = {
 			isa = PBXGroup;
 			children = (
+				B9FA29E4E42619EE2FBE10A5 /* AGENTS.md */,
 				4F6EB86FD0EE011CBF07654B /* AppGroupCoordinatorTests.swift */,
 				268CC999FE8C890B9E92083D /* AppGroupResilienceTests.swift */,
 				7E2F0F37B26044C995133130 /* AppIntentsTests.swift */,
@@ -758,7 +762,6 @@
 			files = (
 				86055F2337D28D87733DB3A6 /* Assets.xcassets in Resources */,
 				D12E0B387D9AAEE305F83553 /* PrivacyInfo.xcprivacy in Resources */,
-				67AEEAD45BA64231399E9117 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -767,7 +770,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8FDA62E522C2C964409F5B64 /* PrivacyInfo.xcprivacy in Resources */,
-				C899B9F2E0CE96DDFC63EAF0 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -776,7 +778,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC997B42B09ED34EDDF1B7F0 /* PrivacyInfo.xcprivacy in Resources */,
-				E7A8BC23F24404937890CB0A /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -786,7 +787,6 @@
 			files = (
 				62B0C00563C611B6973E931E /* Assets.xcassets in Resources */,
 				A2A58808F0405BA2C2D8406B /* PrivacyInfo.xcprivacy in Resources */,
-				03F3712F2C298E85F4192E68 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
