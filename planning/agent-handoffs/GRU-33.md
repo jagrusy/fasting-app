@@ -4,7 +4,7 @@
 - **Branch / worktree / base SHA**: `codex/gru-33-contrast-validation` in `/Users/grusy/.codex/worktrees/bd36/fasting-app`; Base SHA: `99f0e2d93eef250914d79d6e5c8e23f05d5c0e44` (`origin/main`)
 - **Claimed paths and concurrent-work check**: `planning/research/contrast-discovery/` and `planning/agent-handoffs/GRU-33.md`. Verified isolated ownership; no conflicts with active native Fasted work.
 - **Prerequisites**: None blocked. Base commit includes merged PR #57 (canonical guidance, testing contracts, and release guardrails).
-- **Changed behavior and rationale**: Produced the required research deliverable (`planning/research/contrast-discovery/GRU-33-contrast-workflow-validation.md`) analyzing wet-screen completion, older Apple Watch (Series 7) baseline support, sauna thermal limits, and locker separation. Audited 5 competitor apps and workarounds, separating advertised claims from observed behavior. Created a neutral interview guide and usability script. Evaluated Android demand and contrary evidence.
+- **Changed behavior and rationale**: Produced the required research deliverable (`planning/research/contrast-discovery/GRU-33-contrast-workflow-validation.md`) analyzing wet-screen completion, older Apple Watch (Series 7) baseline support, sauna thermal limits vs. real-world on-wrist sauna wear, Apple Health (HealthKit) workout syncing as the primary differentiator, and locker separation. Audited 5 competitor apps and workarounds, separating advertised claims from observed behavior. Created a neutral interview guide and usability script covering HealthKit habits and sauna thermal survival. Evaluated Android demand and contrary evidence.
 - **Changed contracts/schema/identities**: None (research-only lane).
 - **Tests**:
   - Markdown syntax & link integrity checks: Passed.
@@ -14,7 +14,8 @@
 - **Acceptance checklist**:
   - [x] Competitor workflow comparison distinguishing observed behavior from store claims (Pass)
   - [x] Older watch baseline (Series 7 lacks water temp sensor; manual baseline required) (Pass)
-  - [x] Sauna thermal boundary (Apple Watch 32°–95°F operating limit vs 150°–195°F sauna) (Pass)
+  - [x] Sauna thermal boundary & real-world on-wrist wearing (defensive per-transition persistence & low-thermal OLED mode) (Pass)
+  - [x] Apple Health (HealthKit) workout sync as core differentiator (Activity rings, continuous HR sampling, offline durability) (Pass)
   - [x] Neutral, non-leading user interview protocol & failure-point questions (Pass)
   - [x] Tester profile matrix and unvalidated Android demand analysis (Pass)
   - [x] Contrary evidence and conditional recommendation for DRAFT-15 (Pass)
@@ -23,5 +24,6 @@
 - **Remaining blockers, risk and recovery/compatibility notes**:
   - DRAFT-15 (Prototype the contrast session workflow on iOS) is gated in `AGENT_TICKETS.md`. Do not start prototype implementation until owner approves this research and records the go decision.
   - Apple Watch Series 7 has no water temp sensor; any contrast prototype must treat temperature as an optional/manual input.
-  - Apple Watch must not be required inside traditional saunas to avoid device damage and thermal shutdown.
+  - While users routinely wear Apple Watches inside traditional saunas, the software must persist state per transition to disk so thermal shutdowns or reboots do not cause session data loss.
+  - Apple Health workout sync is the primary switching trigger from generic timers; prototype must implement `HKWorkoutSession` / `HKLiveWorkoutBuilder` for full ring and HR credit.
 - **Downstream handoff**: Hand off to repository owner for review, interview execution, and decision on ungating DRAFT-15.
