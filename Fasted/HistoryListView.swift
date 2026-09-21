@@ -4,8 +4,16 @@ import CoreData
 public struct HistoryListView: View {
     @ObservedObject var fastManager: FastManager
 
+    // `entity: Fast.entity()` used to be passed explicitly here, but that static accessor caches
+    // one global NSEntityDescription per process. It stayed harmless as long as only one
+    // NSPersistentContainer for this model was ever alive at a time — but `FastedApp` always
+    // touches `PersistenceController.shared` regardless of which store `ContentView` actually
+    // uses, so a second container (e.g. the isolated UI-test store) coexisting with it made the
+    // cached entity ambiguous and crashed `NSFetchedResultsController.performFetch()` outright
+    // (confirmed via a live crash log: EXC_CRASH / SIGABRT inside `performFetch:`). Omitting
+    // `entity:` lets `@FetchRequest` derive it from `FetchedResults<Fast>` against the environment's
+    // own context instead, which is unambiguous per-container.
     @FetchRequest(
-        entity: Fast.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \Fast.startDate, ascending: false)],
         predicate: NSPredicate(format: "endDate != nil"),
         animation: .default

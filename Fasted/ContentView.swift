@@ -2,13 +2,35 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var fastManager: FastManager
     @State private var selectedTab: Tab = .fast
+    private let viewContext: NSManagedObjectContext
 
-    init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
+    /// `FastedApp` also sets `\.managedObjectContext` on its `WindowGroup`, unconditionally pointed
+    /// at `PersistenceController.shared` — independent of whatever context this initializer
+    /// resolves. Every `@FetchRequest` in this app's descendant views (`HistoryListView` among
+    /// them) reads through *that* environment value, not through `fastManager`. Without
+    /// re-asserting it here, a `-uiTesting` launch would still write fasts through the isolated
+    /// store while every fetch-request view kept reading `.shared` — two disconnected stores
+    /// silently coexisting behind what looks like a single injected context.
+    init(context: NSManagedObjectContext = ContentView.resolveDefaultContext()) {
+        self.viewContext = context
         _fastManager = StateObject(wrappedValue: FastManager(context: context))
+    }
+
+    /// Isolates UI test runs onto their own on-disk store instead of the app's real one.
+    ///
+    /// `PersistenceController.shared` is the single production store every ordinary launch reads
+    /// and writes. Without this seam, a UI test run and a developer's own local usage — or a
+    /// screenshot-seeding run — share that exact database, which is also how `-seedScreenshots80`
+    /// used to reach and erase real fast history (see `FastManager+Mocking.swift`).
+    private static func resolveDefaultContext() -> NSManagedObjectContext {
+        guard ProcessInfo.processInfo.arguments.contains("-uiTesting") else {
+            return PersistenceController.shared.container.viewContext
+        }
+        let identifier = ProcessInfo.processInfo.environment["UITEST_STORE_ID"] ?? UUID().uuidString
+        return PersistenceController.uiTesting(storeIdentifier: identifier).container.viewContext
     }
 
     enum Tab: String, CaseIterable, Identifiable {
@@ -54,16 +76,25 @@ struct ContentView: View {
                 }
                 .tag(Tab.settings)
         }
+        .environment(\.managedObjectContext, viewContext)
         .preferredColorScheme(
             ProcessInfo.processInfo.arguments.contains("-forceDarkMode") ? .dark :
             ProcessInfo.processInfo.arguments.contains("-forceLightMode") ? .light : nil
         )
         .onAppear {
-            if ProcessInfo.processInfo.arguments.contains("-seedScreenshots80") {
-                fastManager.seedMockDataForScreenshots(progress: 0.80)
-            } else if ProcessInfo.processInfo.arguments.contains("-seedScreenshots100") {
-                fastManager.seedMockDataForScreenshots(progress: 1.05)
+            #if DEBUG
+            // Compiled out of Release entirely — not just runtime-gated — so no launch argument
+            // can reach `clearAllFastingData()` in a shipped build. `-uiTesting` is required
+            // alongside the seed flag so this can only ever run against the isolated store from
+            // `resolveDefaultContext()`, never a developer's real local database.
+            if ProcessInfo.processInfo.arguments.contains("-uiTesting") {
+                if ProcessInfo.processInfo.arguments.contains("-seedScreenshots80") {
+                    fastManager.seedMockDataForScreenshots(progress: 0.80)
+                } else if ProcessInfo.processInfo.arguments.contains("-seedScreenshots100") {
+                    fastManager.seedMockDataForScreenshots(progress: 1.05)
+                }
             }
+            #endif
             fastManager.refresh()
             fastManager.syncNotifications()
             applyPendingDeepLink()
