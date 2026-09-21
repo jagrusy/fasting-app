@@ -1,3 +1,4 @@
+#if DEBUG
 import Foundation
 import CoreData
 
@@ -36,3 +37,4 @@ extension FastManager {
         refresh()
     }
 }
+#endif

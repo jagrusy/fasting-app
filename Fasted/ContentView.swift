@@ -59,11 +59,13 @@ struct ContentView: View {
             ProcessInfo.processInfo.arguments.contains("-forceLightMode") ? .light : nil
         )
         .onAppear {
+            #if DEBUG
             if ProcessInfo.processInfo.arguments.contains("-seedScreenshots80") {
                 fastManager.seedMockDataForScreenshots(progress: 0.80)
             } else if ProcessInfo.processInfo.arguments.contains("-seedScreenshots100") {
                 fastManager.seedMockDataForScreenshots(progress: 1.05)
             }
+            #endif
             fastManager.refresh()
             fastManager.syncNotifications()
             applyPendingDeepLink()

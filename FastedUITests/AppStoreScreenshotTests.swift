@@ -9,7 +9,8 @@ final class AppStoreScreenshotTests: XCTestCase {
     func testCaptureAppStoreScreenshots() throws {
         // Part 1: Fast at 80% progress in Light Mode
         let app80 = XCUIApplication()
-        app80.launchArguments = ["-forceLightMode", "-seedScreenshots80"]
+        let store80 = "screenshot_80_\(UUID().uuidString)"
+        app80.launchArguments = ["-forceLightMode", "-seedScreenshots80", "-testStoreName", store80]
         app80.launch()
 
         // 1. Fast Timer Hero (80% Progress in Light Mode)
@@ -52,7 +53,8 @@ final class AppStoreScreenshotTests: XCTestCase {
 
         // Part 2: Fast at 100%+ Goal Reached in Light Mode
         let app100 = XCUIApplication()
-        app100.launchArguments = ["-forceLightMode", "-seedScreenshots100"]
+        let store100 = "screenshot_100_\(UUID().uuidString)"
+        app100.launchArguments = ["-forceLightMode", "-seedScreenshots100", "-testStoreName", store100]
         app100.launch()
 
         let fastTab100 = app100.tabBars.buttons["Fast"]
@@ -63,7 +65,8 @@ final class AppStoreScreenshotTests: XCTestCase {
 
         // Part 3: Dark Mode Hero - Showcases that the app supports dark mode
         let appDark = XCUIApplication()
-        appDark.launchArguments = ["-forceDarkMode", "-seedScreenshots80"]
+        let storeDark = "screenshot_dark_\(UUID().uuidString)"
+        appDark.launchArguments = ["-forceDarkMode", "-seedScreenshots80", "-testStoreName", storeDark]
         appDark.launch()
 
         let fastTabDark = appDark.tabBars.buttons["Fast"]
