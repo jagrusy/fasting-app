@@ -65,6 +65,7 @@
 		54BB535ADD7C60AF2F74DE6D /* OptimisticStreakTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21569A5F6036D31B3C7A4B5D /* OptimisticStreakTests.swift */; };
 		558062F10AACD30B80898353 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
 		56BBADCE8A6AA771C2DF241C /* AppStoreScreenshotValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4978E327A121B83FB6F7FD /* AppStoreScreenshotValidationTests.swift */; };
+		56CFC596C4722E365C1A17E2 /* PersistenceControllerUITestingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 627A7EC87F6C2FE2813F4227 /* PersistenceControllerUITestingTests.swift */; };
 		599FBCC772982680206A9F9F /* FastingActionCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */; };
 		5E28F103B04991B5DC71121C /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98639EA5CF96432052AC501B /* NotificationManager.swift */; };
 		5FE1C9CFE67C485C58B7FFF4 /* FastDurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3450BE8B5B0F980D4687D09 /* FastDurationFormatter.swift */; };
@@ -116,6 +117,7 @@
 		96879764CAD6001EABED713F /* BuildMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C95DACC66EF1CE6953C6D0 /* BuildMetadata.swift */; };
 		98548E8AD56DF8EE3923EC20 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		994FE67C1CE31DACA5B1898F /* WatchPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */; };
+		9A0AB9AAC0BD4A7E2D9BD49E /* UITestIsolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84B2C22AB93A0FBC932336E /* UITestIsolation.swift */; };
 		9AECBC71B2D7B00723DF7DA5 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		9BB47C1977B50828F59E41C0 /* FastManager+AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3740D6FCC59A6BDB6F776A5A /* FastManager+AppGroup.swift */; };
 		9BE30CD05FF60B9801D9FE66 /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
@@ -292,6 +294,7 @@
 		5093F93825789F6E237BD2A2 /* EndFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndFastIntent.swift; sourceTree = "<group>"; };
 		53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingActionCommand.swift; sourceTree = "<group>"; };
 		556AA56BFF312CEBC9395C9D /* FastTimePickerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTimePickerSheetView.swift; sourceTree = "<group>"; };
+		627A7EC87F6C2FE2813F4227 /* PersistenceControllerUITestingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceControllerUITestingTests.swift; sourceTree = "<group>"; };
 		63DC7E46BF688F5ED5A31810 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		66847625426DFA2D05A362D2 /* FastingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingProtocol.swift; sourceTree = "<group>"; };
 		66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingStateSnapshot.swift; sourceTree = "<group>"; };
@@ -340,6 +343,7 @@
 		B70E16BF606D5B7E6BE42DB5 /* DialFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialFaceView.swift; sourceTree = "<group>"; };
 		B7160CB9DE9689FEF2EFEC10 /* FastedUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7EE8D5EE638B61DA187E53A /* FastControlWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastControlWidget.swift; sourceTree = "<group>"; };
+		B84B2C22AB93A0FBC932336E /* UITestIsolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestIsolation.swift; sourceTree = "<group>"; };
 		B9FA29E4E42619EE2FBE10A5 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPayloadTests.swift; sourceTree = "<group>"; };
 		C410780F466CF5987E506477 /* CalendarHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeatmapView.swift; sourceTree = "<group>"; };
@@ -494,6 +498,7 @@
 				EE58434F42AC6CAEFC60420A /* AGENTS.md */,
 				E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */,
 				E95F8810ED7037826FE830C9 /* FastedUITests.swift */,
+				B84B2C22AB93A0FBC932336E /* UITestIsolation.swift */,
 			);
 			path = FastedUITests;
 			sourceTree = "<group>";
@@ -574,6 +579,7 @@
 				1CFA4EEB688E8CA3F0D63709 /* NotificationManagerTests.swift */,
 				21569A5F6036D31B3C7A4B5D /* OptimisticStreakTests.swift */,
 				D18C07DDCC7D9F2D9FB5D6B8 /* PendingCommandReconciliationTests.swift */,
+				627A7EC87F6C2FE2813F4227 /* PersistenceControllerUITestingTests.swift */,
 				780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */,
 				23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */,
 				F624342259EC84B9174A4FAE /* StreakCalculatorTests.swift */,
@@ -846,6 +852,7 @@
 				50D4819AD5B0D7760254EF9B /* NotificationManagerTests.swift in Sources */,
 				54BB535ADD7C60AF2F74DE6D /* OptimisticStreakTests.swift in Sources */,
 				DD2A1F1E7D941774BADAAAAA /* PendingCommandReconciliationTests.swift in Sources */,
+				56CFC596C4722E365C1A17E2 /* PersistenceControllerUITestingTests.swift in Sources */,
 				A0B3A591793493FB73C04BD5 /* ReviewPromptManagerTests.swift in Sources */,
 				FCDDC5D7524F3419E7D9A55E /* SolsticeThemeTests.swift in Sources */,
 				CAF9AF507CA760F146E6B2D0 /* StreakCalculatorTests.swift in Sources */,
@@ -992,6 +999,7 @@
 			files = (
 				830AB177EA6601337FCA6524 /* AppStoreScreenshotTests.swift in Sources */,
 				94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */,
+				9A0AB9AAC0BD4A7E2D9BD49E /* UITestIsolation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

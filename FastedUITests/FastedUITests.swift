@@ -33,9 +33,14 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(startButton.waitForExistence(timeout: 3) || endButton.waitForExistence(timeout: 3))
     }
 
+    /// Regression: the previous `if` / `else if` had no `else`, so a launch where neither button
+    /// existed — a crash, the wrong tab, a broken build — ran zero assertions and reported a pass.
+    /// The branch existed because the test had no way to know whether a fast was already active on
+    /// the shared store; an isolated, guaranteed-empty store removes that ambiguity; a fresh store
+    /// can only ever start idle.
     func testStartAndEndFastFlow() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let storeId = UUID().uuidString
+        let app = launchIsolatedApp(storeId: storeId)
 
         let fastTab = app.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
@@ -44,21 +49,35 @@ final class FastedUITests: XCTestCase {
         let startButton = app.buttons["start_fast_button"]
         let endButton = app.buttons["end_fast_button"]
 
-        if startButton.waitForExistence(timeout: 3) {
-            startButton.tap()
-            XCTAssertTrue(endButton.waitForExistence(timeout: 4))
+        XCTAssertTrue(startButton.waitForExistence(timeout: 5), "A fresh, isolated store must start idle")
+        startButton.tap()
 
-            let statusHeader = app.staticTexts["fast_status_header"]
-            XCTAssertTrue(statusHeader.waitForExistence(timeout: 2))
+        XCTAssertTrue(endButton.waitForExistence(timeout: 4))
+        XCTAssertTrue(app.staticTexts["fast_status_header"].waitForExistence(timeout: 2))
 
-            endButton.tap()
-            dismissEndFastConfirmationIfNeeded(in: app)
-            XCTAssertTrue(startButton.waitForExistence(timeout: 5))
-        } else if endButton.waitForExistence(timeout: 3) {
-            endButton.tap()
-            dismissEndFastConfirmationIfNeeded(in: app)
-            XCTAssertTrue(startButton.waitForExistence(timeout: 5))
-        }
+        endButton.tap()
+        dismissEndFastConfirmationIfNeeded(in: app)
+        XCTAssertTrue(startButton.waitForExistence(timeout: 5))
+
+        let historyTab = app.tabBars.buttons["History"]
+        XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
+        historyTab.tap()
+        assertExactlyOneHistoryEntry(in: app, message: "saving the ended fast must record exactly one history entry")
+
+        // A fresh process reopening the same store: proves the save actually persisted to disk
+        // rather than only updating in-memory UI state. `terminate()` requests termination but
+        // doesn't wait for the OS to finish tearing the process down; relaunching immediately can
+        // race the new process's `NSPersistentContainer.loadPersistentStores` against the old
+        // process's SQLite file locks (confirmed live: an immediate relaunch crashed on reopening
+        // the same store). `wait(for: .notRunning)` is XCTest's own API for this exact race.
+        app.terminate()
+        XCTAssertTrue(app.wait(for: .notRunning, timeout: 5), "old process must fully exit before reopening its store")
+        let relaunched = launchIsolatedApp(storeId: storeId)
+
+        let relaunchedHistoryTab = relaunched.tabBars.buttons["History"]
+        XCTAssertTrue(relaunchedHistoryTab.waitForExistence(timeout: 5))
+        relaunchedHistoryTab.tap()
+        assertExactlyOneHistoryEntry(in: relaunched, message: "the saved fast must still be present after relaunch")
     }
 
     private func dismissEndFastConfirmationIfNeeded(in app: XCUIApplication) {
