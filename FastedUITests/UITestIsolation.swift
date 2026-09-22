@@ -23,12 +23,26 @@ extension XCTestCase {
     func assertExactlyOneHistoryEntry(in app: XCUIApplication, message: String) {
         let historyList = app.collectionViews["history_fast_list"]
         XCTAssertTrue(historyList.waitForExistence(timeout: 5))
-        let identifiers = Set(
+        let identifiers = historyEntryIdentifiers(in: historyList)
+        XCTAssertEqual(identifiers.count, 1, message)
+    }
+
+    func assertNoHistoryEntries(in app: XCUIApplication, message: String) {
+        let emptyState = app.staticTexts["No Completed Fasts Yet"]
+        XCTAssertTrue(emptyState.waitForExistence(timeout: 5), message)
+
+        let historyList = app.collectionViews["history_fast_list"]
+        if historyList.exists {
+            XCTAssertTrue(historyEntryIdentifiers(in: historyList).isEmpty, message)
+        }
+    }
+
+    private func historyEntryIdentifiers(in historyList: XCUIElement) -> Set<String> {
+        Set(
             historyList.descendants(matching: .any)
                 .matching(NSPredicate(format: "identifier BEGINSWITH 'fast_row_'"))
                 .allElementsBoundByIndex
                 .map(\.identifier)
         )
-        XCTAssertEqual(identifiers.count, 1, message)
     }
 }

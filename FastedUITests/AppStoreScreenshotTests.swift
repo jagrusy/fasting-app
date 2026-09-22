@@ -20,17 +20,15 @@ final class AppStoreScreenshotTests: XCTestCase {
 
         // 2. Metabolic Stages Educational Sheet
         let stageBadge = app80.buttons["metabolic_stage_badge"]
-        if stageBadge.waitForExistence(timeout: 3) {
-            stageBadge.tap()
-            let stagesTitle = app80.navigationBars["Metabolic Fasting Stages"]
-            XCTAssertTrue(stagesTitle.waitForExistence(timeout: 3))
-            saveScreenshot(name: "03_MetabolicStages_Autophagy", in: app80)
+        XCTAssertTrue(stageBadge.waitForExistence(timeout: 3), "seeded fast must expose metabolic stages")
+        stageBadge.tap()
+        let stagesTitle = app80.navigationBars["Metabolic Fasting Stages"]
+        XCTAssertTrue(stagesTitle.waitForExistence(timeout: 3))
+        saveScreenshot(name: "03_MetabolicStages_Autophagy", in: app80)
 
-            let doneButton = app80.buttons["stages_done_button"]
-            if doneButton.waitForExistence(timeout: 2) {
-                doneButton.tap()
-            }
-        }
+        let doneButton = app80.buttons["stages_done_button"]
+        XCTAssertTrue(doneButton.waitForExistence(timeout: 2), "metabolic stages must provide a dismiss control")
+        doneButton.tap()
 
         // 3. History Tab Heatmap & Streaks
         let historyTab = app80.tabBars.buttons["History"]
@@ -44,11 +42,12 @@ final class AppStoreScreenshotTests: XCTestCase {
         settingsTab.tap()
 
         let protocolLink = app80.buttons["settings_protocol_navigation_link"]
-        if protocolLink.waitForExistence(timeout: 3) {
-            protocolLink.tap()
-            saveScreenshot(name: "05_ProtocolPicker_CustomDial", in: app80)
-            app80.navigationBars.buttons.element(boundBy: 0).tap()
-        }
+        XCTAssertTrue(protocolLink.waitForExistence(timeout: 3), "settings must expose the protocol picker")
+        protocolLink.tap()
+        saveScreenshot(name: "05_ProtocolPicker_CustomDial", in: app80)
+        let backButton = app80.navigationBars.buttons.element(boundBy: 0)
+        XCTAssertTrue(backButton.waitForExistence(timeout: 2), "protocol picker must provide a back control")
+        backButton.tap()
 
         // Part 2: Fast at 100%+ Goal Reached in Light Mode
         let app100 = XCUIApplication()
