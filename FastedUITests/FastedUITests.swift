@@ -8,8 +8,7 @@ final class FastedUITests: XCTestCase {
     }
 
     func testAppLaunchesWithThreeTabs() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let tabBarsQuery = app.tabBars
         XCTAssertTrue(tabBarsQuery.buttons["Fast"].waitForExistence(timeout: 5))
@@ -18,8 +17,7 @@ final class FastedUITests: XCTestCase {
     }
 
     func testFastTabBasicUIElements() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let fastTab = app.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
@@ -30,7 +28,8 @@ final class FastedUITests: XCTestCase {
 
         let startButton = app.buttons["start_fast_button"]
         let endButton = app.buttons["end_fast_button"]
-        XCTAssertTrue(startButton.waitForExistence(timeout: 3) || endButton.waitForExistence(timeout: 3))
+        XCTAssertTrue(startButton.waitForExistence(timeout: 3), "a fresh isolated store must start idle")
+        XCTAssertFalse(endButton.exists, "the end control must not appear before a fast starts")
     }
 
     /// Regression: the previous `if` / `else if` had no `else`, so a launch where neither button
@@ -56,7 +55,9 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["fast_status_header"].waitForExistence(timeout: 2))
 
         endButton.tap()
-        dismissEndFastConfirmationIfNeeded(in: app)
+        let saveButton = app.buttons["Save Fast"]
+        XCTAssertTrue(saveButton.waitForExistence(timeout: 3), "ending a fast must present the save action")
+        saveButton.tap()
         XCTAssertTrue(startButton.waitForExistence(timeout: 5))
 
         let historyTab = app.tabBars.buttons["History"]
@@ -80,27 +81,38 @@ final class FastedUITests: XCTestCase {
         assertExactlyOneHistoryEntry(in: relaunched, message: "the saved fast must still be present after relaunch")
     }
 
-    private func dismissEndFastConfirmationIfNeeded(in app: XCUIApplication) {
-        let saveButton = app.buttons["Save Fast"]
-        let discardButton = app.buttons["Discard Fast"]
-        let alert = app.alerts.firstMatch
+    func testDiscardFastDoesNotCreateHistoryAfterRelaunch() throws {
+        let storeId = UUID().uuidString
+        let app = launchIsolatedApp(storeId: storeId)
 
-        if saveButton.waitForExistence(timeout: 3) {
-            saveButton.tap()
-        } else if discardButton.waitForExistence(timeout: 2) {
-            discardButton.tap()
-        } else if alert.waitForExistence(timeout: 2) {
-            if alert.buttons["End Fast"].exists {
-                alert.buttons["End Fast"].tap()
-            } else if alert.buttons.element(boundBy: 0).exists {
-                alert.buttons.element(boundBy: 0).tap()
-            }
-        }
+        let startButton = app.buttons["start_fast_button"]
+        let endButton = app.buttons["end_fast_button"]
+        XCTAssertTrue(startButton.waitForExistence(timeout: 5), "a fresh isolated store must start idle")
+        startButton.tap()
+        XCTAssertTrue(endButton.waitForExistence(timeout: 4), "starting must expose the end control")
+
+        endButton.tap()
+        let discardButton = app.buttons["Discard Fast"]
+        XCTAssertTrue(discardButton.waitForExistence(timeout: 3), "ending a fast must present the discard action")
+        discardButton.tap()
+        XCTAssertTrue(startButton.waitForExistence(timeout: 5), "discarding must restore the idle state")
+
+        let historyTab = app.tabBars.buttons["History"]
+        XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
+        historyTab.tap()
+        assertNoHistoryEntries(in: app, message: "discarding must not create a history entry")
+
+        app.terminate()
+        XCTAssertTrue(app.wait(for: .notRunning, timeout: 5), "old process must exit before reopening its store")
+        let relaunched = launchIsolatedApp(storeId: storeId)
+        let relaunchedHistoryTab = relaunched.tabBars.buttons["History"]
+        XCTAssertTrue(relaunchedHistoryTab.waitForExistence(timeout: 5))
+        relaunchedHistoryTab.tap()
+        assertNoHistoryEntries(in: relaunched, message: "discarded data must remain absent after relaunch")
     }
 
     func testCenterMetricCyclingOnTap() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let fastTab = app.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
@@ -109,10 +121,9 @@ final class FastedUITests: XCTestCase {
         let startButton = app.buttons["start_fast_button"]
         let endButton = app.buttons["end_fast_button"]
 
-        if startButton.waitForExistence(timeout: 2) {
-            startButton.tap()
-            XCTAssertTrue(endButton.waitForExistence(timeout: 4))
-        }
+        XCTAssertTrue(startButton.waitForExistence(timeout: 5), "a fresh isolated store must start idle")
+        startButton.tap()
+        XCTAssertTrue(endButton.waitForExistence(timeout: 4))
 
         let ringButton = app.buttons["progress_ring_button"]
         XCTAssertTrue(ringButton.waitForExistence(timeout: 3))
@@ -130,8 +141,7 @@ final class FastedUITests: XCTestCase {
     }
 
     func testProgressRingKnobDraggingUpdatesProgressAndElapsedTime() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let fastTab = app.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
@@ -140,10 +150,9 @@ final class FastedUITests: XCTestCase {
         let startButton = app.buttons["start_fast_button"]
         let endButton = app.buttons["end_fast_button"]
 
-        if startButton.waitForExistence(timeout: 2) {
-            startButton.tap()
-            XCTAssertTrue(endButton.waitForExistence(timeout: 4))
-        }
+        XCTAssertTrue(startButton.waitForExistence(timeout: 5), "a fresh isolated store must start idle")
+        startButton.tap()
+        XCTAssertTrue(endButton.waitForExistence(timeout: 4))
 
         let knob = app.otherElements["progress_knob"]
         XCTAssertTrue(knob.waitForExistence(timeout: 3), "Progress knob must exist and be accessible")
@@ -161,8 +170,7 @@ final class FastedUITests: XCTestCase {
     }
 
     func testHistoryTabDisplaysListOrEmptyState() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let historyTab = app.tabBars.buttons["History"]
         XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
@@ -172,14 +180,11 @@ final class FastedUITests: XCTestCase {
         XCTAssertTrue(navBar.waitForExistence(timeout: 8))
 
         let emptyTitle = app.staticTexts["No Completed Fasts Yet"]
-        let currentStreakLabel = app.staticTexts["current_streak_label"]
-
-        XCTAssertTrue(emptyTitle.waitForExistence(timeout: 8) || currentStreakLabel.waitForExistence(timeout: 8))
+        XCTAssertTrue(emptyTitle.waitForExistence(timeout: 8), "a fresh isolated store must show empty history")
     }
 
     func testHistoryTabMonthNavigation() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let historyTab = app.tabBars.buttons["History"]
         XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
@@ -195,8 +200,7 @@ final class FastedUITests: XCTestCase {
     }
 
     func testSettingsTabProtocolSelection() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let settingsTab = app.tabBars.buttons["Settings"]
         XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
@@ -229,8 +233,7 @@ final class FastedUITests: XCTestCase {
     }
 
     func testSettingsTabMedicalDisclaimerModal() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let settingsTab = app.tabBars.buttons["Settings"]
         XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
@@ -254,17 +257,15 @@ final class FastedUITests: XCTestCase {
     }
 
     func testMetabolicStagesSheetOpensAndDismisses() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let fastTab = app.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
         fastTab.tap()
 
         let startButton = app.buttons["start_fast_button"]
-        if startButton.waitForExistence(timeout: 2) {
-            startButton.tap()
-        }
+        XCTAssertTrue(startButton.waitForExistence(timeout: 5), "a fresh isolated store must start idle")
+        startButton.tap()
 
         let stageBadge = app.buttons["metabolic_stage_badge"]
         XCTAssertTrue(stageBadge.waitForExistence(timeout: 3))
@@ -281,8 +282,7 @@ final class FastedUITests: XCTestCase {
     }
 
     func testSettingsTabFeedbackButtonsExist() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let settingsTab = app.tabBars.buttons["Settings"]
         XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
@@ -307,8 +307,7 @@ final class FastedUITests: XCTestCase {
     /// `CFBundleURLTypes`, launches the app, and `onOpenURL` picks the tab. A unit test can only
     /// check the URL parsing, not that any of that plumbing is actually connected.
     func testDeepLinkOpensHistoryTab() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         // The app opens on Fast, so landing on History proves the link moved it.
         XCTAssertTrue(app.navigationBars["Solstice"].waitForExistence(timeout: 5))
@@ -319,8 +318,7 @@ final class FastedUITests: XCTestCase {
     }
 
     func testDeepLinkOpensFastTrackerFromAnotherTab() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let historyTab = app.tabBars.buttons["History"]
         XCTAssertTrue(historyTab.waitForExistence(timeout: 5))
@@ -334,8 +332,7 @@ final class FastedUITests: XCTestCase {
 
     /// An unrecognised host must be ignored rather than moving the user somewhere arbitrary.
     func testUnknownDeepLinkLeavesTheCurrentTabAlone() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchIsolatedApp()
 
         let historyTab = app.tabBars.buttons["History"]
         XCTAssertTrue(historyTab.waitForExistence(timeout: 5))

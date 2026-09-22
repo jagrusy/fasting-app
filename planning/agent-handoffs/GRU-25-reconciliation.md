@@ -1,0 +1,27 @@
+# GRU-25 PR #60 reconciliation handoff
+
+- Issue / task: GRU-25 follow-up — reconcile Antigravity PR #60 after PR #59 completed DRAFT-02.
+- Branch / worktree / base SHA / head SHA: `codex/gru-25-pr60-reconcile`; `/Users/grusy/.codex/worktrees/bd36/fasting-app`; base `6a7220d073edffb9dbc6bfd06a9b069d36e9c8b7`; head is the commit containing this handoff.
+- Claimed paths and concurrent-work check: `Fasted/FastManager+Mocking.swift`, `FastedUITests/FastedUITests.swift`, `FastedUITests/AppStoreScreenshotTests.swift`, `FastedUITests/UITestIsolation.swift`, and this handoff. PR #60 was the only competing writer and is superseded by this reconciliation.
+- Prerequisites: PR #59 merged as `6a7220d073edffb9dbc6bfd06a9b069d36e9c8b7`; PR #60 source commit reviewed at `cbbb2bf69f17a7baaabd0e629430f9abe82c5622`.
+- Changed behavior and rationale: every ordinary UI scenario launches with an isolated disk store and asserts its known fresh state; save and discard flows assert durable results after relaunch; screenshot capture fails when required screens or controls are absent; screenshot mock seeding is excluded from Release compilation. Current main's safer `-uiTesting` context/environment injection is retained.
+- Changed contracts/schema/identities: none. Store identity, Core Data schema, bundle IDs, App Group, and scheme names are unchanged.
+- Tests:
+  - Xcode 26.1.1 (17B100), XcodeGen 2.44.1, iPhone 17 Pro iOS 26.1 simulator `00C480BE-5EE8-4EAD-A597-FF056B517A60`.
+  - `xcodegen generate`: passed; generated project unchanged.
+  - `swiftlint lint --strict --no-cache`: 0 violations.
+  - `xcodebuild test -project Fasted.xcodeproj -scheme FastedTests -destination 'platform=iOS Simulator,id=00C480BE-5EE8-4EAD-A597-FF056B517A60' -only-testing:FastedTests/PersistenceControllerUITestingTests -resultBundlePath '/private/tmp/gru25-reconcile.4fjCFf/unit.xcresult'`: 3/3 passed.
+  - `xcodebuild test -project Fasted.xcodeproj -scheme FastedUITests -destination 'platform=iOS Simulator,id=00C480BE-5EE8-4EAD-A597-FF056B517A60' -resultBundlePath '/private/tmp/gru25-reconcile.4fjCFf/ui.xcresult'`: 16/16 passed on the first run.
+  - `xcodebuild build -project Fasted.xcodeproj -scheme Fasted -configuration Release -destination 'generic/platform=iOS' -derivedDataPath '/private/tmp/gru25-reconcile.4fjCFf/DerivedDataRelease' CODE_SIGNING_ALLOWED=NO`: passed, including embedded iOS and Watch bundles.
+  - `nm .../Release-iphoneos/Fasted.app/Fasted | rg -i 'seedMockDataForScreenshots'`: no symbol found.
+- First failures and resolution: the first strict-lint invocation found 0 violations but could not write SwiftLint's user cache under the sandbox. Re-running with `--no-cache` passed. No test or build failures occurred.
+- Acceptance checklist:
+  - Fresh state per UI scenario: pass.
+  - Missing required controls fail rather than skip: pass.
+  - Save -> exact history -> process relaunch: pass.
+  - Discard -> no history -> process relaunch: pass.
+  - Screenshot fixtures cannot erase the production store and are absent from Release: pass.
+  - Deterministic notification-denial UI evidence: not claimed. PR #60's version conditionally skipped denial and was intentionally not ported; existing unit coverage remains the honest evidence.
+- Remaining blockers, risk and recovery/compatibility notes: PR #60 must be closed as superseded after the reconciliation PR is opened. The isolated SQLite files live in the simulator temporary directory and are intentionally not production data.
+- Independent reviewer / PR: Antigravity supplied PR #60; Codex independently reconciled it against merged PR #59. Replacement PR pending.
+- Downstream handoff: merge this focused follow-up before GRU-26 because both lanes otherwise overlap UI-test and persistence-adjacent files.
