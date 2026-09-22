@@ -2,6 +2,22 @@ import Foundation
 import CoreData
 
 extension FastManager {
+    public func clearOperationError() {
+        operationError = nil
+    }
+
+    @discardableResult
+    func fail(_ error: Error, operation: String, rollback: Bool = true) -> Bool {
+        if rollback {
+            persistence.rollback()
+        }
+        NSLog("[Solstice] \(operation) failed: \(error)")
+        let message = "Solstice couldn't \(operation.lowercased()). "
+            + "Your saved fasting data is unchanged. Please try again."
+        operationError = FastManagerOperationError(message: message)
+        return false
+    }
+
     public func validateInterval(
         startDate: Date,
         endDate: Date? = nil,
@@ -24,8 +40,12 @@ extension FastManager {
             request.predicate = NSPredicate(format: "id != %@", excludeId as CVarArg)
         }
 
-        guard let allFasts = try? viewContext.fetch(request) else {
-            return (true, nil)
+        let allFasts: [Fast]
+        do {
+            allFasts = try persistence.fetchFasts(request)
+        } catch {
+            _ = fail(error, operation: "Validate the fasting time", rollback: false)
+            return (false, "Solstice couldn't verify this time against your history. Please try again.")
         }
 
         for other in allFasts {
@@ -41,7 +61,8 @@ extension FastManager {
         return (true, nil)
     }
 
-    public func clearAllFastingData() {
+    @discardableResult
+    public func clearAllFastingData() -> Bool {
         let request: NSFetchRequest<NSFetchRequestResult> = Fast.fetchRequest()
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
         deleteRequest.resultType = .resultTypeObjectIDs
@@ -59,8 +80,10 @@ extension FastManager {
             notificationManager.cancelRecurringReminders()
             clearAllSnoozeOffsets()
             self.objectWillChange.send()
+            publishSnapshot()
+            return true
         } catch {
-            NSLog("Error clearing all fasting data: \(error)")
+            return fail(error, operation: "Erase fasting data")
         }
     }
 }

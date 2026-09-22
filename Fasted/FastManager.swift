@@ -2,9 +2,19 @@ import Foundation
 import CoreData
 import SwiftUI
 
+public struct FastManagerOperationError: Identifiable, Equatable {
+    public let id = UUID()
+    public let message: String
+
+    init(message: String) {
+        self.message = message
+    }
+}
+
 @MainActor
 public final class FastManager: ObservableObject {
     let viewContext: NSManagedObjectContext
+    let persistence: FastManagerPersistence
     public let notificationManager: NotificationManager
     let defaults: UserDefaults
     public let coordinator: AppGroupCoordinator
@@ -15,14 +25,32 @@ public final class FastManager: ObservableObject {
 
     @Published public internal(set) var activeFast: Fast?
     @Published public internal(set) var userSettings: UserSettings?
+    @Published public internal(set) var operationError: FastManagerOperationError?
 
-    public init(
+    public convenience init(
         context: NSManagedObjectContext = PersistenceController.shared.container.viewContext,
         notificationManager: NotificationManager = .shared,
         defaults: UserDefaults = .standard,
         coordinator: AppGroupCoordinator = .shared
     ) {
+        self.init(
+            context: context,
+            notificationManager: notificationManager,
+            defaults: defaults,
+            coordinator: coordinator,
+            persistence: FastManagerPersistence(context: context)
+        )
+    }
+
+    init(
+        context: NSManagedObjectContext,
+        notificationManager: NotificationManager = .shared,
+        defaults: UserDefaults = .standard,
+        coordinator: AppGroupCoordinator = .shared,
+        persistence: FastManagerPersistence
+    ) {
         self.viewContext = context
+        self.persistence = persistence
         self.notificationManager = notificationManager
         self.defaults = defaults
         self.coordinator = coordinator
@@ -41,7 +69,7 @@ public final class FastManager: ObservableObject {
 
     private func setupNotificationCallbacks() {
         notificationManager.onStartFastRequested = { [weak self] in
-            self?.startFast()
+            _ = self?.startFast()
         }
         notificationManager.onEndFastRequested = { [weak self] in
             self?.endFast()
@@ -55,50 +83,59 @@ public final class FastManager: ObservableObject {
     /// snapshot every other surface reads is rewritten from Core Data last, so an optimistic
     /// write from a widget or the watch is always overwritten by the authoritative value.
     public func refresh() {
-        fetchActiveFast()
-        fetchUserSettings()
+        guard fetchActiveFast(), fetchUserSettings() else { return }
         processPendingCommands()
         publishSnapshot()
     }
 
-    public func fetchActiveFast() {
+    @discardableResult
+    public func fetchActiveFast() -> Bool {
         let request: NSFetchRequest<Fast> = Fast.fetchRequest()
         request.predicate = NSPredicate(format: "endDate == nil")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \Fast.startDate, ascending: false)]
         request.fetchLimit = 1
 
         do {
-            let results = try viewContext.fetch(request)
+            let results = try persistence.fetchFasts(request)
             self.activeFast = results.first
+            return true
         } catch {
-            NSLog("Failed to fetch active fast: \(error)")
-            self.activeFast = nil
+            return fail(error, operation: "Load the active fast", rollback: false)
         }
     }
 
-    public func fetchUserSettings() {
+    @discardableResult
+    public func fetchUserSettings() -> Bool {
         let request: NSFetchRequest<UserSettings> = UserSettings.fetchRequest()
         request.fetchLimit = 1
 
         do {
-            let results = try viewContext.fetch(request)
+            let results = try persistence.fetchSettings(request)
             if let existing = results.first {
                 self.userSettings = existing
+                return true
             } else {
-                self.userSettings = createDefaultUserSettings()
+                guard let settings = createDefaultUserSettings() else { return false }
+                self.userSettings = settings
+                return true
             }
         } catch {
-            NSLog("Failed to fetch UserSettings: \(error)")
+            return fail(error, operation: "Load settings", rollback: false)
         }
     }
 
-    private func createDefaultUserSettings() -> UserSettings {
+    private func createDefaultUserSettings() -> UserSettings? {
         let initial = UserSettings(context: viewContext)
         initial.id = UUID()
         initial.selectedProtocol = FastingProtocol.default.ratioString
         initial.notificationsEnabled = false
-        try? viewContext.save()
-        return initial
+        do {
+            try persistence.save()
+            return initial
+        } catch {
+            _ = fail(error, operation: "Create settings")
+            return nil
+        }
     }
 
     public var currentProtocol: FastingProtocol {
@@ -125,25 +162,12 @@ public final class FastManager: ObservableObject {
         return decoded
     }
 
-    public func updateSelectedProtocol(_ protocolType: String) {
-        guard let settings = userSettings else { return }
-        settings.selectedProtocol = protocolType
-
-        do {
-            try viewContext.save()
-            self.objectWillChange.send()
-            publishSnapshot()
-        } catch {
-            NSLog("Error saving protocol setting: \(error)")
-        }
-    }
-
     @discardableResult
     public func startFast(
         startDate: Date = Date(),
         targetDuration: TimeInterval? = nil,
         protocolType: String? = nil
-    ) -> Fast {
+    ) -> Fast? {
         if let existing = activeFast {
             return existing
         }
@@ -161,7 +185,7 @@ public final class FastManager: ObservableObject {
         fast.updatedAt = Date()
 
         do {
-            try viewContext.save()
+            try persistence.save()
             self.activeFast = fast
 
             let targetEnd = startDate.addingTimeInterval(duration)
@@ -175,14 +199,16 @@ public final class FastManager: ObservableObject {
                 enabled: notificationSchedule.notifyOnStageChange
             )
             publishSnapshot()
+            return fast
         } catch {
-            NSLog("Error starting fast: \(error)")
+            _ = fail(error, operation: "Start the fast")
+            return nil
         }
-        return fast
     }
 
-    public func endFast(endDate: Date = Date(), moodRating: Int16? = nil) {
-        guard let fast = activeFast else { return }
+    @discardableResult
+    public func endFast(endDate: Date = Date(), moodRating: Int16? = nil) -> Bool {
+        guard let fast = activeFast else { return false }
 
         fast.endDate = endDate
         fast.isCompleted = fast.hasReachedTarget()
@@ -192,7 +218,7 @@ public final class FastManager: ObservableObject {
         fast.updatedAt = Date()
 
         do {
-            try viewContext.save()
+            try persistence.save()
             let completed = fast
             self.activeFast = nil
             notificationManager.cancelGoalNotification()
@@ -207,17 +233,19 @@ public final class FastManager: ObservableObject {
                 completedFast: completed,
                 allCompletedFasts: allCompleted
             )
+            return true
         } catch {
-            NSLog("Error ending fast: \(error)")
+            return fail(error, operation: "End the fast")
         }
     }
 
+    @discardableResult
     public func updateActiveFast(
         startDate: Date,
         targetDuration: TimeInterval? = nil,
         protocolType: String? = nil
-    ) {
-        guard let fast = activeFast else { return }
+    ) -> Bool {
+        guard let fast = activeFast else { return false }
         fast.startDate = startDate
         if let duration = targetDuration {
             fast.targetDuration = duration
@@ -228,7 +256,7 @@ public final class FastManager: ObservableObject {
         fast.updatedAt = Date()
 
         do {
-            try viewContext.save()
+            try persistence.save()
             self.objectWillChange.send()
 
             let targetEnd = startDate.addingTimeInterval(fast.targetDuration + snoozeOffset(for: fast))
@@ -243,8 +271,9 @@ public final class FastManager: ObservableObject {
                 enabled: notificationSchedule.notifyOnStageChange
             )
             publishSnapshot()
+            return true
         } catch {
-            NSLog("Error updating active fast: \(error)")
+            return fail(error, operation: "Update the active fast")
         }
     }
 

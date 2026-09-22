@@ -63,15 +63,28 @@ public struct PersistenceController {
         return PersistenceController(storeURL: url)
     }
 
-    public func saveContext() {
+    public func saveContext() throws {
         let context = container.viewContext
         if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                let nsError = error as NSError
-                NSLog("Unresolved Core Data save error \(nsError), \(nsError.userInfo)")
-            }
+            try context.save()
         }
+    }
+}
+
+/// Injectable Core Data boundaries used by `FastManager`.
+///
+/// Keeping object creation on the real context while injecting only the failure-prone I/O calls
+/// lets tests exercise the same managed objects and rollback behavior as production.
+struct FastManagerPersistence {
+    var fetchFasts: (NSFetchRequest<Fast>) throws -> [Fast]
+    var fetchSettings: (NSFetchRequest<UserSettings>) throws -> [UserSettings]
+    var save: () throws -> Void
+    var rollback: () -> Void
+
+    init(context: NSManagedObjectContext) {
+        fetchFasts = { try context.fetch($0) }
+        fetchSettings = { try context.fetch($0) }
+        save = { try context.save() }
+        rollback = { context.rollback() }
     }
 }

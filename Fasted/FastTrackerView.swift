@@ -211,10 +211,11 @@ public struct FastTrackerView: View {
     private func startFastButton(now: Date) -> some View {
         Button {
             let tapDate = Date()
-            fastManager.startFast(startDate: tapDate)
-            NotificationManager.shared.requestAuthorization { granted in
-                if granted {
-                    fastManager.syncNotifications()
+            if fastManager.startFast(startDate: tapDate) != nil {
+                NotificationManager.shared.requestAuthorization { granted in
+                    if granted {
+                        fastManager.syncNotifications()
+                    }
                 }
             }
         } label: {

@@ -69,12 +69,6 @@ public struct ProtocolPickerView: View {
     }
 
     private func applyToActiveFast(_ proto: FastingProtocol) {
-        fastManager.updateSelectedProtocol(proto.ratioString)
-        guard let fast = fastManager.activeFast, let startDate = fast.startDate else { return }
-        fastManager.updateActiveFast(
-            startDate: startDate,
-            targetDuration: proto.fastingSeconds,
-            protocolType: proto.ratioString
-        )
+        fastManager.updateSelectedProtocol(proto.ratioString, retargetActiveFast: true)
     }
 }

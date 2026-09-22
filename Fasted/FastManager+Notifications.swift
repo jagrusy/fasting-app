@@ -1,23 +1,65 @@
 import Foundation
 
 extension FastManager {
-    public func updateNotificationSchedule(enabled: Bool, schedule: NotificationSchedule) {
-        guard let settings = userSettings else { return }
-        settings.notificationsEnabled = enabled
-
-        if let encoded = try? JSONEncoder().encode(schedule) {
-            settings.notificationSchedule = encoded
+    @discardableResult
+    public func updateSelectedProtocol(_ protocolType: String, retargetActiveFast: Bool = false) -> Bool {
+        guard let settings = userSettings else {
+            let message = "Solstice couldn't update the fasting plan. Please try again."
+            operationError = FastManagerOperationError(message: message)
+            return false
+        }
+        settings.selectedProtocol = protocolType
+        let active = retargetActiveFast ? activeFast : nil
+        if let active {
+            active.targetDuration = FastingProtocol.from(protocolType: protocolType).fastingSeconds
+            active.protocolType = protocolType
+            active.updatedAt = Date()
         }
 
         do {
-            try viewContext.save()
+            try persistence.save()
+            self.objectWillChange.send()
+            if let active, let startDate = active.startDate {
+                let targetEnd = startDate.addingTimeInterval(active.targetDuration + snoozeOffset(for: active))
+                notificationManager.scheduleGoalNotification(
+                    targetEndDate: targetEnd,
+                    protocolName: protocolType,
+                    enabled: notificationSchedule.notifyOnGoalReached
+                )
+                notificationManager.scheduleStageTransitionNotifications(
+                    startDate: startDate,
+                    enabled: notificationSchedule.notifyOnStageChange
+                )
+            }
+            publishSnapshot()
+            return true
+        } catch {
+            return fail(error, operation: "Update the fasting plan")
+        }
+    }
+
+    @discardableResult
+    public func updateNotificationSchedule(enabled: Bool, schedule: NotificationSchedule) -> Bool {
+        guard let settings = userSettings else {
+            let message = "Solstice couldn't update notification settings. Please try again."
+            operationError = FastManagerOperationError(message: message)
+            return false
+        }
+        settings.notificationsEnabled = enabled
+
+        do {
+            let encoded = try JSONEncoder().encode(schedule)
+            settings.notificationSchedule = encoded
+            try persistence.save()
             self.objectWillChange.send()
 
             notificationManager.scheduleRecurringReminders(schedule: schedule, enabled: enabled)
             rescheduleGoalNotificationForActiveFast(notifyOnGoalReached: schedule.notifyOnGoalReached)
             rescheduleStageNotificationsForActiveFast(notifyOnStageChange: schedule.notifyOnStageChange)
+            publishSnapshot()
+            return true
         } catch {
-            NSLog("Error updating notification settings: \(error)")
+            return fail(error, operation: "Update notification settings")
         }
     }
 

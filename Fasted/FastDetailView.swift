@@ -60,8 +60,9 @@ public struct FastDetailView: View {
             titleVisibility: .visible,
             actions: {
                 Button("Delete", role: .destructive) {
-                    fastManager.deleteFast(fast)
-                    dismiss()
+                    if fastManager.deleteFast(fast) {
+                        dismiss()
+                    }
                 }
                 Button("Cancel", role: .cancel) {}
             },
@@ -186,8 +187,9 @@ public struct FastDetailView: View {
             return
         }
 
-        fastManager.updateCompletedFast(fast, startDate: startDate, endDate: endDate)
-        hasChanges = false
-        dismiss()
+        if fastManager.updateCompletedFast(fast, startDate: startDate, endDate: endDate) {
+            hasChanges = false
+            dismiss()
+        }
     }
 }
