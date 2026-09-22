@@ -12,10 +12,12 @@ final class FastExtensionsTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        context.rollback()
         cancellables.removeAll()
     }
 
     override func tearDown() {
+        context.rollback()
         cancellables.removeAll()
         super.tearDown()
     }
@@ -29,6 +31,8 @@ final class FastExtensionsTests: XCTestCase {
         fast.endDate = end
         fast.targetDuration = 16 * 3600
         fast.isCompleted = true
+        fast.createdAt = start
+        fast.updatedAt = start
 
         XCTAssertEqual(fast.duration(), 16 * 3600)
         XCTAssertTrue(fast.isGoalMet)
@@ -105,6 +109,8 @@ final class FastExtensionsTests: XCTestCase {
         fast.endDate = start.addingTimeInterval(16 * 3600)
         fast.targetDuration = 16 * 3600
         fast.isCompleted = true
+        fast.createdAt = start
+        fast.updatedAt = start
 
         XCTAssertTrue(fast.isGoalMet)
         XCTAssertTrue(fast.hasReachedTarget())

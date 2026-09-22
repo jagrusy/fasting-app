@@ -63,7 +63,9 @@ final class FastedTests: XCTestCase {
         XCTAssertNil(manager.activeFast)
 
         let startTime = Date().addingTimeInterval(-1000)
-        let fast = manager.startFast(startDate: startTime, targetDuration: 57600, protocolType: "16:8")
+        let fast = try XCTUnwrap(
+            manager.startFast(startDate: startTime, targetDuration: 57600, protocolType: "16:8")
+        )
 
         XCTAssertTrue(manager.isFasting)
         XCTAssertNotNil(manager.activeFast)
@@ -89,7 +91,7 @@ final class FastedTests: XCTestCase {
         let manager = try XCTUnwrap(fastManager)
         let ctx = try XCTUnwrap(context)
 
-        let fast = manager.startFast(startDate: Date())
+        let fast = try XCTUnwrap(manager.startFast(startDate: Date()))
         XCTAssertTrue(manager.isFasting)
 
         manager.deleteFast(fast)
@@ -106,7 +108,9 @@ final class FastedTests: XCTestCase {
         // read "101% of 17h goal" in history instead of "108% of 16h goal"). Snoozing should only delay
         // when the goal notification re-fires, never change what the goal itself is.
         let manager = try XCTUnwrap(fastManager)
-        let fast = manager.startFast(startDate: Date(), targetDuration: 57600, protocolType: "16:8")
+        let fast = try XCTUnwrap(
+            manager.startFast(startDate: Date(), targetDuration: 57600, protocolType: "16:8")
+        )
         XCTAssertEqual(fast.targetDuration, 57600)
 
         manager.snoozeFast(by: 1800)
@@ -123,7 +127,7 @@ final class FastedTests: XCTestCase {
         let start = Date().addingTimeInterval(-72000)
         let end = start.addingTimeInterval(50000)
 
-        let fast = manager.startFast(startDate: start, targetDuration: 57600)
+        let fast = try XCTUnwrap(manager.startFast(startDate: start, targetDuration: 57600))
         manager.endFast(endDate: end)
         XCTAssertFalse(fast.isCompleted)
 
@@ -162,7 +166,7 @@ final class FastedTests: XCTestCase {
         let manager = try XCTUnwrap(fastManager)
         let ctx = try XCTUnwrap(context)
 
-        let active = manager.startFast(startDate: Date())
+        let active = try XCTUnwrap(manager.startFast(startDate: Date()))
         let sharedId = try XCTUnwrap(active.id)
 
         let unrelated = Fast(context: ctx)
@@ -184,8 +188,8 @@ final class FastedTests: XCTestCase {
         let manager = try XCTUnwrap(fastManager)
         let ctx = try XCTUnwrap(context)
 
-        let first = manager.startFast(startDate: Date())
-        let second = manager.startFast(startDate: Date().addingTimeInterval(10))
+        let first = try XCTUnwrap(manager.startFast(startDate: Date()))
+        let second = try XCTUnwrap(manager.startFast(startDate: Date().addingTimeInterval(10)))
 
         XCTAssertEqual(first.id, second.id)
 
@@ -214,14 +218,16 @@ final class FastedTests: XCTestCase {
         XCTAssertEqual(manager.currentProtocol.ratioString, "18:6")
         XCTAssertEqual(manager.currentProtocol.fastingHours, 18)
 
-        let fast = manager.startFast(startDate: Date())
+        let fast = try XCTUnwrap(manager.startFast(startDate: Date()))
         XCTAssertEqual(fast.protocolType, "18:6")
         XCTAssertEqual(fast.targetDuration, 18 * 3600)
     }
 
     func testUpdateSelectedProtocolAloneLeavesActiveFastUntouched() throws {
         let manager = try XCTUnwrap(fastManager)
-        let fast = manager.startFast(startDate: Date(), targetDuration: 16 * 3600, protocolType: "16:8")
+        let fast = try XCTUnwrap(
+            manager.startFast(startDate: Date(), targetDuration: 16 * 3600, protocolType: "16:8")
+        )
 
         manager.updateSelectedProtocol("18:6")
 
@@ -232,7 +238,9 @@ final class FastedTests: XCTestCase {
     func testUpdateActiveFastCanRetargetRunningFastToNewProtocol() throws {
         let manager = try XCTUnwrap(fastManager)
         let start = Date().addingTimeInterval(-3600)
-        let fast = manager.startFast(startDate: start, targetDuration: 16 * 3600, protocolType: "16:8")
+        let fast = try XCTUnwrap(
+            manager.startFast(startDate: start, targetDuration: 16 * 3600, protocolType: "16:8")
+        )
 
         manager.updateActiveFast(startDate: start, targetDuration: 18 * 3600, protocolType: "18:6")
 
