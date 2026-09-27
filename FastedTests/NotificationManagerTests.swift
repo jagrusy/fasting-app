@@ -187,8 +187,8 @@ final class NotificationManagerTests: XCTestCase {
     }
 
     /// Regression: the weekly repeat fired during a multi-day fast. Only the weekdays whose next
-    /// reminder lands inside the fast move, to their first occurrence after the goal; the rest keep
-    /// repeating, so reminders continue even if the app isn't reopened.
+    /// reminder lands inside the fast move past the goal; the rest keep repeating, so reminders
+    /// continue even if the app isn't reopened.
     func testStartRemindersDuringTheActiveFastMovePastItsGoal() {
         // Monday 4th 21:00, fast reaches its goal Thursday 7th 21:00.
         let plan = NotificationManager.startReminderPlan(
@@ -198,16 +198,28 @@ final class NotificationManagerTests: XCTestCase {
             calendar: utcCalendar
         )
 
-        // Weekdays: 1 = Sunday … 7 = Saturday. Tue/Wed/Thu fall inside the fast.
+        // Weekdays: 1 = Sunday … 7 = Saturday. Tue/Wed/Thu fall inside the fast, so each gets its
+        // next four weeks after the goal as one-off reminders instead of a weekly repeat.
+        func deferred(from day: Int) -> [Date] {
+            (0..<NotificationManager.deferredReminderWeeks).compactMap {
+                utcCalendar.date(byAdding: .day, value: 7 * $0, to: utcDate(day: day, hour: 20))
+            }
+        }
+        XCTAssertEqual(NotificationManager.deferredReminderWeeks, 4)
         XCTAssertEqual(plan, [
             NotificationManager.StartReminder(weekday: 1),
             NotificationManager.StartReminder(weekday: 2),
-            NotificationManager.StartReminder(weekday: 3, oneOffDate: utcDate(day: 12, hour: 20)),
-            NotificationManager.StartReminder(weekday: 4, oneOffDate: utcDate(day: 13, hour: 20)),
-            NotificationManager.StartReminder(weekday: 5, oneOffDate: utcDate(day: 14, hour: 20)),
+            NotificationManager.StartReminder(weekday: 3, deferredDates: deferred(from: 12)),
+            NotificationManager.StartReminder(weekday: 4, deferredDates: deferred(from: 13)),
+            NotificationManager.StartReminder(weekday: 5, deferredDates: deferred(from: 14)),
             NotificationManager.StartReminder(weekday: 6),
             NotificationManager.StartReminder(weekday: 7)
         ])
+    }
+
+    func testWeekZeroKeepsTheLegacyWeeklyIdentifier() {
+        XCTAssertEqual(NotificationManager.startReminderIdentifier(weekday: 3, week: 0), "recurring_start_day_3")
+        XCTAssertEqual(NotificationManager.startReminderIdentifier(weekday: 3, week: 2), "recurring_start_day_3_2")
     }
 
     func testPastSuppressionLeavesAllRemindersRepeating() {

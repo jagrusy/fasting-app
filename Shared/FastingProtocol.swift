@@ -89,6 +89,10 @@ public struct FastingProtocol: Identifiable, Hashable {
     private static let extendedPresetHours = [24, 36, 48, 72]
 
     /// Longer fasts, identified by length alone ("36h").
+    ///
+    /// Watch builds before these existed read any such identifier as 16:8. The Watch starts fasts
+    /// from the idle snapshot's `protocolType`, which is the Settings selection, so keep that
+    /// selection limited to the daily `presets` until the Watch contract carries the goal length.
     public static let extendedPresets: [FastingProtocol] = extendedPresetHours.map { fixedLength(hours: $0) }
 
     public static var allPresets: [FastingProtocol] {

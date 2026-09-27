@@ -249,43 +249,29 @@ extension NotificationManager {
             calendar: calendar
         )
         for reminder in plan {
-            let components: DateComponents
-            if let date = reminder.oneOffDate {
-                components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-            } else {
-                components = DateComponents(
-                    hour: time.hour ?? 20,
-                    minute: time.minute ?? 0,
-                    weekday: reminder.weekday
+            if reminder.deferredDates.isEmpty {
+                scheduleStartReminder(
+                    at: DateComponents(hour: time.hour ?? 20, minute: time.minute ?? 0, weekday: reminder.weekday),
+                    repeats: true,
+                    identifier: Self.startReminderIdentifier(weekday: reminder.weekday, week: 0)
                 )
             }
-            scheduleReminder(
-                at: components,
-                repeats: reminder.oneOffDate == nil,
-                title: "Time to Start Fasting ⏱️",
-                body: "Your fasting window starts now. Have a great fast!",
-                identifier: "recurring_start_day_\(reminder.weekday)",
-                categoryIdentifier: NotificationManager.startFastCategoryId
-            )
+            for (week, date) in reminder.deferredDates.enumerated() {
+                scheduleStartReminder(
+                    at: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date),
+                    repeats: false,
+                    identifier: Self.startReminderIdentifier(weekday: reminder.weekday, week: week)
+                )
+            }
         }
     }
 
-    private func scheduleReminder(
-        at dateComponents: DateComponents,
-        repeats: Bool,
-        title: String,
-        body: String,
-        identifier: String,
-        categoryIdentifier: String? = nil
-    ) {
-
+    private func scheduleStartReminder(at dateComponents: DateComponents, repeats: Bool, identifier: String) {
         let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = body
+        content.title = "Time to Start Fasting ⏱️"
+        content.body = "Your fasting window starts now. Have a great fast!"
         content.sound = .default
-        if let category = categoryIdentifier {
-            content.categoryIdentifier = category
-        }
+        content.categoryIdentifier = NotificationManager.startFastCategoryId
 
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: repeats)
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
@@ -300,25 +286,35 @@ extension NotificationManager {
     public func cancelRecurringReminders() {
         // `recurring_end_day_*` is no longer scheduled, but builds shipped before it was removed
         // may still have those requests pending — keep cancelling them or they fire forever.
-        let identifiers = (1...7).flatMap { [
-            "recurring_start_day_\($0)",
-            "recurring_end_day_\($0)"
-        ] }
+        let identifiers = (1...7).flatMap { weekday in
+            ["recurring_end_day_\(weekday)"]
+                + (0..<Self.deferredReminderWeeks).map { Self.startReminderIdentifier(weekday: weekday, week: $0) }
+        }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+    }
+
+    /// How many weekly occurrences a deferred weekday is scheduled for, one-off, after the active
+    /// fast's goal. iOS can't start a repeating trigger at a future date, so this bounds how long
+    /// that weekday keeps reminding if the app is never opened again after the fast; any sync
+    /// (launch, foreground, fast change, acting on a reminder) restores the weekly repeat.
+    public static let deferredReminderWeeks = 4
+
+    /// Week 0 keeps the identifier earlier builds used for the weekly repeat, so an upgrade replaces
+    /// rather than duplicates it.
+    public static func startReminderIdentifier(weekday: Int, week: Int) -> String {
+        week == 0 ? "recurring_start_day_\(weekday)" : "recurring_start_day_\(weekday)_\(week)"
     }
 
     /// One start reminder per selected weekday.
     public struct StartReminder: Equatable {
         public let weekday: Int
-        /// Nil for the normal weekly repeat. Set when that weekday's next reminder falls inside the
-        /// active fast: it then fires once, on the first occurrence after the fast's goal, and the
-        /// weekly repeat is restored the next time notifications sync (every launch, foreground and
-        /// fast change, including acting on this reminder).
-        public let oneOffDate: Date?
+        /// Empty for the normal weekly repeat. Set when that weekday's next reminder falls inside
+        /// the active fast: the next `deferredReminderWeeks` occurrences after the fast's goal.
+        public let deferredDates: [Date]
 
-        public init(weekday: Int, oneOffDate: Date? = nil) {
+        public init(weekday: Int, deferredDates: [Date] = []) {
             self.weekday = weekday
-            self.oneOffDate = oneOffDate
+            self.deferredDates = deferredDates
         }
     }
 
@@ -342,7 +338,10 @@ extension NotificationManager {
             else {
                 return StartReminder(weekday: weekday)
             }
-            return StartReminder(weekday: weekday, oneOffDate: afterFast)
+            let deferred = (0..<deferredReminderWeeks).compactMap {
+                calendar.date(byAdding: .weekOfYear, value: $0, to: afterFast)
+            }
+            return StartReminder(weekday: weekday, deferredDates: deferred)
         }
     }
 
