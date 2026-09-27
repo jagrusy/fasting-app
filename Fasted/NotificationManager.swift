@@ -103,72 +103,6 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
-    public func scheduleRecurringReminders(
-        schedule: NotificationSchedule,
-        enabled: Bool,
-        suppressUntil: Date? = nil,
-        now: Date = Date()
-    ) {
-        cancelRecurringReminders()
-        guard enabled else { return }
-
-        let calendar = Calendar.current
-        let dates = Self.upcomingStartReminderDates(
-            schedule: schedule,
-            now: now,
-            suppressUntil: suppressUntil,
-            calendar: calendar
-        )
-        for (index, date) in dates.enumerated() {
-            scheduleReminder(
-                at: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date),
-                title: "Time to Start Fasting ⏱️",
-                body: "Your fasting window starts now. Have a great fast!",
-                identifier: Self.startReminderIdentifier(index: index),
-                categoryIdentifier: NotificationManager.startFastCategoryId
-            )
-        }
-    }
-
-    private func scheduleReminder(
-        at dateComponents: DateComponents,
-        title: String,
-        body: String,
-        identifier: String,
-        categoryIdentifier: String? = nil
-    ) {
-
-        let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = body
-        content.sound = .default
-        if let category = categoryIdentifier {
-            content.categoryIdentifier = category
-        }
-
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                NSLog("Failed to schedule reminder \(identifier): \(error)")
-            }
-        }
-    }
-
-    public func cancelRecurringReminders() {
-        // The weekly repeating `recurring_start_day_*` and `recurring_end_day_*` requests are no
-        // longer scheduled, but earlier builds may still have them pending — keep cancelling them
-        // or they fire forever.
-        let legacyIdentifiers = (1...7).flatMap { [
-            "recurring_start_day_\($0)",
-            "recurring_end_day_\($0)"
-        ] }
-        let identifiers = legacyIdentifiers
-            + (0...Self.startReminderHorizonDays).map { Self.startReminderIdentifier(index: $0) }
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
-    }
-
     // MARK: - Stage Transition Notifications
 
     public struct StageBoundary: Equatable {
@@ -294,46 +228,121 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     }
 }
 
-// MARK: - Start Reminder and Day Milestone Timing
+// MARK: - Start Reminders and Day Milestone Timing
 
 extension NotificationManager {
-    /// How far ahead start reminders are scheduled. They are one-off requests rather than weekly
-    /// repeats so that days covered by a fast can be skipped; every launch, foreground and fast
-    /// change tops them back up.
-    public static let startReminderHorizonDays = 14
+    public func scheduleRecurringReminders(
+        schedule: NotificationSchedule,
+        enabled: Bool,
+        suppressUntil: Date? = nil,
+        now: Date = Date()
+    ) {
+        cancelRecurringReminders()
+        guard enabled else { return }
 
-    public static func startReminderIdentifier(index: Int) -> String {
-        "start_reminder_\(index)"
+        let calendar = Calendar.current
+        let time = calendar.dateComponents([.hour, .minute], from: schedule.startReminderTime)
+        let plan = Self.startReminderPlan(
+            schedule: schedule,
+            now: now,
+            suppressUntil: suppressUntil,
+            calendar: calendar
+        )
+        for reminder in plan {
+            let components: DateComponents
+            if let date = reminder.oneOffDate {
+                components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+            } else {
+                components = DateComponents(
+                    hour: time.hour ?? 20,
+                    minute: time.minute ?? 0,
+                    weekday: reminder.weekday
+                )
+            }
+            scheduleReminder(
+                at: components,
+                repeats: reminder.oneOffDate == nil,
+                title: "Time to Start Fasting ⏱️",
+                body: "Your fasting window starts now. Have a great fast!",
+                identifier: "recurring_start_day_\(reminder.weekday)",
+                categoryIdentifier: NotificationManager.startFastCategoryId
+            )
+        }
     }
 
-    /// Upcoming start-reminder times on the schedule's selected days, within the horizon, skipping
-    /// any at or before `suppressUntil` (the active fast's goal) so a long fast isn't told to start.
-    public static func upcomingStartReminderDates(
+    private func scheduleReminder(
+        at dateComponents: DateComponents,
+        repeats: Bool,
+        title: String,
+        body: String,
+        identifier: String,
+        categoryIdentifier: String? = nil
+    ) {
+
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        if let category = categoryIdentifier {
+            content.categoryIdentifier = category
+        }
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: repeats)
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                NSLog("Failed to schedule reminder \(identifier): \(error)")
+            }
+        }
+    }
+
+    public func cancelRecurringReminders() {
+        // `recurring_end_day_*` is no longer scheduled, but builds shipped before it was removed
+        // may still have those requests pending — keep cancelling them or they fire forever.
+        let identifiers = (1...7).flatMap { [
+            "recurring_start_day_\($0)",
+            "recurring_end_day_\($0)"
+        ] }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+    }
+
+    /// One start reminder per selected weekday.
+    public struct StartReminder: Equatable {
+        public let weekday: Int
+        /// Nil for the normal weekly repeat. Set when that weekday's next reminder falls inside the
+        /// active fast: it then fires once, on the first occurrence after the fast's goal, and the
+        /// weekly repeat is restored the next time notifications sync (every launch, foreground and
+        /// fast change, including acting on this reminder).
+        public let oneOffDate: Date?
+
+        public init(weekday: Int, oneOffDate: Date? = nil) {
+            self.weekday = weekday
+            self.oneOffDate = oneOffDate
+        }
+    }
+
+    /// Weekly repeats stay scheduled even if the app isn't opened; only a weekday whose next
+    /// reminder would land during the active fast (before `suppressUntil`, its goal) is moved.
+    public static func startReminderPlan(
         schedule: NotificationSchedule,
         now: Date = Date(),
         suppressUntil: Date? = nil,
         calendar: Calendar = .current
-    ) -> [Date] {
+    ) -> [StartReminder] {
         let time = calendar.dateComponents([.hour, .minute], from: schedule.startReminderTime)
-        let today = calendar.startOfDay(for: now)
-        guard let horizon = calendar.date(byAdding: .day, value: startReminderHorizonDays, to: now) else { return [] }
-
-        return (0...startReminderHorizonDays).compactMap { offset -> Date? in
-            guard let day = calendar.date(byAdding: .day, value: offset, to: today),
-                  schedule.selectedDays.contains(calendar.component(.weekday, from: day)),
-                  let fireDate = calendar.date(
-                    bySettingHour: time.hour ?? 20,
-                    minute: time.minute ?? 0,
-                    second: 0,
-                    of: day
-                  ),
-                  fireDate > now, fireDate <= horizon else {
-                return nil
+        return schedule.selectedDays.sorted().map { weekday -> StartReminder in
+            guard let suppressUntil = suppressUntil, suppressUntil > now else {
+                return StartReminder(weekday: weekday)
             }
-            if let suppressUntil = suppressUntil, fireDate <= suppressUntil {
-                return nil
+            let matching = DateComponents(hour: time.hour ?? 20, minute: time.minute ?? 0, weekday: weekday)
+            guard let next = calendar.nextDate(after: now, matching: matching, matchingPolicy: .nextTime),
+                  next <= suppressUntil,
+                  let afterFast = calendar.nextDate(after: suppressUntil, matching: matching, matchingPolicy: .nextTime)
+            else {
+                return StartReminder(weekday: weekday)
             }
-            return fireDate
+            return StartReminder(weekday: weekday, oneOffDate: afterFast)
         }
     }
 

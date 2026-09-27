@@ -176,35 +176,48 @@ final class NotificationManagerTests: XCTestCase {
         )
     }
 
-    func testStartRemindersCoverTheHorizonOnSelectedDays() {
-        let dates = NotificationManager.upcomingStartReminderDates(
-            schedule: reminderSchedule(days: Set(1...7)),
+    func testStartRemindersRepeatWeeklyWhenNotFasting() {
+        let plan = NotificationManager.startReminderPlan(
+            schedule: reminderSchedule(days: [1, 4, 6]),
             now: utcDate(day: 4, hour: 12),
             calendar: utcCalendar
         )
 
-        XCTAssertEqual(dates.count, NotificationManager.startReminderHorizonDays)
-        XCTAssertEqual(dates.first, utcDate(day: 4, hour: 20))
-        XCTAssertEqual(dates.last, utcDate(day: 17, hour: 20))
-
-        let sundaysOnly = NotificationManager.upcomingStartReminderDates(
-            schedule: reminderSchedule(days: [1]),
-            now: utcDate(day: 4, hour: 12),
-            calendar: utcCalendar
-        )
-        XCTAssertEqual(sundaysOnly, [utcDate(day: 10, hour: 20), utcDate(day: 17, hour: 20)])
+        XCTAssertEqual(plan, [1, 4, 6].map { NotificationManager.StartReminder(weekday: $0) })
     }
 
-    /// Regression: the reminder repeated weekly, so a multi-day fast was told to start fasting.
-    func testStartRemindersAreSkippedUntilTheActiveFastsGoal() {
-        let dates = NotificationManager.upcomingStartReminderDates(
+    /// Regression: the weekly repeat fired during a multi-day fast. Only the weekdays whose next
+    /// reminder lands inside the fast move, to their first occurrence after the goal; the rest keep
+    /// repeating, so reminders continue even if the app isn't reopened.
+    func testStartRemindersDuringTheActiveFastMovePastItsGoal() {
+        // Monday 4th 21:00, fast reaches its goal Thursday 7th 21:00.
+        let plan = NotificationManager.startReminderPlan(
             schedule: reminderSchedule(days: Set(1...7)),
             now: utcDate(day: 4, hour: 21),
             suppressUntil: utcDate(day: 7, hour: 21),
             calendar: utcCalendar
         )
 
-        XCTAssertEqual(dates.first, utcDate(day: 8, hour: 20))
-        XCTAssertFalse(dates.contains { $0 <= utcDate(day: 7, hour: 21) })
+        // Weekdays: 1 = Sunday … 7 = Saturday. Tue/Wed/Thu fall inside the fast.
+        XCTAssertEqual(plan, [
+            NotificationManager.StartReminder(weekday: 1),
+            NotificationManager.StartReminder(weekday: 2),
+            NotificationManager.StartReminder(weekday: 3, oneOffDate: utcDate(day: 12, hour: 20)),
+            NotificationManager.StartReminder(weekday: 4, oneOffDate: utcDate(day: 13, hour: 20)),
+            NotificationManager.StartReminder(weekday: 5, oneOffDate: utcDate(day: 14, hour: 20)),
+            NotificationManager.StartReminder(weekday: 6),
+            NotificationManager.StartReminder(weekday: 7)
+        ])
+    }
+
+    func testPastSuppressionLeavesAllRemindersRepeating() {
+        let plan = NotificationManager.startReminderPlan(
+            schedule: reminderSchedule(days: [3]),
+            now: utcDate(day: 4, hour: 21),
+            suppressUntil: utcDate(day: 4, hour: 9),
+            calendar: utcCalendar
+        )
+
+        XCTAssertEqual(plan, [NotificationManager.StartReminder(weekday: 3)])
     }
 }

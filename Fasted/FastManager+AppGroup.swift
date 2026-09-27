@@ -113,7 +113,6 @@ extension FastManager {
             activeFast = nil
             notificationManager.cancelGoalNotification()
             notificationManager.cancelStageTransitionNotifications()
-            syncNotifications()
         }
         clearSnoozeOffset(for: fast)
         viewContext.delete(fast)
@@ -121,6 +120,7 @@ extension FastManager {
         do {
             try viewContext.save()
             self.objectWillChange.send()
+            syncNotifications()
             publishSnapshot()
         } catch {
             NSLog("Error deleting fast: \(error)")
