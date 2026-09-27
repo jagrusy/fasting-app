@@ -282,6 +282,8 @@ public struct FastTrackerView: View {
 // MARK: - Start button + protocol menu
 
 private extension FastTrackerView {
+    var startMenuSegmentWidth: CGFloat { 56 }
+
     /// One rounded, accent-colored control: the main "Start Fast" segment (tapping it starts the
     /// default protocol exactly like before) and a chevron segment on its trailing edge that opens a
     /// menu of every other protocol.
@@ -290,11 +292,14 @@ private extension FastTrackerView {
             Button {
                 beginFast(targetDuration: nil, protocolType: nil)
             } label: {
+                // Inset by divider + chevron so the label centres on the page, under the ring.
                 Text("Start Fast")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
+                    .padding(.leading, startMenuSegmentWidth + 1)
                     .frame(height: 56)
+                    .contentShape(Rectangle())
             }
             .accessibilityIdentifier("start_fast_button")
 
@@ -308,7 +313,7 @@ private extension FastTrackerView {
                 Image(systemName: "chevron.down")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 56, height: 56)
+                    .frame(width: startMenuSegmentWidth, height: 56)
             }
             .accessibilityIdentifier("start_fast_menu")
             .accessibilityLabel("Choose fast type")
