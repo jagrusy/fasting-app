@@ -127,4 +127,22 @@ public struct DialMath {
         let seconds = hours * 3600.0
         return max(1800.0, seconds)
     }
+
+    /// Ring fractions (0, 1) of each whole 24-hour boundary strictly inside a fast's goal, for drawing
+    /// day-marker ticks on a ring where one full lap represents the entire goal (not one day).
+    /// 48h -> [0.5]; 72h -> [1/3, 2/3]; 36h -> [24/36]; 24h or less -> [].
+    public static func dayBoundaryFractions(targetDuration: TimeInterval) -> [Double] {
+        guard targetDuration.isFinite, targetDuration > 0 else { return [] }
+        let maxDuration = 168.0 * 3600.0 // app caps fixed fast lengths at 168h.
+        let duration = min(targetDuration, maxDuration)
+        let daySeconds = 24.0 * 3600.0
+
+        var fractions: [Double] = []
+        var boundary = daySeconds
+        while boundary < duration {
+            fractions.append(boundary / duration)
+            boundary += daySeconds
+        }
+        return fractions
+    }
 }
