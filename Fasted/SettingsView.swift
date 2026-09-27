@@ -6,6 +6,8 @@ public struct SettingsView: View {
     @State private var schedule: NotificationSchedule = .default
     @State private var showEraseConfirmation: Bool = false
     @State private var showDisclaimer: Bool = false
+    @State private var versionTapCount = 0
+    @AppStorage("developerToolsEnabled") private var developerToolsEnabled = false
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -25,6 +27,9 @@ public struct SettingsView: View {
             healthAndResourcesSection
             dataManagementSection
             aboutSection
+            if developerToolsEnabled {
+                developerSection
+            }
         }
         .navigationTitle("Settings")
         .onAppear(perform: loadSettings)
@@ -190,6 +195,20 @@ public struct SettingsView: View {
         }
     }
 
+    /// Hidden until the Version row is tapped seven times. Holds experiments meant for on-device
+    /// evaluation in TestFlight builds, not features.
+    private var developerSection: some View {
+        Section("Developer") {
+            NavigationLink("AI Lab") {
+                AILabView()
+            }
+            Button("Hide Developer Tools") {
+                developerToolsEnabled = false
+                versionTapCount = 0
+            }
+        }
+    }
+
     private var aboutSection: some View {
         Section {
             HStack {
@@ -197,6 +216,13 @@ public struct SettingsView: View {
                 Spacer()
                 Text(displayVersion)
                     .foregroundStyle(.secondary)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                versionTapCount += 1
+                if versionTapCount >= 7 {
+                    developerToolsEnabled = true
+                }
             }
             .contextMenu {
                 Button {
