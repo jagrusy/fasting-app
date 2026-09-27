@@ -8,7 +8,7 @@ public struct SettingsView: View {
     @State private var showEraseConfirmation: Bool = false
     @State private var showDisclaimer: Bool = false
     @State private var versionTapCount = 0
-    @AppStorage("developerToolsEnabled") private var developerToolsEnabled = false
+    @AppStorage(DeveloperTools.enabledKey) private var developerToolsEnabled = false
     @State private var developerToolsAllowed = false
 
     public init(fastManager: FastManager) {
@@ -205,10 +205,12 @@ public struct SettingsView: View {
             NavigationLink("AI Lab") {
                 AILabView()
             }
+            .accessibilityIdentifier("settings_ai_lab_link")
             Button("Hide Developer Tools") {
                 developerToolsEnabled = false
                 versionTapCount = 0
             }
+            .accessibilityIdentifier("settings_hide_developer_tools_button")
         }
     }
 
@@ -221,6 +223,8 @@ public struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
             .contentShape(Rectangle())
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("settings_version_row")
             .onTapGesture {
                 guard developerToolsAllowed else { return }
                 versionTapCount += 1
@@ -274,6 +278,8 @@ public struct SettingsView: View {
 /// Developer tools are for debug and TestFlight builds only. An App Store install reports the
 /// production environment, so the unlock does nothing there.
 enum DeveloperTools {
+    static let enabledKey = "developerToolsEnabled"
+
     static func isAllowed() async -> Bool {
         if isDebugBuild { return true }
         guard case .verified(let transaction)? = try? await AppTransaction.shared else { return false }
