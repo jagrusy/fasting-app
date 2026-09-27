@@ -120,6 +120,7 @@ extension FastManager {
         do {
             try viewContext.save()
             self.objectWillChange.send()
+            syncNotifications()
             publishSnapshot()
         } catch {
             NSLog("Error deleting fast: \(error)")

@@ -25,7 +25,9 @@ extension FastingStateSnapshot {
         // counts adds nothing. Incrementing unconditionally showed an inflated streak until the app
         // next republished the authoritative value.
         let countsAsNewDay = isComplete && startsAnUncountedDay(calendar: calendar)
-        let newStreak = countsAsNewDay ? currentStreak + 1 : currentStreak
+        // Whole days a long fast spans after its start day count too (see `StreakDays`).
+        let spannedDays = isComplete ? spannedWholeDays(until: endDate, calendar: calendar) : 0
+        let newStreak = currentStreak + (countsAsNewDay ? 1 : 0) + spannedDays
         let newLongest = max(longestStreak, newStreak)
         return FastingStateSnapshot(
             isFasting: false,
@@ -38,6 +40,11 @@ extension FastingStateSnapshot {
             lastCompletedFastStartDate: isComplete ? startDate : lastCompletedFastStartDate,
             updatedAt: Date()
         )
+    }
+
+    private func spannedWholeDays(until endDate: Date, calendar: Calendar) -> Int {
+        guard let start = startDate else { return 0 }
+        return StreakDays.credited(start: start, end: endDate, calendar: calendar).count - 1
     }
 
     private func startsAnUncountedDay(calendar: Calendar) -> Bool {
