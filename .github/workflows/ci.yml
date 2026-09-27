@@ -122,6 +122,18 @@ jobs:
             -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath TestResults-UI.xcresult
 
+      # project.yml is the source of truth, but Fasted.xcodeproj is committed so it can be opened
+      # without XcodeGen. Fail when it drifts, printing the exact regenerated diff to apply.
+      # Runs after the tests so a stale project never hides test results.
+      - name: Check committed Xcode project matches project.yml
+        run: |
+          git add --intent-to-add -- Fasted.xcodeproj
+          if ! git diff --quiet -- Fasted.xcodeproj; then
+            echo "::error::Fasted.xcodeproj is out of date with project.yml. Run 'xcodegen generate' and commit."
+            git --no-pager diff -- Fasted.xcodeproj
+            exit 1
+          fi
+
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
