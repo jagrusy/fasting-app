@@ -116,4 +116,95 @@ final class NotificationManagerTests: XCTestCase {
         }
         wait(for: [exp], timeout: 2.0)
     }
+
+    // MARK: - Day milestones
+
+    func testDayMilestonesFireAtEachWholeDayBeforeTheGoal() {
+        let now = Date()
+        let milestones = NotificationManager.futureDayMilestones(startDate: now, targetDuration: 72 * 3600, now: now)
+
+        // Day 1 is covered by the 24h stage notification and day 3 is the goal itself.
+        XCTAssertEqual(milestones.count, 1)
+        XCTAssertEqual(milestones[0].hours, 48)
+        XCTAssertEqual(milestones[0].hoursRemaining, 24)
+        XCTAssertEqual(milestones[0].timeInterval, 48 * 3600, accuracy: 1.0)
+    }
+
+    func testNoDayMilestonesForFastsUnderTwoDays() {
+        let now = Date()
+        for hours in [16.0, 24, 36, 48] {
+            XCTAssertTrue(
+                NotificationManager.futureDayMilestones(startDate: now, targetDuration: hours * 3600, now: now).isEmpty,
+                "\(hours)h"
+            )
+        }
+    }
+
+    func testDayMilestonesSkipThoseAlreadyPassed() {
+        let now = Date()
+        let started50hAgo = now.addingTimeInterval(-50 * 3600)
+        let milestones = NotificationManager.futureDayMilestones(
+            startDate: started50hAgo,
+            targetDuration: 100 * 3600,
+            now: now
+        )
+
+        XCTAssertEqual(milestones.map(\.hours), [72, 96])
+        XCTAssertEqual(milestones[0].timeInterval, 22 * 3600, accuracy: 1.0)
+        XCTAssertEqual(milestones[1].hoursRemaining, 4)
+    }
+
+    // MARK: - Start reminders
+
+    private var utcCalendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
+        return calendar
+    }
+
+    /// 2026-05-04 is a Monday.
+    private func utcDate(day: Int, hour: Int) -> Date {
+        let components = DateComponents(year: 2026, month: 5, day: day, hour: hour)
+        return utcCalendar.date(from: components) ?? Date(timeIntervalSince1970: 0)
+    }
+
+    private func reminderSchedule(days: Set<Int>) -> NotificationSchedule {
+        NotificationSchedule(
+            startReminderTime: utcDate(day: 1, hour: 20),
+            endReminderTime: utcDate(day: 1, hour: 12),
+            selectedDays: days
+        )
+    }
+
+    func testStartRemindersCoverTheHorizonOnSelectedDays() {
+        let dates = NotificationManager.upcomingStartReminderDates(
+            schedule: reminderSchedule(days: Set(1...7)),
+            now: utcDate(day: 4, hour: 12),
+            calendar: utcCalendar
+        )
+
+        XCTAssertEqual(dates.count, NotificationManager.startReminderHorizonDays)
+        XCTAssertEqual(dates.first, utcDate(day: 4, hour: 20))
+        XCTAssertEqual(dates.last, utcDate(day: 17, hour: 20))
+
+        let sundaysOnly = NotificationManager.upcomingStartReminderDates(
+            schedule: reminderSchedule(days: [1]),
+            now: utcDate(day: 4, hour: 12),
+            calendar: utcCalendar
+        )
+        XCTAssertEqual(sundaysOnly, [utcDate(day: 10, hour: 20), utcDate(day: 17, hour: 20)])
+    }
+
+    /// Regression: the reminder repeated weekly, so a multi-day fast was told to start fasting.
+    func testStartRemindersAreSkippedUntilTheActiveFastsGoal() {
+        let dates = NotificationManager.upcomingStartReminderDates(
+            schedule: reminderSchedule(days: Set(1...7)),
+            now: utcDate(day: 4, hour: 21),
+            suppressUntil: utcDate(day: 7, hour: 21),
+            calendar: utcCalendar
+        )
+
+        XCTAssertEqual(dates.first, utcDate(day: 8, hour: 20))
+        XCTAssertFalse(dates.contains { $0 <= utcDate(day: 7, hour: 21) })
+    }
 }

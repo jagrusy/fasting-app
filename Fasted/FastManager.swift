@@ -163,17 +163,7 @@ public final class FastManager: ObservableObject {
         do {
             try viewContext.save()
             self.activeFast = fast
-
-            let targetEnd = startDate.addingTimeInterval(duration)
-            notificationManager.scheduleGoalNotification(
-                targetEndDate: targetEnd,
-                protocolName: proto,
-                enabled: notificationSchedule.notifyOnGoalReached
-            )
-            notificationManager.scheduleStageTransitionNotifications(
-                startDate: startDate,
-                enabled: notificationSchedule.notifyOnStageChange
-            )
+            syncNotifications()
             publishSnapshot()
         } catch {
             NSLog("Error starting fast: \(error)")
@@ -198,6 +188,7 @@ public final class FastManager: ObservableObject {
             notificationManager.cancelGoalNotification()
             notificationManager.cancelStageTransitionNotifications()
             clearSnoozeOffset(for: fast)
+            syncNotifications()
             publishSnapshot()
 
             let request: NSFetchRequest<Fast> = Fast.fetchRequest()
@@ -230,18 +221,7 @@ public final class FastManager: ObservableObject {
         do {
             try viewContext.save()
             self.objectWillChange.send()
-
-            let targetEnd = startDate.addingTimeInterval(fast.targetDuration + snoozeOffset(for: fast))
-            let proto = fast.protocolType ?? FastingProtocol.default.ratioString
-            notificationManager.scheduleGoalNotification(
-                targetEndDate: targetEnd,
-                protocolName: proto,
-                enabled: notificationSchedule.notifyOnGoalReached
-            )
-            notificationManager.scheduleStageTransitionNotifications(
-                startDate: startDate,
-                enabled: notificationSchedule.notifyOnStageChange
-            )
+            syncNotifications()
             publishSnapshot()
         } catch {
             NSLog("Error updating active fast: \(error)")
@@ -252,15 +232,7 @@ public final class FastManager: ObservableObject {
         guard let fast = activeFast, let id = fast.id else { return }
         let newOffset = defaults.double(forKey: snoozeOffsetKey(for: id)) + extensionSeconds
         defaults.set(newOffset, forKey: snoozeOffsetKey(for: id))
-
-        let start = fast.startDate ?? Date()
-        let targetEnd = start.addingTimeInterval(fast.targetDuration + newOffset)
-        let proto = fast.protocolType ?? FastingProtocol.default.ratioString
-        notificationManager.scheduleGoalNotification(
-            targetEndDate: targetEnd,
-            protocolName: proto,
-            enabled: notificationSchedule.notifyOnGoalReached
-        )
+        syncNotifications()
         publishSnapshot()
     }
 }

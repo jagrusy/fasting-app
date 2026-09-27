@@ -113,6 +113,7 @@ extension FastManager {
             activeFast = nil
             notificationManager.cancelGoalNotification()
             notificationManager.cancelStageTransitionNotifications()
+            syncNotifications()
         }
         clearSnoozeOffset(for: fast)
         viewContext.delete(fast)

@@ -39,9 +39,9 @@ public struct StreakCalculator {
             acc + fast.duration(relativeTo: now)
         }
 
-        let completedDaysSet = Set(completedFasts.compactMap { fast -> Date? in
-            guard let start = fast.startDate else { return nil }
-            return calendar.startOfDay(for: start)
+        let completedDaysSet = Set(completedFasts.flatMap { fast -> [Date] in
+            guard let start = fast.startDate else { return [] }
+            return StreakDays.credited(start: start, end: fast.resolvedEndDate(relativeTo: now), calendar: calendar)
         })
 
         let currentStreak = computeCurrentStreak(days: completedDaysSet, calendar: calendar, now: now)
@@ -110,7 +110,16 @@ public struct StreakCalculator {
             return start >= startOfDay && start < endOfDay
         }
 
-        guard !dayFasts.isEmpty else { return .none }
+        guard !dayFasts.isEmpty else {
+            // A fast of a day or more can cover this whole day without starting on it.
+            let spanning = fasts.first { fast in
+                guard let start = fast.startDate else { return false }
+                return start < startOfDay && fast.resolvedEndDate() >= endOfDay
+            }
+            guard let fast = spanning else { return .none }
+            let hours = endOfDay.timeIntervalSince(startOfDay) / 3600.0
+            return fast.isGoalMet() ? .goalMet(hours: hours) : .partial(hours: hours)
+        }
 
         var totalSeconds: Double = 0
         var hasGoalMet = false
