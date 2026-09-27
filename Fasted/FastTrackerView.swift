@@ -383,10 +383,14 @@ private extension FastTrackerView {
         }
     }
 
+    /// `startFast` only sets `activeFast` once the save commits, so the length is remembered and
+    /// the sheet dismissed only for a fast that actually started; on a failed save the sheet stays
+    /// open rather than looking like it worked.
     func startCustomFast(hours: Int) {
-        fastManager.rememberCustomFastHours(hours)
-        showCustomFastSheet = false
         let proto = FastingProtocol.fixedLength(hours: hours)
         beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
+        guard fastManager.isFasting else { return }
+        fastManager.rememberCustomFastHours(hours)
+        showCustomFastSheet = false
     }
 }
