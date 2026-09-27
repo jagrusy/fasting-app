@@ -30,6 +30,7 @@
 		225990CB5BDA1CA63EBD5F00 /* OpenFastTrackerIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3AE31ACC9B80F3421BA782 /* OpenFastTrackerIntent.swift */; };
 		250B6E2DE094437E20F3DC66 /* FastManagerValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776385FA5C186C9AFB85A306 /* FastManagerValidationTests.swift */; };
 		26C19A5BD6BDB1553F38F4C1 /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
+		27F92F7411212B91D5D78B0D /* DeveloperToolsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD8D8BF385FFAC09CE7D293F /* DeveloperToolsUITests.swift */; };
 		281063BCF8438C5CECA4B923 /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
 		290EB23E7C0C6FB242F90E6F /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
 		2AEB2AFC805215E2DE91E60D /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
@@ -353,6 +354,7 @@
 		C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastProgressViews.swift; sourceTree = "<group>"; };
 		C8A408558CA277F27154BD5D /* FastRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastRowView.swift; sourceTree = "<group>"; };
 		C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartFastIntent.swift; sourceTree = "<group>"; };
+		CD8D8BF385FFAC09CE7D293F /* DeveloperToolsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperToolsUITests.swift; sourceTree = "<group>"; };
 		D0EE0A457EFF011B0258010B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D18C07DDCC7D9F2D9FB5D6B8 /* PendingCommandReconciliationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingCommandReconciliationTests.swift; sourceTree = "<group>"; };
 		D1B3B10BBD804653FFAD01A9 /* ReviewPromptManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptManager.swift; sourceTree = "<group>"; };
@@ -516,6 +518,7 @@
 			children = (
 				EE58434F42AC6CAEFC60420A /* AGENTS.md */,
 				E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */,
+				CD8D8BF385FFAC09CE7D293F /* DeveloperToolsUITests.swift */,
 				E95F8810ED7037826FE830C9 /* FastedUITests.swift */,
 				B84B2C22AB93A0FBC932336E /* UITestIsolation.swift */,
 			);
@@ -1027,6 +1030,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				830AB177EA6601337FCA6524 /* AppStoreScreenshotTests.swift in Sources */,
+				27F92F7411212B91D5D78B0D /* DeveloperToolsUITests.swift in Sources */,
 				94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */,
 				9A0AB9AAC0BD4A7E2D9BD49E /* UITestIsolation.swift in Sources */,
 			);
