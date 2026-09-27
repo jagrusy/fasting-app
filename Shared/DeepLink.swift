@@ -1,6 +1,6 @@
 import Foundation
 
-/// Where a tap on a widget, Live Activity, or Control Center tile should land inside the app.
+/// Where a tap on a widget or Control Center tile should land inside the app.
 ///
 /// Both endpoints are tab selections, not navigation pushes — `ContentView` has no per-fast
 /// destination to route to, since the active fast is simply whatever `FastTrackerView` renders.
