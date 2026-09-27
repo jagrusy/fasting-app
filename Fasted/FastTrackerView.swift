@@ -292,8 +292,7 @@ private extension FastTrackerView {
             Button {
                 beginFast(targetDuration: nil, protocolType: nil)
             } label: {
-                // Inset by divider + chevron so the label centres on the page, under the ring.
-                Text("Start Fast")
+                Text("Start Fast") // inset by divider + chevron so it centres under the ring
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
