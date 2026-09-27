@@ -275,11 +275,17 @@ public struct SettingsView: View {
 /// production environment, so the unlock does nothing there.
 enum DeveloperTools {
     static func isAllowed() async -> Bool {
+        if isDebugBuild { return true }
+        guard case .verified(let transaction)? = try? await AppTransaction.shared else { return false }
+        return transaction.environment == .sandbox
+    }
+
+    /// A runtime flag rather than `#if` around the lookup, so Debug CI builds compile the StoreKit path too.
+    private static var isDebugBuild: Bool {
         #if DEBUG
         return true
         #else
-        guard case .verified(let transaction)? = try? await AppTransaction.shared else { return false }
-        return transaction.environment == .sandbox
+        return false
         #endif
     }
 }
