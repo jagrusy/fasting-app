@@ -94,4 +94,22 @@ extension FastManager {
         let keys = defaults.dictionaryRepresentation().keys.filter { $0.hasPrefix(Self.snoozeOffsetKeyPrefix) }
         keys.forEach { defaults.removeObject(forKey: $0) }
     }
+
+    // MARK: - Last custom fast length
+
+    private static let lastCustomFastHoursKey = "com.solstice.lastCustomFastHours"
+
+    /// The last length the user picked from the custom-fast sheet, offered again as a shortcut in
+    /// the Start menu. Nil when never set, or when the stored value no longer parses as a valid
+    /// custom length (e.g. a stale value from a future app version).
+    public var lastCustomFastHours: Int? {
+        let stored = defaults.integer(forKey: Self.lastCustomFastHoursKey)
+        guard stored != 0, FastingProtocol.customHoursRange.contains(stored) else { return nil }
+        return stored
+    }
+
+    public func rememberCustomFastHours(_ hours: Int) {
+        guard FastingProtocol.customHoursRange.contains(hours) else { return }
+        defaults.set(hours, forKey: Self.lastCustomFastHoursKey)
+    }
 }

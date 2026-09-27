@@ -109,4 +109,43 @@ final class FastedDialMathTests: XCTestCase {
         // Never returns a negative duration
         XCTAssertEqual(DialMath.snapInterval(-100, toMinutes: 5), 0)
     }
+
+    func testDayBoundaryFractionsForMultiDayFasts() {
+        // 48h -> a single boundary at the halfway point.
+        let fractions48 = DialMath.dayBoundaryFractions(targetDuration: 48 * 3600)
+        XCTAssertEqual(fractions48.count, 1)
+        XCTAssertEqual(fractions48[0], 0.5, accuracy: 0.0001)
+
+        // 72h -> two boundaries, at one third and two thirds.
+        let fractions72 = DialMath.dayBoundaryFractions(targetDuration: 72 * 3600)
+        XCTAssertEqual(fractions72.count, 2)
+        XCTAssertEqual(fractions72[0], 1.0 / 3.0, accuracy: 0.0001)
+        XCTAssertEqual(fractions72[1], 2.0 / 3.0, accuracy: 0.0001)
+
+        // 36h -> a single boundary at 24/36.
+        let fractions36 = DialMath.dayBoundaryFractions(targetDuration: 36 * 3600)
+        XCTAssertEqual(fractions36.count, 1)
+        XCTAssertEqual(fractions36[0], 24.0 / 36.0, accuracy: 0.0001)
+    }
+
+    func testDayBoundaryFractionsForShortOrInvalidFasts() {
+        // 24h or less has no whole day boundary strictly inside the goal.
+        XCTAssertEqual(DialMath.dayBoundaryFractions(targetDuration: 24 * 3600).count, 0)
+        XCTAssertEqual(DialMath.dayBoundaryFractions(targetDuration: 16 * 3600).count, 0)
+
+        // Non-positive and non-finite input is guarded against.
+        XCTAssertEqual(DialMath.dayBoundaryFractions(targetDuration: 0).count, 0)
+        XCTAssertEqual(DialMath.dayBoundaryFractions(targetDuration: -100).count, 0)
+        XCTAssertEqual(DialMath.dayBoundaryFractions(targetDuration: .infinity).count, 0)
+        XCTAssertEqual(DialMath.dayBoundaryFractions(targetDuration: .nan).count, 0)
+    }
+
+    func testDayBoundaryFractionsCapsAtAppMaximum() {
+        // The app caps fixed fast lengths at 168h; a longer custom duration should still
+        // produce boundaries relative to that cap rather than growing unbounded.
+        let fractionsOverCap = DialMath.dayBoundaryFractions(targetDuration: 200 * 3600)
+        let fractionsAtCap = DialMath.dayBoundaryFractions(targetDuration: 168 * 3600)
+        XCTAssertEqual(fractionsOverCap, fractionsAtCap)
+        XCTAssertEqual(fractionsOverCap.count, 6) // boundaries at 24,48,72,96,120,144 of 168.
+    }
 }
