@@ -349,8 +349,11 @@ final class FastedUITests: XCTestCase {
 // MARK: - Start menu
 
 extension FastedUITests {
+    /// The menu must start the chosen fast, not the default: the ring's label shows the stored
+    /// goal ("24h" rather than the default "16:8"), and it survives reopening the same store.
     func testStartMenuStartsAnExtendedFast() throws {
-        let app = launchIsolatedApp()
+        let storeId = UUID().uuidString
+        let app = launchIsolatedApp(storeId: storeId)
 
         let fastTab = app.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
@@ -367,10 +370,24 @@ extension FastedUITests {
         XCTAssertTrue(extendedItem.waitForExistence(timeout: 3), "the 24-Hour Fast item must appear in the menu")
         extendedItem.tap()
 
-        XCTAssertTrue(app.staticTexts["fast_status_header"].waitForExistence(timeout: 3))
-        XCTAssertEqual(app.staticTexts["fast_status_header"].label, "Fasting in Progress")
+        XCTAssertTrue(app.buttons["end_fast_button"].waitForExistence(timeout: 4))
+        assertActiveGoalLabel(in: app, is: "24h", message: "the menu must start a 24-hour fast, not the default")
 
-        let endButton = app.buttons["end_fast_button"]
-        XCTAssertTrue(endButton.waitForExistence(timeout: 4), "starting from the menu must expose the end control")
+        app.terminate()
+        XCTAssertTrue(app.wait(for: .notRunning, timeout: 5), "old process must fully exit before reopening its store")
+        let relaunched = launchIsolatedApp(storeId: storeId)
+
+        let relaunchedFastTab = relaunched.tabBars.buttons["Fast"]
+        XCTAssertTrue(relaunchedFastTab.waitForExistence(timeout: 5))
+        relaunchedFastTab.tap()
+        XCTAssertTrue(relaunched.buttons["end_fast_button"].waitForExistence(timeout: 5))
+        assertActiveGoalLabel(in: relaunched, is: "24h", message: "the 24-hour goal must persist across relaunch")
+    }
+
+    /// `progress_percentage_text` reads "<n>% · <goal label>" in the default elapsed display mode.
+    private func assertActiveGoalLabel(in app: XCUIApplication, is goal: String, message: String) {
+        let label = app.staticTexts["progress_percentage_text"]
+        XCTAssertTrue(label.waitForExistence(timeout: 3), message)
+        XCTAssertTrue(label.label.hasSuffix("· \(goal)"), "\(message) (was \"\(label.label)\")")
     }
 }
