@@ -16,7 +16,7 @@ concurrency:
 jobs:
   lint:
     name: SwiftLint
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -29,20 +29,40 @@ jobs:
 
   build-and-test:
     name: Build & Test
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Select Xcode
+        # Same selection as deploy.yml, so CI builds with the toolchain that ships to TestFlight.
+        run: |
+          ls /Applications | grep -i '^Xcode' || true
+          LATEST=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -n 1)
+          echo "Selecting $LATEST"
+          sudo xcode-select -s "$LATEST/Contents/Developer"
+          xcodebuild -version
 
       - name: Discover Simulator
         id: sim
         run: |
           SIM_NAME=$(xcrun simctl list devices available -j | jq -r '.devices[] | select(. != []) | .[] | select(.isAvailable == true and (.name | contains("iPhone"))) | .name' | head -n 1)
           if [ -z "$SIM_NAME" ]; then
-            SIM_NAME="iPhone 16"
+            echo "::error::No available iPhone simulator for the selected Xcode"
+            exit 1
           fi
-          echo "Found available iOS Simulator: $SIM_NAME"
+          SIM_UDID=$(xcrun simctl list devices available -j | jq -r --arg n "$SIM_NAME" '[.devices[] | .[] | select(.isAvailable == true and .name == $n)][0].udid')
+          echo "Found available iOS Simulator: $SIM_NAME ($SIM_UDID)"
           echo "name=$SIM_NAME" >> $GITHUB_OUTPUT
+          echo "udid=$SIM_UDID" >> $GITHUB_OUTPUT
+
+      # The first UI test launch on a cold simulator can exceed XCUITest's launch timeout
+      # ("Timed out while launching application via Xcode"), which failed main's CI for c04d7bd
+      # before any test code ran. Boot and wait for the device to finish booting up front.
+      - name: Boot Simulator
+        run: |
+          xcrun simctl boot "${{ steps.sim.outputs.udid }}" || true
+          xcrun simctl bootstatus "${{ steps.sim.outputs.udid }}" -b
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -59,7 +79,7 @@ jobs:
           xcodebuild build \
             -project Fasted.xcodeproj \
             -scheme Fasted \
-            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
             SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 
       - name: Build iOS Widget Extension
@@ -67,7 +87,7 @@ jobs:
           xcodebuild build \
             -project Fasted.xcodeproj \
             -scheme FastedWidgets \
-            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
             SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 
       - name: Build watchOS Application
@@ -91,7 +111,7 @@ jobs:
           xcodebuild test \
             -project Fasted.xcodeproj \
             -scheme FastedTests \
-            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath TestResults-Unit.xcresult
 
       - name: Run UI Tests
@@ -99,7 +119,7 @@ jobs:
           xcodebuild test \
             -project Fasted.xcodeproj \
             -scheme FastedUITests \
-            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath TestResults-UI.xcresult
 
       - name: Upload Test Results
