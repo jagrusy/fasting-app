@@ -10,6 +10,5 @@ struct FastedWidgetsBundle: WidgetBundle {
         EatingWindowWidget()
         FastControlWidget()
         FastSnoozeControlWidget()
-        FastLiveActivity()
     }
 }
