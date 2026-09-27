@@ -60,7 +60,7 @@ struct FoundationModelsProgramSuggester: ProgramSuggesting {
         let session = LanguageModelSession(instructions: Self.instructions)
         let response = try await session.respond(to: goals, generating: GeneratedProgram.self)
         let generated = response.content
-        return ProgramProposal(
+        return try ProgramProposal(
             title: generated.title,
             lengthDays: generated.lengthDays,
             habits: generated.habits.map {
