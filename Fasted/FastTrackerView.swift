@@ -17,6 +17,7 @@ public struct FastTrackerView: View {
     @State private var dragRawElapsed: TimeInterval?
     @State private var showValidationAlert: Bool = false
     @State private var validationMessage: String?
+    @State private var showCustomFastSheet: Bool = false
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -40,6 +41,15 @@ public struct FastTrackerView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(validationMessage ?? "That time overlaps with another fast.")
+        }
+        .sheet(isPresented: $showCustomFastSheet) {
+            CustomFastSheetView(
+                initialHours: fastManager.lastCustomFastHours ?? 36,
+                onStart: { hours in
+                    startCustomFast(hours: hours)
+                },
+                onCancel: { showCustomFastSheet = false }
+            )
         }
     }
 
@@ -121,6 +131,7 @@ public struct FastTrackerView: View {
                 progress: progress,
                 isFasting: fastManager.isFasting,
                 ringWidth: 24,
+                targetDuration: fastManager.activeFast?.targetDuration ?? 0,
                 onProgressDragged: { deltaProgress in
                     handleProgressDragDelta(deltaProgress: deltaProgress, now: now)
                 },
@@ -208,28 +219,6 @@ public struct FastTrackerView: View {
         }
     }
 
-    private func startFastButton(now: Date) -> some View {
-        Button {
-            let tapDate = Date()
-            fastManager.startFast(startDate: tapDate)
-            NotificationManager.shared.requestAuthorization { granted in
-                if granted {
-                    fastManager.syncNotifications()
-                }
-            }
-        } label: {
-            Text("Start Fast")
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(Color.accentColor)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        }
-        .accessibilityIdentifier("start_fast_button")
-        .padding(.horizontal, 24)
-    }
-
     /// `deltaProgress` is a small incremental fraction of a full revolution, not an absolute position —
     /// this keeps the drag continuous across the 12-o'clock wrap point and lets a fast that's already
     /// past its goal (>100%) be nudged further without snapping back down to wherever the touch angle
@@ -287,5 +276,117 @@ public struct FastTrackerView: View {
         let startDate = fast.startDate ?? date
         let elapsed = date.timeIntervalSince(startDate)
         return max(0.0, elapsed / fast.targetDuration)
+    }
+}
+
+// MARK: - Start button + protocol menu
+
+private extension FastTrackerView {
+    /// One rounded, accent-colored control: the main "Start Fast" segment (tapping it starts the
+    /// default protocol exactly like before) and a chevron segment on its trailing edge that opens a
+    /// menu of every other protocol.
+    func startFastButton(now: Date) -> some View {
+        HStack(spacing: 0) {
+            Button {
+                beginFast(targetDuration: nil, protocolType: nil)
+            } label: {
+                Text("Start Fast")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+            }
+            .accessibilityIdentifier("start_fast_button")
+
+            Rectangle()
+                .fill(Color.white.opacity(0.35))
+                .frame(width: 1, height: 28)
+
+            Menu {
+                startMenuContent()
+            } label: {
+                Image(systemName: "chevron.down")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 56, height: 56)
+            }
+            .accessibilityIdentifier("start_fast_menu")
+            .accessibilityLabel("Choose fast type")
+        }
+        .background(Color.accentColor)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .padding(.horizontal, 24)
+    }
+
+    @ViewBuilder
+    func startMenuContent() -> some View {
+        Section("Daily") {
+            ForEach(FastingProtocol.presets) { proto in
+                dailyMenuItem(proto)
+            }
+        }
+
+        Section("Extended") {
+            ForEach(FastingProtocol.extendedPresets) { proto in
+                Button(proto.name) {
+                    beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
+                }
+                .accessibilityIdentifier("start_menu_\(proto.ratioString)")
+            }
+        }
+
+        lastCustomMenuItem()
+
+        Button {
+            showCustomFastSheet = true
+        } label: {
+            Label("Custom…", systemImage: "slider.horizontal.3")
+        }
+        .accessibilityIdentifier("start_menu_custom")
+    }
+
+    @ViewBuilder
+    func dailyMenuItem(_ proto: FastingProtocol) -> some View {
+        let title = "\(proto.ratioString) · \(proto.name)"
+        Button {
+            beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
+        } label: {
+            if proto.ratioString == fastManager.currentProtocol.ratioString {
+                Label(title, systemImage: "checkmark")
+            } else {
+                Text(title)
+            }
+        }
+        .accessibilityIdentifier("start_menu_\(proto.ratioString)")
+    }
+
+    /// A shortcut for the last custom length picked, when it isn't already one of the extended
+    /// presets offered above it.
+    @ViewBuilder
+    func lastCustomMenuItem() -> some View {
+        if let lastCustom = fastManager.lastCustomFastHours,
+           !FastingProtocol.extendedPresets.contains(where: { Int($0.fastingHours) == lastCustom }) {
+            let proto = FastingProtocol.fixedLength(hours: lastCustom)
+            Button("Custom (\(lastCustom)h)") {
+                beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
+            }
+            .accessibilityIdentifier("start_menu_custom_last")
+        }
+    }
+
+    func beginFast(targetDuration: TimeInterval?, protocolType: String?) {
+        fastManager.startFast(startDate: Date(), targetDuration: targetDuration, protocolType: protocolType)
+        NotificationManager.shared.requestAuthorization { granted in
+            if granted {
+                fastManager.syncNotifications()
+            }
+        }
+    }
+
+    func startCustomFast(hours: Int) {
+        fastManager.rememberCustomFastHours(hours)
+        showCustomFastSheet = false
+        let proto = FastingProtocol.fixedLength(hours: hours)
+        beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
     }
 }

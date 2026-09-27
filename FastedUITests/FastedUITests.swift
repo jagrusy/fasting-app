@@ -345,3 +345,32 @@ final class FastedUITests: XCTestCase {
         XCTAssertFalse(app.navigationBars["Solstice"].exists)
     }
 }
+
+// MARK: - Start menu
+
+extension FastedUITests {
+    func testStartMenuStartsAnExtendedFast() throws {
+        let app = launchIsolatedApp()
+
+        let fastTab = app.tabBars.buttons["Fast"]
+        XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
+        fastTab.tap()
+
+        let startButton = app.buttons["start_fast_button"]
+        XCTAssertTrue(startButton.waitForExistence(timeout: 5), "a fresh isolated store must start idle")
+
+        let menuButton = app.buttons["start_fast_menu"]
+        XCTAssertTrue(menuButton.waitForExistence(timeout: 3), "the protocol menu chevron must exist alongside Start")
+        menuButton.tap()
+
+        let extendedItem = app.buttons["start_menu_24h"]
+        XCTAssertTrue(extendedItem.waitForExistence(timeout: 3), "the 24-Hour Fast item must appear in the menu")
+        extendedItem.tap()
+
+        XCTAssertTrue(app.staticTexts["fast_status_header"].waitForExistence(timeout: 3))
+        XCTAssertEqual(app.staticTexts["fast_status_header"].label, "Fasting in Progress")
+
+        let endButton = app.buttons["end_fast_button"]
+        XCTAssertTrue(endButton.waitForExistence(timeout: 4), "starting from the menu must expose the end control")
+    }
+}

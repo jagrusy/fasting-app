@@ -345,3 +345,47 @@ extension FastedTests {
         XCTAssertEqual(FastingProtocol.label(forTargetDuration: 31 * 3600, protocolType: "30h"), "Custom")
     }
 }
+
+// MARK: - Custom fast start-menu additions
+
+extension FastedTests {
+    func testLastCustomFastHoursRoundTripsThroughIsolatedDefaults() throws {
+        let manager = try XCTUnwrap(fastManager)
+        XCTAssertNil(manager.lastCustomFastHours)
+
+        manager.rememberCustomFastHours(30)
+        XCTAssertEqual(manager.lastCustomFastHours, 30)
+
+        manager.rememberCustomFastHours(48)
+        XCTAssertEqual(manager.lastCustomFastHours, 48)
+    }
+
+    func testLastCustomFastHoursRejectsOutOfRangeValues() throws {
+        let manager = try XCTUnwrap(fastManager)
+
+        manager.rememberCustomFastHours(30)
+        XCTAssertEqual(manager.lastCustomFastHours, 30)
+
+        manager.rememberCustomFastHours(11) // below FastingProtocol.customHoursRange
+        XCTAssertEqual(manager.lastCustomFastHours, 30, "an out-of-range value must not overwrite the last valid one")
+
+        manager.rememberCustomFastHours(73) // above FastingProtocol.customHoursRange
+        XCTAssertEqual(manager.lastCustomFastHours, 30)
+    }
+
+    func testStartingFixedLengthCustomFastLeavesCurrentProtocolUnchanged() throws {
+        let manager = try XCTUnwrap(fastManager)
+        XCTAssertEqual(manager.currentProtocol.ratioString, "16:8")
+
+        let custom = FastingProtocol.fixedLength(hours: 30)
+        let fast = manager.startFast(
+            startDate: Date(),
+            targetDuration: custom.fastingSeconds,
+            protocolType: custom.ratioString
+        )
+
+        XCTAssertEqual(fast.protocolType, "30h")
+        XCTAssertEqual(fast.targetDuration, 30 * 3600)
+        XCTAssertEqual(manager.currentProtocol.ratioString, "16:8")
+    }
+}
