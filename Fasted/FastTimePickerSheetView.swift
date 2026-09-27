@@ -62,11 +62,14 @@ struct CustomFastSheetView: View {
                 Button {
                     onStart(hours)
                 } label: {
+                    // A minimum rather than fixed height, so the label wraps and grows with
+                    // Dynamic Type instead of being clipped by the rounded background.
                     Text("Start \(hours)-Hour Fast")
                         .font(.headline.weight(.semibold))
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
+                        .multilineTextAlignment(.center)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity, minHeight: 56)
                         .background(Color.accentColor)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
@@ -84,6 +87,6 @@ struct CustomFastSheetView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
     }
 }
