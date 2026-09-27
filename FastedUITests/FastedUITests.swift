@@ -364,7 +364,11 @@ extension FastedUITests {
 
         let menuButton = app.buttons["start_fast_menu"]
         XCTAssertTrue(menuButton.waitForExistence(timeout: 3), "the protocol menu chevron must exist alongside Start")
-        menuButton.tap()
+        // XCUITest's `tap()` first asks accessibility to scroll the element into view, which fails
+        // for a SwiftUI `Menu` (kAXErrorCannotComplete, hit point {-1, -1}) even when it is fully
+        // on screen. Tapping its centre coordinate still goes through normal hit-testing, so this
+        // fails if anything covers the chevron.
+        menuButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
         let extendedItem = app.buttons["start_menu_24h"]
         XCTAssertTrue(extendedItem.waitForExistence(timeout: 3), "the 24-Hour Fast item must appear in the menu")
