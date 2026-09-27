@@ -23,7 +23,7 @@ struct AILabView: View {
                 Button(isGenerating ? "Generating…" : "Generate program") {
                     generate()
                 }
-                .disabled(isGenerating || !modelAvailable || goals.isEmpty)
+                .disabled(isGenerating || !modelAvailable || trimmedGoals.isEmpty)
                 if let elapsed = elapsed {
                     Text(String(format: "Took %.1f s", elapsed))
                         .font(.caption)
@@ -89,6 +89,10 @@ struct AILabView: View {
         }
     }
 
+    private var trimmedGoals: String {
+        goals.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private var modelAvailable: Bool {
         #if canImport(FoundationModels)
         if #available(iOS 26.0, *) {
@@ -113,7 +117,7 @@ struct AILabView: View {
         isGenerating = true
         errorText = nil
         let started = Date()
-        let prompt = goals
+        let prompt = trimmedGoals
         Task {
             do {
                 proposal = try await FoundationModelsProgramSuggester().suggestProgram(for: prompt)

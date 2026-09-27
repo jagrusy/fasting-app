@@ -71,7 +71,7 @@ struct FoundationModelsProgramSuggester: ProgramSuggesting {
                 )
             },
             fastingNote: generated.fastingNote
-        ).sanitized()
+        ).validated()
     }
 }
 #endif

@@ -100,6 +100,21 @@ public struct ProgramProposal: Equatable {
     }
 }
 
+public enum ProgramSuggestionError: Error, Equatable {
+    /// Nothing usable survived `sanitized()`: the model returned no habits, or only blank or
+    /// duplicate ones. A challenge with nothing to check off is never shown as a success.
+    case noHabits
+}
+
+extension ProgramProposal {
+    /// `sanitized()`, rejecting a result with no habits left.
+    public func validated() throws -> ProgramProposal {
+        let clean = sanitized()
+        guard !clean.habits.isEmpty else { throw ProgramSuggestionError.noHabits }
+        return clean
+    }
+}
+
 /// Turns free-text goals into a proposed program. Injected so tests and devices without Apple
 /// Intelligence never touch FoundationModels.
 public protocol ProgramSuggesting {

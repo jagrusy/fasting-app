@@ -65,4 +65,13 @@ final class ProgramProposalTests: XCTestCase {
         XCTAssertEqual(ProgramProposal.Cadence.parse("twice a week"), .daily)
         XCTAssertEqual(ProgramProposal.Cadence.parse("every morning"), .daily)
     }
+
+    func testValidatedRejectsAProposalWithNoUsableHabits() {
+        let empty = ProgramProposal(title: "Reset", lengthDays: 30, habits: [habit("  "), habit("")])
+        XCTAssertThrowsError(try empty.validated()) { error in
+            XCTAssertEqual(error as? ProgramSuggestionError, .noHabits)
+        }
+        let valid = ProgramProposal(title: "Reset", lengthDays: 30, habits: [habit("Walk")])
+        XCTAssertEqual(try valid.validated().habits.count, 1)
+    }
 }
