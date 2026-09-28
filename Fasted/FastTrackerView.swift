@@ -284,9 +284,7 @@ public struct FastTrackerView: View {
 private extension FastTrackerView {
     var startMenuSegmentWidth: CGFloat { 56 }
 
-    /// One rounded, accent-colored control: the main "Start Fast" segment (tapping it starts the
-    /// default protocol exactly like before) and a chevron segment on its trailing edge that opens a
-    /// menu of every other protocol.
+    /// Starts the default protocol, with a trailing menu for other protocols.
     func startFastButton(now: Date) -> some View {
         HStack(spacing: 0) {
             Button {
@@ -379,7 +377,9 @@ private extension FastTrackerView {
     }
 
     func beginFast(targetDuration: TimeInterval?, protocolType: String?) {
-        fastManager.startFast(startDate: Date(), targetDuration: targetDuration, protocolType: protocolType)
+        guard fastManager.startFast(
+            startDate: Date(), targetDuration: targetDuration, protocolType: protocolType
+        ) != nil else { return }
         NotificationManager.shared.requestAuthorization { granted in
             if granted {
                 fastManager.syncNotifications()

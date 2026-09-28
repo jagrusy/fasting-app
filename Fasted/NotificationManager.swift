@@ -16,14 +16,21 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     public var onEndFastRequested: (@MainActor () -> Void)?
     public var onSnoozeRequested: (@MainActor (TimeInterval) -> Void)?
 
-    private override init() {
-        super.init()
+    private let delivery: NotificationDelivery
+
+    private override convenience init() {
+        self.init(delivery: .live)
         UNUserNotificationCenter.current().delegate = self
+    }
+
+    init(delivery: NotificationDelivery) {
+        self.delivery = delivery
+        super.init()
         registerCategories()
     }
 
     public func requestAuthorization(completion: ((Bool) -> Void)? = nil) {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+        delivery.requestAuthorization { granted, error in
             if let error = error {
                 NSLog("Notification authorization error: \(error)")
             }
@@ -72,7 +79,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
             options: []
         )
 
-        UNUserNotificationCenter.current().setNotificationCategories([goalCategory, startCategory])
+        delivery.register([goalCategory, startCategory])
     }
 
     public func scheduleGoalNotification(targetEndDate: Date, protocolName: String, enabled: Bool = true) {
@@ -91,7 +98,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
         let request = UNNotificationRequest(identifier: "fast_goal_notification", content: content, trigger: trigger)
 
-        UNUserNotificationCenter.current().add(request) { error in
+        delivery.add(request) { error in
             if let error = error {
                 NSLog("Failed to schedule goal notification: \(error)")
             }
@@ -100,7 +107,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
 
     public func cancelGoalNotification() {
         let identifiers = ["fast_goal_notification"]
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        delivery.remove(identifiers)
     }
 
     // MARK: - Stage Transition Notifications
@@ -156,7 +163,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
                 let identifier = Self.dayMilestoneIdentifier(forDay: milestone.hours / 24)
                 let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
 
-                UNUserNotificationCenter.current().add(request) { error in
+                delivery.add(request) { error in
                     if let error = error {
                         NSLog("Failed to schedule day milestone \(identifier): \(error)")
                     }
@@ -175,7 +182,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
             let identifier = Self.stageNotificationIdentifier(for: item.stage)
             let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
 
-            UNUserNotificationCenter.current().add(request) { error in
+            delivery.add(request) { error in
                 if let error = error {
                     NSLog("Failed to schedule stage notification \(identifier): \(error)")
                 }
@@ -187,7 +194,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     public func cancelStageTransitionNotifications() {
         let identifiers = MetabolicStage.allCases.map { Self.stageNotificationIdentifier(for: $0) }
             + (1...Self.maxDayMilestones).map { Self.dayMilestoneIdentifier(forDay: $0) }
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        delivery.remove(identifiers)
     }
 
     // UNUserNotificationCenterDelegate
@@ -276,7 +283,7 @@ extension NotificationManager {
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: repeats)
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
 
-        UNUserNotificationCenter.current().add(request) { error in
+        delivery.add(request) { error in
             if let error = error {
                 NSLog("Failed to schedule reminder \(identifier): \(error)")
             }
@@ -290,7 +297,7 @@ extension NotificationManager {
             ["recurring_end_day_\(weekday)"]
                 + (0..<Self.deferredReminderWeeks).map { Self.startReminderIdentifier(weekday: weekday, week: $0) }
         }
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        delivery.remove(identifiers)
     }
 
     /// How many weekly occurrences a deferred weekday is scheduled for, one-off, after the active

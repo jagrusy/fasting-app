@@ -22,7 +22,9 @@ public struct SettingsView: View {
                 isEnabled: $notificationsEnabled,
                 schedule: $schedule,
                 onSave: { enabled, newSchedule in
-                    fastManager.updateNotificationSchedule(enabled: enabled, schedule: newSchedule)
+                    if !fastManager.updateNotificationSchedule(enabled: enabled, schedule: newSchedule) {
+                        loadSettings()
+                    }
                 }
             )
             feedbackSection

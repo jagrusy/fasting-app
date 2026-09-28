@@ -80,6 +80,7 @@
 		669719083CB80521E2E92B45 /* StartFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */; };
 		6731DABAFE89191832089A9C /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */; };
 		67747AFA11317A45528691C1 /* MetabolicStageBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */; };
+		67A486A6240887F7B5557490 /* FastManagerPersistenceFailureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CCC2CB229D929E6A57EEB6 /* FastManagerPersistenceFailureTests.swift */; };
 		67B1232CA7B93E2F23C217D7 /* FastControlActionIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB494F124427FB1724B45579 /* FastControlActionIntent.swift */; };
 		67F7593024E306184CEB9657 /* FastManager+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */; };
 		680301A03BB0BED727DFF532 /* FastedDialMathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */; };
@@ -167,6 +168,7 @@
 		E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47F0F9EAF3379520543128F /* FastedTests.swift */; };
 		E0C993AB8D2B4405872918E8 /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
 		E4961D7D9EDBBE71BB479A7B /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
+		E7C17F9DD2B294F3B8A4036E /* FastManagerEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9BB663AF02432B7CB39F54A /* FastManagerEffects.swift */; };
 		E8A5B963DF26327D10D275D0 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
 		E9AFDD35443083072B92D138 /* BuildMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C95DACC66EF1CE6953C6D0 /* BuildMetadata.swift */; };
 		EAB59149E74AD57EA1933FDA /* FastGaugeMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225FC5D6935A29EA6DD836F1 /* FastGaugeMetricsTests.swift */; };
@@ -348,11 +350,13 @@
 		BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPayloadTests.swift; sourceTree = "<group>"; };
 		BEAE0BF8730F3277852D8EFB /* FoundationModelsProgramSuggester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationModelsProgramSuggester.swift; sourceTree = "<group>"; };
 		C0FB54B8FE50C8D986AECA4A /* AILabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AILabView.swift; sourceTree = "<group>"; };
+		C1CCC2CB229D929E6A57EEB6 /* FastManagerPersistenceFailureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManagerPersistenceFailureTests.swift; sourceTree = "<group>"; };
 		C410780F466CF5987E506477 /* CalendarHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeatmapView.swift; sourceTree = "<group>"; };
 		C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSummaryCardsView.swift; sourceTree = "<group>"; };
 		C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+Validation.swift"; sourceTree = "<group>"; };
 		C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastProgressViews.swift; sourceTree = "<group>"; };
 		C8A408558CA277F27154BD5D /* FastRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastRowView.swift; sourceTree = "<group>"; };
+		C9BB663AF02432B7CB39F54A /* FastManagerEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManagerEffects.swift; sourceTree = "<group>"; };
 		C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartFastIntent.swift; sourceTree = "<group>"; };
 		CD8D8BF385FFAC09CE7D293F /* DeveloperToolsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperToolsUITests.swift; sourceTree = "<group>"; };
 		D0EE0A457EFF011B0258010B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -551,6 +555,7 @@
 				37B59CA62211138ECBF72E75 /* Fast+Extensions.swift */,
 				F44F4C21FE2197D21744A872 /* FastDetailView.swift */,
 				430F756F747961AC57EF500D /* Fasted.entitlements */,
+				79E00FFDBAD21B51249AC6C9 /* Fasted.xcdatamodeld */,
 				8F0D8DFC60CE5AFA74094EEB /* FastedApp.swift */,
 				2D4D805535A363DDAF977B89 /* FastingArcShape.swift */,
 				0B49461E82EC597415611F11 /* FastManager.swift */,
@@ -558,6 +563,7 @@
 				EF81F5F39B0264BBD3C3831D /* FastManager+Mocking.swift */,
 				15A78317288959CA1D370A02 /* FastManager+Notifications.swift */,
 				C7D761F1D9D8AF7961A0ECBD /* FastManager+Validation.swift */,
+				C9BB663AF02432B7CB39F54A /* FastManagerEffects.swift */,
 				E1F3859AA323EFA3BAE7F2B4 /* FastMetricsCenterView.swift */,
 				C8A408558CA277F27154BD5D /* FastRowView.swift */,
 				EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */,
@@ -583,7 +589,6 @@
 				C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */,
 				133D5524D58FDC210D137DE4 /* WatchSessionManager.swift */,
 				E2B34555B8B77A47FB6DA407 /* AI */,
-				79E00FFDBAD21B51249AC6C9 /* Fasted.xcdatamodeld */,
 			);
 			path = Fasted;
 			sourceTree = "<group>";
@@ -605,6 +610,7 @@
 				D6C9E4A998368D7123C81D98 /* FastExtensionsTests.swift */,
 				225FC5D6935A29EA6DD836F1 /* FastGaugeMetricsTests.swift */,
 				3DCBC6565F8F188353EA37C0 /* FastingStateSnapshotTests.swift */,
+				C1CCC2CB229D929E6A57EEB6 /* FastManagerPersistenceFailureTests.swift */,
 				776385FA5C186C9AFB85A306 /* FastManagerValidationTests.swift */,
 				B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */,
 				EF72FD633682DB725F8845B5 /* MetabolicStageTests.swift */,
@@ -772,6 +778,7 @@
 				};
 			};
 			buildConfigurationList = 54E6C0D3DDF6D0ED13D8705F /* Build configuration list for PBXProject "Fasted" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -781,16 +788,15 @@
 			mainGroup = 867EEE02883DF0582CD8873E;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 9092DA5EE35FF49A58DA03C5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				0A23D54D311FDECC7C46A32A /* Fasted */,
-				AC6E01BB515F34D666FA8660 /* FastedWidgets */,
-				B1D5E537D851865F55892C1C /* FastedWatch */,
-				BC1FFDAC16141D7ECA59A7B4 /* FastedWatchWidgets */,
 				C383F9169379EEB61DEDE0FE /* FastedTests */,
 				A1D3CF1DC13453B009F3FA5A /* FastedUITests */,
+				B1D5E537D851865F55892C1C /* FastedWatch */,
+				BC1FFDAC16141D7ECA59A7B4 /* FastedWatchWidgets */,
+				AC6E01BB515F34D666FA8660 /* FastedWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -876,6 +882,7 @@
 				7D7E4E7BB19DCAE3CC48218E /* FastDurationFormatterTests.swift in Sources */,
 				52E86FE9CE2ED8B27EDB571E /* FastExtensionsTests.swift in Sources */,
 				EAB59149E74AD57EA1933FDA /* FastGaugeMetricsTests.swift in Sources */,
+				67A486A6240887F7B5557490 /* FastManagerPersistenceFailureTests.swift in Sources */,
 				250B6E2DE094437E20F3DC66 /* FastManagerValidationTests.swift in Sources */,
 				680301A03BB0BED727DFF532 /* FastedDialMathTests.swift in Sources */,
 				E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */,
@@ -923,6 +930,7 @@
 				4F73B0E08C8899B1D478714E /* FastManager+Notifications.swift in Sources */,
 				67F7593024E306184CEB9657 /* FastManager+Validation.swift in Sources */,
 				70A1E82B96E8466B544F780D /* FastManager.swift in Sources */,
+				E7C17F9DD2B294F3B8A4036E /* FastManagerEffects.swift in Sources */,
 				63DD19E655D1AD38E81DF671 /* FastMetricsCenterView.swift in Sources */,
 				C599741E6A0988A4ED07D94E /* FastProgressViews.swift in Sources */,
 				42B7EDBE72C5CBDF62F4E7EF /* FastRowView.swift in Sources */,

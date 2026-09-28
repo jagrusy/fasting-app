@@ -55,7 +55,7 @@ final class FastManagerValidationTests: XCTestCase {
         let fast1Start = now.addingTimeInterval(-86400)
         let fast1End = now.addingTimeInterval(-43200)
 
-        let fast1 = manager.startFast(startDate: fast1Start, targetDuration: 16 * 3600)
+        let fast1 = try XCTUnwrap(manager.startFast(startDate: fast1Start, targetDuration: 16 * 3600))
         manager.endFast(endDate: fast1End)
 
         // Attempt overlapping interval

@@ -2,11 +2,17 @@ import Foundation
 import CoreData
 
 extension FastManager {
-    public func publishSnapshot() {
+    @discardableResult
+    public func publishSnapshot() -> Bool {
         let allCompletedRequest: NSFetchRequest<Fast> = Fast.fetchRequest()
         allCompletedRequest.predicate = NSPredicate(format: "endDate != nil AND isCompleted == YES")
         allCompletedRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Fast.endDate, ascending: false)]
-        let completedFasts = (try? viewContext.fetch(allCompletedRequest)) ?? []
+        let completedFasts: [Fast]
+        do {
+            completedFasts = try persistence.fetchFasts(allCompletedRequest)
+        } catch {
+            return fail(error, operation: "Refresh shared fasting status", rollback: false)
+        }
 
         let streakInfo = StreakCalculator.calculate(from: completedFasts)
         let lastCompletedDate = completedFasts.first?.endDate
@@ -40,7 +46,8 @@ extension FastManager {
         }
 
         coordinator.writeSnapshot(snapshot)
-        WatchSessionManager.shared.syncSnapshotToWatch(snapshot)
+        effects.syncWatch(snapshot)
+        return true
     }
 
     /// Applies commands enqueued by the widget, Control Center, a notification action, or the
@@ -84,46 +91,53 @@ extension FastManager {
 
     /// Ends the current fast without saving it to history — used when the user explicitly discards
     /// an early end rather than saving a partial fast.
-    public func discardActiveFast() {
-        guard let fast = activeFast else { return }
-        deleteFast(fast)
+    @discardableResult
+    public func discardActiveFast() -> Bool {
+        guard let fast = activeFast else { return false }
+        return deleteFast(fast)
     }
 
+    @discardableResult
     public func updateCompletedFast(
         _ fast: Fast,
         startDate: Date,
         endDate: Date
-    ) {
+    ) -> Bool {
         fast.startDate = startDate
         fast.endDate = endDate
         fast.isCompleted = fast.hasReachedTarget()
         fast.updatedAt = Date()
 
         do {
-            try viewContext.save()
+            try persistence.save()
             self.objectWillChange.send()
             publishSnapshot()
+            return true
         } catch {
-            NSLog("Error updating completed fast: \(error)")
+            return fail(error, operation: "Update the completed fast")
         }
     }
 
-    public func deleteFast(_ fast: Fast) {
-        if let active = activeFast, active === fast {
-            activeFast = nil
-            notificationManager.cancelGoalNotification()
-            notificationManager.cancelStageTransitionNotifications()
-        }
-        clearSnoozeOffset(for: fast)
+    @discardableResult
+    public func deleteFast(_ fast: Fast) -> Bool {
+        let wasActive = activeFast === fast
+        let deletedID = fast.id
         viewContext.delete(fast)
 
         do {
-            try viewContext.save()
+            try persistence.save()
+            if wasActive {
+                activeFast = nil
+                notificationManager.cancelGoalNotification()
+                notificationManager.cancelStageTransitionNotifications()
+            }
+            if let deletedID { defaults.removeObject(forKey: snoozeOffsetKey(for: deletedID)) }
             self.objectWillChange.send()
             syncNotifications()
             publishSnapshot()
+            return true
         } catch {
-            NSLog("Error deleting fast: \(error)")
+            return fail(error, operation: "Delete the fast")
         }
     }
 }

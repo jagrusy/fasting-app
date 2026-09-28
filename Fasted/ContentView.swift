@@ -77,6 +77,19 @@ struct ContentView: View {
                 .tag(Tab.settings)
         }
         .environment(\.managedObjectContext, viewContext)
+        .alert(
+            "Couldn't Complete That",
+            isPresented: Binding(
+                get: { fastManager.operationError != nil },
+                set: { if !$0 { fastManager.clearOperationError() } }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                fastManager.clearOperationError()
+            }
+        } message: {
+            Text(fastManager.operationError?.message ?? "Your saved fasting data is unchanged. Please try again.")
+        }
         .preferredColorScheme(
             ProcessInfo.processInfo.arguments.contains("-forceDarkMode") ? .dark :
             ProcessInfo.processInfo.arguments.contains("-forceLightMode") ? .light : nil
