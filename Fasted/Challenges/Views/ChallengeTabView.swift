@@ -14,13 +14,6 @@ struct ChallengeTabView: View {
         self.fastManager = fastManager
     }
 
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter
-    }()
-
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -172,11 +165,11 @@ struct ChallengeTabView: View {
                 .tint(SolsticeColors.solarAmber)
 
             HStack {
-                Text("Started \(dateFormatter.string(from: challenge.startDate))")
+                Text("Started \(challenge.formattedDate(challenge.startDate))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Text("Ends \(dateFormatter.string(from: challenge.endDate))")
+                Text("Ends \(challenge.formattedDate(challenge.endDate))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

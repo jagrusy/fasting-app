@@ -9,13 +9,6 @@ struct PastChallengesView: View {
         self.challengeManager = challengeManager
     }
 
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter
-    }()
-
     var body: some View {
         NavigationStack {
             Group {
@@ -71,7 +64,7 @@ struct PastChallengesView: View {
                                 Text("•")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
-                                Text(dateFormatter.string(from: challenge.startDate))
+                                Text(challenge.formattedDate(challenge.startDate))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }

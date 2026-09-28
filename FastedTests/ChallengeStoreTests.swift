@@ -170,4 +170,19 @@ final class ChallengeStoreTests: XCTestCase {
         XCTAssertEqual(old.scheduledDays(for: old.commitments[0], through: now).count, 24)
         XCTAssertEqual(old.completedCount(for: old.commitments[0], through: now), 0)
     }
+
+    func testChallengeDateFormattingUsesChallengeTimeZone() throws {
+        let draft = ChallengeDraft(
+            title: "Tokyo Challenge",
+            timeZoneID: "Asia/Tokyo",
+            commitments: [CommitmentDraft(title: "Hydrate")]
+        )
+        let challenge = try store().start(draft)
+        let formatted = challenge.formattedDate(challenge.startDate)
+        let expectedFormatter = DateFormatter()
+        expectedFormatter.dateStyle = .medium
+        expectedFormatter.timeStyle = .none
+        expectedFormatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
+        XCTAssertEqual(formatted, expectedFormatter.string(from: challenge.startDate))
+    }
 }
