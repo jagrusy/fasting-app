@@ -167,6 +167,7 @@ public struct MealComposerSheet: View {
             try mealManager.saveMeal(draft: draft, activeFast: fastManager.activeFast)
             dismiss()
         } catch {
+            mealManager.errorMessage = nil
             errorMessage = error.localizedDescription
             showErrorAlert = true
         }
