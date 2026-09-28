@@ -3,15 +3,21 @@ import SwiftUI
 public struct SettingsView: View {
     @ObservedObject var fastManager: FastManager
     var challengeManager: ChallengeManager?
+    var mealManager: MealManager?
     @State private var notificationsEnabled: Bool = false
     @State private var schedule: NotificationSchedule = .default
     @State private var showEraseConfirmation: Bool = false
     @State private var showDisclaimer: Bool = false
     @State private var showBuilder: Bool = false
 
-    init(fastManager: FastManager, challengeManager: ChallengeManager? = nil) {
+    init(
+        fastManager: FastManager,
+        challengeManager: ChallengeManager? = nil,
+        mealManager: MealManager? = nil
+    ) {
         self.fastManager = fastManager
         self.challengeManager = challengeManager
+        self.mealManager = mealManager
     }
 
     public var body: some View {
@@ -22,6 +28,9 @@ public struct SettingsView: View {
                     challengeManager: challengeManager,
                     showBuilder: $showBuilder
                 )
+            }
+            if let mealManager {
+                JournalSettingsSection(mealManager: mealManager)
             }
             NotificationSettingsSection(
                 isEnabled: $notificationsEnabled,

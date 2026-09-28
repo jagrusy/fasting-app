@@ -4,12 +4,22 @@ import SwiftUI
 struct TodayTabView: View {
     @ObservedObject var fastManager: FastManager
     @ObservedObject var challengeManager: ChallengeManager
+    var mealManager: MealManager?
+    var onFastEnded: ((Date) -> Void)?
     @State private var showSettings: Bool = false
     @State private var showBuilder: Bool = false
+    @State private var showMealComposer: Bool = false
 
-    init(fastManager: FastManager, challengeManager: ChallengeManager) {
+    init(
+        fastManager: FastManager,
+        challengeManager: ChallengeManager,
+        mealManager: MealManager? = nil,
+        onFastEnded: ((Date) -> Void)? = nil
+    ) {
         self.fastManager = fastManager
         self.challengeManager = challengeManager
+        self.mealManager = mealManager
+        self.onFastEnded = onFastEnded
     }
 
     var body: some View {
@@ -22,7 +32,11 @@ struct TodayTabView: View {
                         startChallengeInviteCard
                     }
 
-                    FastTrackerView(fastManager: fastManager)
+                    if let mealManager, mealManager.isJournalEnabled {
+                        logMealActionCard
+                    }
+
+                    FastTrackerView(fastManager: fastManager, onFastEnded: onFastEnded)
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
@@ -42,7 +56,11 @@ struct TodayTabView: View {
             }
             .sheet(isPresented: $showSettings) {
                 NavigationStack {
-                    SettingsView(fastManager: fastManager, challengeManager: challengeManager)
+                    SettingsView(
+                        fastManager: fastManager,
+                        challengeManager: challengeManager,
+                        mealManager: mealManager
+                    )
                         .toolbar {
                             ToolbarItem(placement: .confirmationAction) {
                                 Button("Done") {
@@ -56,7 +74,39 @@ struct TodayTabView: View {
             .sheet(isPresented: $showBuilder) {
                 ChallengeBuilderView(challengeManager: challengeManager)
             }
+            .sheet(isPresented: $showMealComposer) {
+                if let mealManager {
+                    MealComposerSheet(
+                        mealManager: mealManager,
+                        fastManager: fastManager,
+                        isPostFastInvitation: false
+                    )
+                }
+            }
         }
+    }
+
+    private var logMealActionCard: some View {
+        HStack {
+            Image(systemName: "fork.knife")
+                .foregroundStyle(SolsticeColors.solarAmber)
+            Text("Food Journal")
+                .font(.subheadline.weight(.semibold))
+            Spacer()
+            Button("Log Meal") {
+                showMealComposer = true
+            }
+            .font(.caption.weight(.bold))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.accentColor)
+            .foregroundStyle(.white)
+            .clipShape(Capsule())
+            .accessibilityIdentifier("today_log_meal_button")
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 
     private func todayCommitmentsCard(_ challenge: Challenge) -> some View {

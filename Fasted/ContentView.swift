@@ -5,6 +5,7 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var fastManager: FastManager
     @StateObject private var challengeManager: ChallengeManager
+    @StateObject private var mealManager: MealManager
     @State private var selectedTab: Tab = .fast
     private let viewContext: NSManagedObjectContext
 
@@ -17,7 +18,8 @@ struct ContentView: View {
     /// silently coexisting behind what looks like a single injected context.
     init(
         context: NSManagedObjectContext = ContentView.resolveDefaultContext(),
-        challengeManager: ChallengeManager? = nil
+        challengeManager: ChallengeManager? = nil,
+        mealManager: MealManager? = nil
     ) {
         self.viewContext = context
         _fastManager = StateObject(wrappedValue: FastManager(context: context))
@@ -28,6 +30,15 @@ struct ContentView: View {
         } else {
             let coordinator = PersistenceController.shared.container.persistentStoreCoordinator
             _challengeManager = StateObject(wrappedValue: ChallengeManager(coordinator: coordinator))
+        }
+
+        if let mealManager {
+            _mealManager = StateObject(wrappedValue: mealManager)
+        } else if let coordinator = context.persistentStoreCoordinator {
+            _mealManager = StateObject(wrappedValue: MealManager(coordinator: coordinator))
+        } else {
+            let coordinator = PersistenceController.shared.container.persistentStoreCoordinator
+            _mealManager = StateObject(wrappedValue: MealManager(coordinator: coordinator))
         }
     }
 
@@ -50,6 +61,7 @@ struct ContentView: View {
         case today = "Today"
         case challenge = "Challenge"
         case history = "History"
+        case journal = "Journal"
         case settings = "Settings"
 
         var id: String { rawValue }
@@ -60,6 +72,7 @@ struct ContentView: View {
             case .today: return "sun.max.fill"
             case .challenge: return "flag.2.crossed.fill"
             case .history: return "chart.bar"
+            case .journal: return "book.closed.fill"
             case .settings: return "gearshape"
             }
         }
@@ -75,11 +88,16 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             if challengeManager.isChallengesEnabled {
-                TodayTabView(fastManager: fastManager, challengeManager: challengeManager)
-                    .tabItem {
-                        Label(Tab.today.rawValue, systemImage: Tab.today.icon)
-                    }
-                    .tag(Tab.today)
+                TodayTabView(
+                    fastManager: fastManager,
+                    challengeManager: challengeManager,
+                    mealManager: mealManager,
+                    onFastEnded: { mealManager.handleFastEnded(endDate: $0) }
+                )
+                .tabItem {
+                    Label(Tab.today.rawValue, systemImage: Tab.today.icon)
+                }
+                .tag(Tab.today)
 
                 ChallengeTabView(challengeManager: challengeManager, fastManager: fastManager)
                     .tabItem {
@@ -87,30 +105,48 @@ struct ContentView: View {
                     }
                     .tag(Tab.challenge)
             } else {
-                FastTabView(fastManager: fastManager, onSettingsTapped: {
-                    selectedTab = .settings
-                })
+                FastTabView(
+                    fastManager: fastManager,
+                    onSettingsTapped: { selectedTab = .settings },
+                    onFastEnded: { mealManager.handleFastEnded(endDate: $0) }
+                )
                 .tabItem {
                     Label(Tab.fast.rawValue, systemImage: Tab.fast.icon)
                 }
                 .tag(Tab.fast)
             }
 
-            HistoryTabView(fastManager: fastManager, onSettingsTapped: {
-                selectedTab = .settings
-            })
+            if mealManager.isJournalEnabled {
+                JournalTabView(
+                    fastManager: fastManager,
+                    mealManager: mealManager,
+                    onSettingsTapped: { selectedTab = .settings }
+                )
+                .tabItem {
+                    Label(Tab.journal.rawValue, systemImage: Tab.journal.icon)
+                }
+                .tag(Tab.journal)
+            } else {
+                HistoryTabView(fastManager: fastManager, onSettingsTapped: {
+                    selectedTab = .settings
+                })
                 .tabItem {
                     Label(Tab.history.rawValue, systemImage: Tab.history.icon)
                 }
                 .tag(Tab.history)
+            }
 
-            SettingsTabView(fastManager: fastManager, challengeManager: challengeManager)
-                .tabItem {
-                    Label(Tab.settings.rawValue, systemImage: Tab.settings.icon)
-                }
-                .tag(Tab.settings)
+            SettingsTabView(
+                fastManager: fastManager,
+                challengeManager: challengeManager,
+                mealManager: mealManager
+            )
+            .tabItem {
+                Label(Tab.settings.rawValue, systemImage: Tab.settings.icon)
+            }
+            .tag(Tab.settings)
         }
-        .id(challengeManager.isChallengesEnabled)
+        .id("\(challengeManager.isChallengesEnabled)-\(mealManager.isJournalEnabled)")
         .environment(\.managedObjectContext, viewContext)
         .alert(
             "Couldn't Complete That",
@@ -138,6 +174,47 @@ struct ContentView: View {
         } message: {
             Text(challengeManager.errorMessage ?? "Your challenge data is unchanged. Please try again.")
         }
+        .alert(
+            "Couldn't Save Meal",
+            isPresented: Binding(
+                get: { mealManager.errorMessage != nil },
+                set: { if !$0 { mealManager.errorMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                mealManager.errorMessage = nil
+            }
+        } message: {
+            Text(mealManager.errorMessage ?? "Your meal could not be saved. Please try again.")
+        }
+        .sheet(isPresented: $mealManager.showPostFastComposer) {
+            MealComposerSheet(
+                mealManager: mealManager,
+                fastManager: fastManager,
+                initialMealTime: mealManager.postFastComposerMealTime,
+                isPostFastInvitation: true
+            )
+        }
+        .confirmationDialog(
+            "End Active Fast?",
+            isPresented: Binding(
+                get: { mealManager.fastingOverlapConfirmation != nil },
+                set: { if !$0 { mealManager.fastingOverlapConfirmation = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("End Fast at Meal Time") {
+                if let overlap = mealManager.fastingOverlapConfirmation {
+                    fastManager.endFast(endDate: overlap.meal.mealTime)
+                    mealManager.fastingOverlapConfirmation = nil
+                }
+            }
+            Button("Keep Fasting", role: .cancel) {
+                mealManager.fastingOverlapConfirmation = nil
+            }
+        } message: {
+            Text("You logged a meal during your active fast. Would you like to end your fast at that meal's time?")
+        }
         .preferredColorScheme(
             ProcessInfo.processInfo.arguments.contains("-forceDarkMode") ? .dark :
             ProcessInfo.processInfo.arguments.contains("-forceLightMode") ? .light : nil
@@ -159,6 +236,7 @@ struct ContentView: View {
             fastManager.refresh()
             fastManager.syncNotifications()
             challengeManager.refresh()
+            mealManager.refresh()
             applyPendingDeepLink()
         }
         .onChange(of: scenePhase) { _, newPhase in
@@ -168,6 +246,7 @@ struct ContentView: View {
                 fastManager.refresh()
                 fastManager.syncNotifications()
                 challengeManager.refresh()
+                mealManager.refresh()
                 applyPendingDeepLink()
             }
         }
@@ -176,6 +255,13 @@ struct ContentView: View {
                 selectedTab = .today
             } else if !enabled && (selectedTab == .today || selectedTab == .challenge) {
                 selectedTab = .fast
+            }
+        }
+        .onChange(of: mealManager.isJournalEnabled) { _, enabled in
+            if enabled && selectedTab == .history {
+                selectedTab = .journal
+            } else if !enabled && selectedTab == .journal {
+                selectedTab = .history
             }
         }
         .onOpenURL { url in
@@ -199,10 +285,11 @@ struct ContentView: View {
 struct FastTabView: View {
     @ObservedObject var fastManager: FastManager
     var onSettingsTapped: (() -> Void)?
+    var onFastEnded: ((Date) -> Void)?
 
     var body: some View {
         NavigationStack {
-            FastTrackerView(fastManager: fastManager)
+            FastTrackerView(fastManager: fastManager, onFastEnded: onFastEnded)
                 .navigationTitle("Solstice")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -245,11 +332,16 @@ struct HistoryTabView: View {
 
 struct SettingsTabView: View {
     @ObservedObject var fastManager: FastManager
-    @ObservedObject var challengeManager: ChallengeManager
+    var challengeManager: ChallengeManager?
+    var mealManager: MealManager?
 
     var body: some View {
         NavigationStack {
-            SettingsView(fastManager: fastManager, challengeManager: challengeManager)
+            SettingsView(
+                fastManager: fastManager,
+                challengeManager: challengeManager,
+                mealManager: mealManager
+            )
         }
     }
 }

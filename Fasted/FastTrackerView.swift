@@ -18,9 +18,11 @@ public struct FastTrackerView: View {
     @State private var showValidationAlert: Bool = false
     @State private var validationMessage: String?
     @State private var showCustomFastSheet: Bool = false
+    var onFastEnded: ((Date) -> Void)?
 
-    public init(fastManager: FastManager) {
+    public init(fastManager: FastManager, onFastEnded: ((Date) -> Void)? = nil) {
         self.fastManager = fastManager
+        self.onFastEnded = onFastEnded
     }
 
     public var body: some View {
@@ -204,13 +206,19 @@ public struct FastTrackerView: View {
         fastManager.updateActiveFast(startDate: startDate)
     }
 
+    private func handleEndFast(at date: Date) {
+        if fastManager.endFast(endDate: date) {
+            onFastEnded?(date)
+        }
+    }
+
     private func actionButton(now: Date, progress: Double) -> some View {
         Group {
             if fastManager.isFasting {
                 EndFastButtonView(
                     goalReached: progress >= 1.0,
-                    onComplete: { fastManager.endFast(endDate: now) },
-                    onSave: { fastManager.endFast(endDate: now) },
+                    onComplete: { handleEndFast(at: now) },
+                    onSave: { handleEndFast(at: now) },
                     onDiscard: { fastManager.discardActiveFast() }
                 )
             } else {
@@ -323,11 +331,8 @@ private extension FastTrackerView {
     @ViewBuilder
     func startMenuContent() -> some View {
         Section("Daily") {
-            ForEach(FastingProtocol.presets) { proto in
-                dailyMenuItem(proto)
-            }
+            ForEach(FastingProtocol.presets) { proto in dailyMenuItem(proto) }
         }
-
         Section("Extended") {
             ForEach(FastingProtocol.extendedPresets) { proto in
                 Button(proto.name) {
@@ -336,9 +341,7 @@ private extension FastTrackerView {
                 .accessibilityIdentifier("start_menu_\(proto.ratioString)")
             }
         }
-
         lastCustomMenuItem()
-
         Button {
             showCustomFastSheet = true
         } label: {
@@ -362,8 +365,6 @@ private extension FastTrackerView {
         .accessibilityIdentifier("start_menu_\(proto.ratioString)")
     }
 
-    /// A shortcut for the last custom length picked, when it isn't already one of the extended
-    /// presets offered above it.
     @ViewBuilder
     func lastCustomMenuItem() -> some View {
         if let lastCustom = fastManager.lastCustomFastHours,
@@ -381,15 +382,10 @@ private extension FastTrackerView {
             startDate: Date(), targetDuration: targetDuration, protocolType: protocolType
         ) != nil else { return }
         NotificationManager.shared.requestAuthorization { granted in
-            if granted {
-                fastManager.syncNotifications()
-            }
+            if granted { fastManager.syncNotifications() }
         }
     }
 
-    /// `startFast` only sets `activeFast` once the save commits, so the length is remembered and
-    /// the sheet dismissed only for a fast that actually started; on a failed save the sheet stays
-    /// open rather than looking like it worked.
     func startCustomFast(hours: Int) {
         let proto = FastingProtocol.fixedLength(hours: hours)
         beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
