@@ -1,3 +1,4 @@
+import StoreKit
 import SwiftUI
 
 public struct SettingsView: View {
@@ -6,6 +7,9 @@ public struct SettingsView: View {
     @State private var schedule: NotificationSchedule = .default
     @State private var showEraseConfirmation: Bool = false
     @State private var showDisclaimer: Bool = false
+    @State private var versionTapCount = 0
+    @AppStorage(DeveloperTools.enabledKey) private var developerToolsEnabled = false
+    @State private var developerToolsAllowed = false
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -27,9 +31,13 @@ public struct SettingsView: View {
             healthAndResourcesSection
             dataManagementSection
             aboutSection
+            if developerToolsAllowed && developerToolsEnabled {
+                developerSection
+            }
         }
         .navigationTitle("Settings")
         .onAppear(perform: loadSettings)
+        .task { developerToolsAllowed = await DeveloperTools.isAllowed() }
         .sheet(isPresented: $showDisclaimer) {
             MedicalDisclaimerView()
         }
@@ -192,6 +200,22 @@ public struct SettingsView: View {
         }
     }
 
+    /// Hidden until the Version row is tapped seven times, and only in debug and TestFlight builds.
+    /// Holds experiments meant for on-device evaluation, not features.
+    private var developerSection: some View {
+        Section("Developer") {
+            NavigationLink("AI Lab") {
+                AILabView()
+            }
+            .accessibilityIdentifier("settings_ai_lab_link")
+            Button("Hide Developer Tools") {
+                developerToolsEnabled = false
+                versionTapCount = 0
+            }
+            .accessibilityIdentifier("settings_hide_developer_tools_button")
+        }
+    }
+
     private var aboutSection: some View {
         Section {
             HStack {
@@ -199,6 +223,16 @@ public struct SettingsView: View {
                 Spacer()
                 Text(displayVersion)
                     .foregroundStyle(.secondary)
+            }
+            .contentShape(Rectangle())
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("settings_version_row")
+            .onTapGesture {
+                guard developerToolsAllowed else { return }
+                versionTapCount += 1
+                if versionTapCount >= 7 {
+                    developerToolsEnabled = true
+                }
             }
             .contextMenu {
                 Button {
@@ -240,5 +274,26 @@ public struct SettingsView: View {
             notificationsEnabled = userSettings.notificationsEnabled
         }
         schedule = fastManager.notificationSchedule
+    }
+}
+
+/// Developer tools are for debug and TestFlight builds only. An App Store install reports the
+/// production environment, so the unlock does nothing there.
+enum DeveloperTools {
+    static let enabledKey = "developerToolsEnabled"
+
+    static func isAllowed() async -> Bool {
+        if isDebugBuild { return true }
+        guard case .verified(let transaction)? = try? await AppTransaction.shared else { return false }
+        return transaction.environment == .sandbox
+    }
+
+    /// A runtime flag rather than `#if` around the lookup, so Debug CI builds compile the StoreKit path too.
+    private static var isDebugBuild: Bool {
+        #if DEBUG
+        return true
+        #else
+        return false
+        #endif
     }
 }

@@ -47,6 +47,10 @@ targets:
     dependencies:
       - target: FastedWidgets
       - target: FastedWatch
+      # iOS 26-only; weak so the app still launches on iOS 18.2+, where the AI Lab code is gated
+      # behind #available and never touches it.
+      - sdk: FoundationModels.framework
+        weak: true
     settings:
       base:
         INFOPLIST_FILE: Fasted/Info.plist
