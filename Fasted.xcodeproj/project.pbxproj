@@ -13,6 +13,7 @@
 		043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */; };
 		084F697FBF35CB11AABC725E /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		089D9A852E6784E04D5691EF /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
+		09FEE3627E0CA18F31C7AC0E /* ChallengeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF512965A5D99AB8BD0EB6D /* ChallengeStore.swift */; };
 		0B2AD02224339FDBB03BCC7B /* CalendarHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C410780F466CF5987E506477 /* CalendarHeatmapView.swift */; };
 		0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71CDC6BEC973FA849ACE8BB /* DialMath.swift */; };
 		0DA5795F7E3BF7899CCB21F3 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */; };
@@ -41,7 +42,9 @@
 		32CD46CD2BD3A67D6FDC1E50 /* EndFastButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686659048DA2EF750EEC4B80 /* EndFastButtonView.swift */; };
 		360CFB21C3156EAD7E510477 /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
 		37B8A9BBE8451FE77AF2539F /* AppGroupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */; };
+		38C09642A50B1D0A119C3A50 /* Challenge+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844661071E1F175EB88B392E /* Challenge+CoreData.swift */; };
 		39156B8BD6396C734A368D72 /* WatchRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30075AF85C05CFEC9FB09DCD /* WatchRootView.swift */; };
+		3C2252589BC3FB997316AD44 /* ChallengeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07D4C1C96B57B4A83B7CEE8 /* ChallengeStoreTests.swift */; };
 		3D385853457F9BE5FE7B2073 /* DialHeaderCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6A862A23FBC7C8C6B9B693 /* DialHeaderCardView.swift */; };
 		415B59ABB94BB486947A64A6 /* FeedbackHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D60C3D545A4D4424365CD3 /* FeedbackHelperTests.swift */; };
 		42B7EDBE72C5CBDF62F4E7EF /* FastRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A408558CA277F27154BD5D /* FastRowView.swift */; };
@@ -142,6 +145,7 @@
 		BD7B9EA2D7B7CB3207FC128C /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
 		BF2F556E68B0CEFA2BF7F3A7 /* OpenFastTrackerIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3AE31ACC9B80F3421BA782 /* OpenFastTrackerIntent.swift */; };
 		C16FE1D2D9A43E674540AC0D /* FastComplications.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23249B6FE33FC0540C9DE9B /* FastComplications.swift */; };
+		C2E635D25E334071944A800C /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10A083342E1CAFA102D910B /* Challenge.swift */; };
 		C3798D8BCAAE1F1B30E50E4E /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
 		C599741E6A0988A4ED07D94E /* FastProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E7D4C96D058457F9AACBAB /* FastProgressViews.swift */; };
 		C7A0AE6139079DA758A59AD8 /* SolsticeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B1BC8A89D6457B8D4C7A /* SolsticeTheme.swift */; };
@@ -251,6 +255,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0AF512965A5D99AB8BD0EB6D /* ChallengeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeStore.swift; sourceTree = "<group>"; };
 		0B49461E82EC597415611F11 /* FastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManager.swift; sourceTree = "<group>"; };
 		133D5524D58FDC210D137DE4 /* WatchSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSessionManager.swift; sourceTree = "<group>"; };
 		1455AA140C0695813955B378 /* DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLink.swift; sourceTree = "<group>"; };
@@ -275,6 +280,7 @@
 		3740D6FCC59A6BDB6F776A5A /* FastManager+AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastManager+AppGroup.swift"; sourceTree = "<group>"; };
 		37B59CA62211138ECBF72E75 /* Fast+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Fast+Extensions.swift"; sourceTree = "<group>"; };
 		37F15CA34B550C7DFC463680 /* FastedTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		395C0D33B0C5BD626D2F69DF /* FastedChallenges.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FastedChallenges.xcdatamodel; sourceTree = "<group>"; };
 		3DCBC6565F8F188353EA37C0 /* FastingStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingStateSnapshotTests.swift; sourceTree = "<group>"; };
 		3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackHelper.swift; sourceTree = "<group>"; };
 		3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterDisplayMode.swift; sourceTree = "<group>"; };
@@ -309,6 +315,7 @@
 		7E2F0F37B26044C995133130 /* AppIntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntentsTests.swift; sourceTree = "<group>"; };
 		80ABF2C76FAC79CAD26EEC81 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		81E0320AF8E2D6046FFFFD73 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		844661071E1F175EB88B392E /* Challenge+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Challenge+CoreData.swift"; sourceTree = "<group>"; };
 		8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarwinNotificationCenter.swift; sourceTree = "<group>"; };
 		84E793DE11CB215C34D949B9 /* FastStreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastStreakWidget.swift; sourceTree = "<group>"; };
@@ -339,6 +346,7 @@
 		B84B2C22AB93A0FBC932336E /* UITestIsolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestIsolation.swift; sourceTree = "<group>"; };
 		B9FA29E4E42619EE2FBE10A5 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPayloadTests.swift; sourceTree = "<group>"; };
+		C10A083342E1CAFA102D910B /* Challenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Challenge.swift; sourceTree = "<group>"; };
 		C1CCC2CB229D929E6A57EEB6 /* FastManagerPersistenceFailureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManagerPersistenceFailureTests.swift; sourceTree = "<group>"; };
 		C410780F466CF5987E506477 /* CalendarHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeatmapView.swift; sourceTree = "<group>"; };
 		C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSummaryCardsView.swift; sourceTree = "<group>"; };
@@ -347,6 +355,7 @@
 		C8A408558CA277F27154BD5D /* FastRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastRowView.swift; sourceTree = "<group>"; };
 		C9BB663AF02432B7CB39F54A /* FastManagerEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManagerEffects.swift; sourceTree = "<group>"; };
 		C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartFastIntent.swift; sourceTree = "<group>"; };
+		D07D4C1C96B57B4A83B7CEE8 /* ChallengeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeStoreTests.swift; sourceTree = "<group>"; };
 		D0EE0A457EFF011B0258010B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D18C07DDCC7D9F2D9FB5D6B8 /* PendingCommandReconciliationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingCommandReconciliationTests.swift; sourceTree = "<group>"; };
 		D1B3B10BBD804653FFAD01A9 /* ReviewPromptManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptManager.swift; sourceTree = "<group>"; };
@@ -418,6 +427,16 @@
 				B3038D5CED8DB75F5970CF61 /* Shared */,
 				9092DA5EE35FF49A58DA03C5 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		89F44B2FE3A6F291D24480DB /* Challenges */ = {
+			isa = PBXGroup;
+			children = (
+				C10A083342E1CAFA102D910B /* Challenge.swift */,
+				844661071E1F175EB88B392E /* Challenge+CoreData.swift */,
+				0AF512965A5D99AB8BD0EB6D /* ChallengeStore.swift */,
+			);
+			path = Challenges;
 			sourceTree = "<group>";
 		};
 		9092DA5EE35FF49A58DA03C5 /* Products */ = {
@@ -545,6 +564,7 @@
 				2EA35504122572AB7F1EB512 /* StreakCalculator.swift */,
 				C770BC33495C6320774F0A46 /* StreakSummaryCardsView.swift */,
 				133D5524D58FDC210D137DE4 /* WatchSessionManager.swift */,
+				89F44B2FE3A6F291D24480DB /* Challenges */,
 			);
 			path = Fasted;
 			sourceTree = "<group>";
@@ -558,6 +578,7 @@
 				7E2F0F37B26044C995133130 /* AppIntentsTests.swift */,
 				AF4978E327A121B83FB6F7FD /* AppStoreScreenshotValidationTests.swift */,
 				74435CB885215FB2DBEC2E5A /* BuildMetadataTests.swift */,
+				D07D4C1C96B57B4A83B7CEE8 /* ChallengeStoreTests.swift */,
 				68222DD80B162A582A18EB12 /* DeepLinkTests.swift */,
 				93A9AA51C89A1605E7B9D157 /* FastControlStateTests.swift */,
 				451A59AE22137ED94C1A12D3 /* FastDurationFormatterTests.swift */,
@@ -831,6 +852,7 @@
 				B24EE21CBC7DABBBEE6BC9E5 /* AppIntentsTests.swift in Sources */,
 				56BBADCE8A6AA771C2DF241C /* AppStoreScreenshotValidationTests.swift in Sources */,
 				60B63C7C538AA3271C824FEB /* BuildMetadataTests.swift in Sources */,
+				3C2252589BC3FB997316AD44 /* ChallengeStoreTests.swift in Sources */,
 				EFF109DE04A205D5B0C972DB /* DeepLinkTests.swift in Sources */,
 				DC61CF2EAD9D12332B025B45 /* FastControlStateTests.swift in Sources */,
 				7D7E4E7BB19DCAE3CC48218E /* FastDurationFormatterTests.swift in Sources */,
@@ -864,6 +886,9 @@
 				43206CBE9578432351D137CA /* BuildMetadata.swift in Sources */,
 				0B2AD02224339FDBB03BCC7B /* CalendarHeatmapView.swift in Sources */,
 				043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */,
+				38C09642A50B1D0A119C3A50 /* Challenge+CoreData.swift in Sources */,
+				C2E635D25E334071944A800C /* Challenge.swift in Sources */,
+				09FEE3627E0CA18F31C7AC0E /* ChallengeStore.swift in Sources */,
 				F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */,
 				6642F8D9E27AE3956A132F16 /* DarwinNotificationCenter.swift in Sources */,
 				80C56E1FB8BE6855AC3EAA4A /* DeepLink.swift in Sources */,
@@ -1502,8 +1527,9 @@
 			isa = XCVersionGroup;
 			children = (
 				9703687703B4FF485009663A /* Fasted.xcdatamodel */,
+				395C0D33B0C5BD626D2F69DF /* FastedChallenges.xcdatamodel */,
 			);
-			currentVersion = 9703687703B4FF485009663A /* Fasted.xcdatamodel */;
+			currentVersion = 395C0D33B0C5BD626D2F69DF /* FastedChallenges.xcdatamodel */;
 			path = Fasted.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
