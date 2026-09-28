@@ -96,7 +96,9 @@ struct ContentView: View {
                 .tag(Tab.fast)
             }
 
-            HistoryTabView(fastManager: fastManager)
+            HistoryTabView(fastManager: fastManager, onSettingsTapped: {
+                selectedTab = .settings
+            })
                 .tabItem {
                     Label(Tab.history.rawValue, systemImage: Tab.history.icon)
                 }
@@ -122,6 +124,19 @@ struct ContentView: View {
             }
         } message: {
             Text(fastManager.operationError?.message ?? "Your saved fasting data is unchanged. Please try again.")
+        }
+        .alert(
+            "Couldn't Update Challenge",
+            isPresented: Binding(
+                get: { challengeManager.errorMessage != nil },
+                set: { if !$0 { challengeManager.errorMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                challengeManager.errorMessage = nil
+            }
+        } message: {
+            Text(challengeManager.errorMessage ?? "Your challenge data is unchanged. Please try again.")
         }
         .preferredColorScheme(
             ProcessInfo.processInfo.arguments.contains("-forceDarkMode") ? .dark :
@@ -207,11 +222,23 @@ struct FastTabView: View {
 
 struct HistoryTabView: View {
     @ObservedObject var fastManager: FastManager
+    var onSettingsTapped: (() -> Void)?
 
     var body: some View {
         NavigationStack {
             HistoryListView(fastManager: fastManager)
                 .navigationTitle("History")
+                .toolbar {
+                    if let onSettingsTapped {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button(action: onSettingsTapped) {
+                                Image(systemName: "gearshape")
+                                    .foregroundStyle(Color.primary)
+                            }
+                            .accessibilityIdentifier("history_tab_settings_button")
+                        }
+                    }
+                }
         }
     }
 }

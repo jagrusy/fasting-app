@@ -71,7 +71,11 @@ struct ChallengeTabView: View {
             ) {
                 Button("Archive Challenge", role: .destructive) {
                     if let id = challengeManager.activeChallenge?.id {
-                        try? challengeManager.archive(challengeID: id)
+                        do {
+                            try challengeManager.archive(challengeID: id)
+                        } catch {
+                            challengeManager.errorMessage = error.localizedDescription
+                        }
                     }
                 }
                 Button("Cancel", role: .cancel) {}

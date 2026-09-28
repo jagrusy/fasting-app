@@ -93,21 +93,40 @@ final class ChallengeManager: ObservableObject {
 
     @discardableResult
     func startChallenge(draft: ChallengeDraft, replacing: UUID? = nil) throws -> Challenge {
-        let challenge = try store.start(draft, replacing: replacing)
-        isChallengesEnabled = true
-        refresh()
-        return challenge
+        do {
+            let challenge = try store.start(draft, replacing: replacing)
+            isChallengesEnabled = true
+            refresh()
+            return challenge
+        } catch {
+            errorMessage = error.localizedDescription
+            throw error
+        }
     }
 
     func checkIn(commitmentID: UUID, on date: Date, status: ChallengeCheckInStatus?) throws {
-        guard let challenge = activeChallenge else { throw ChallengeError.staleChallenge }
-        try store.checkIn(challengeID: challenge.id, commitmentID: commitmentID, on: date, status: status)
-        refresh()
+        guard let challenge = activeChallenge else {
+            let error = ChallengeError.staleChallenge
+            errorMessage = error.localizedDescription
+            throw error
+        }
+        do {
+            try store.checkIn(challengeID: challenge.id, commitmentID: commitmentID, on: date, status: status)
+            refresh()
+        } catch {
+            errorMessage = error.localizedDescription
+            throw error
+        }
     }
 
     func archive(challengeID: UUID) throws {
-        try store.archive(challengeID: challengeID)
-        refresh()
+        do {
+            try store.archive(challengeID: challengeID)
+            refresh()
+        } catch {
+            errorMessage = error.localizedDescription
+            throw error
+        }
     }
 
     func scheduledCommitments(for date: Date) -> [ChallengeCommitment] {

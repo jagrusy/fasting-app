@@ -188,6 +188,10 @@ struct TodayTabView: View {
 
     private func toggleCommitment(_ commitmentID: UUID, on date: Date, currentlyCompleted: Bool) {
         let newStatus: ChallengeCheckInStatus? = currentlyCompleted ? nil : .done
-        try? challengeManager.checkIn(commitmentID: commitmentID, on: date, status: newStatus)
+        do {
+            try challengeManager.checkIn(commitmentID: commitmentID, on: date, status: newStatus)
+        } catch {
+            challengeManager.errorMessage = error.localizedDescription
+        }
     }
 }

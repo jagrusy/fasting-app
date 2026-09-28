@@ -114,4 +114,21 @@ final class ChallengeUITests: XCTestCase {
         let pastButton = app.buttons["challenge_view_past_button"]
         XCTAssertTrue(pastButton.waitForExistence(timeout: 3), "Archived challenge must be accessible in history")
     }
+
+    func testSettingsShortcutOnRootTabs() throws {
+        let app = launchIsolatedApp()
+
+        // 1. Check Fast tab settings button
+        let fastSettings = app.buttons["fast_tab_settings_button"]
+        XCTAssertTrue(fastSettings.waitForExistence(timeout: 5))
+        fastSettings.tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 3))
+
+        // 2. Check History tab settings button
+        app.tabBars.buttons["History"].tap()
+        let historySettings = app.buttons["history_tab_settings_button"]
+        XCTAssertTrue(historySettings.waitForExistence(timeout: 5))
+        historySettings.tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 3))
+    }
 }
