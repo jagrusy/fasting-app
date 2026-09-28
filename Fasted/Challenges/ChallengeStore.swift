@@ -8,15 +8,23 @@ final class ChallengeStore {
     private let save: (NSManagedObjectContext) throws -> Void
 
     init(
-        container: NSPersistentContainer,
+        coordinator: NSPersistentStoreCoordinator,
         now: @escaping () -> Date = Date.init,
         save: @escaping (NSManagedObjectContext) throws -> Void = { try $0.save() }
     ) {
         context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-        context.persistentStoreCoordinator = container.persistentStoreCoordinator
+        context.persistentStoreCoordinator = coordinator
         context.mergePolicy = NSErrorMergePolicy
         self.now = now
         self.save = save
+    }
+
+    convenience init(
+        container: NSPersistentContainer,
+        now: @escaping () -> Date = Date.init,
+        save: @escaping (NSManagedObjectContext) throws -> Void = { try $0.save() }
+    ) {
+        self.init(coordinator: container.persistentStoreCoordinator, now: now, save: save)
     }
 
     func challenges() throws -> [Challenge] {
@@ -55,6 +63,17 @@ final class ChallengeStore {
             let result = try Challenge.decode(record)
             try save(context)
             return result
+        }
+    }
+
+    /// Archives an active challenge early, recording `endedAt`. Preserves all records.
+    func archive(challengeID: UUID) throws {
+        try transaction {
+            let instant = now()
+            guard let record = try records().first(where: { $0.value(forKey: "id") as? UUID == challengeID })
+            else { throw ChallengeError.staleChallenge }
+            record.setValue(instant, forKey: "endedAt")
+            try save(context)
         }
     }
 

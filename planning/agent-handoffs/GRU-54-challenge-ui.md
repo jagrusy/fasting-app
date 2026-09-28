@@ -1,0 +1,42 @@
+# Issue handoff: GRU-54 Challenge navigation & category-led manual builder
+
+- Issue / task: GRU-54 (Package 2 of Challenge & Food Journal plan): Navigation architecture (optional Today/Challenge tabs) and Category-Led Manual Challenge Builder
+- Branch / worktree / base SHA / head SHA: `codex/gru-54-challenge-ui` / `/Users/grusy/repos/fasting-app/.worktrees/gru-54-challenge-ui` / base `bde074c`
+- Claimed paths and concurrent-work check: `Fasted/Challenges/*`, `Fasted/ContentView.swift`, `Fasted/SettingsView.swift`, `FastedTests/ChallengeManagerTests.swift`, `FastedUITests/ChallengeUITests.swift`, `FastedUITests/UITestIsolation.swift`, `Fasted.xcodeproj/project.pbxproj`, `planning/agent-handoffs/GRU-54-challenge-ui.md`. Single writer, no concurrent branches touching these files.
+- Prerequisites: GRU-53 merged into main (`bde074c` / PR #69). Owner approval recorded for challenge-and-food-journal-plan.md.
+- Changed behavior and rationale:
+  - Preserved default fasting-only navigation for existing users and fresh installs (`Fast`, `History`, `Settings`).
+  - Added explicit opt-in preference toggle in Settings to enable Challenges mode, switching navigation seamlessly to `Today`, `Challenge`, `History`, `Settings` with top-right Settings gear accessible from all root tabs.
+  - Implemented `TodayTabView` combining fasting tracker with today's scheduled commitments checklist, day counter ("Day X of Y"), and all-done celebratory banner.
+  - Implemented `ChallengeTabView` with active challenge card, calendar progress dots grid, commitments list, "Start a New Challenge", "Archive Current Challenge", and past challenge history navigation.
+  - Implemented category-led manual builder (`ChallengeBuilderView`) supporting 6 categories (Movement, Sleep, Food, Mindfulness, Routine, Custom) with curated suggestions, 1–6 commitments, duration quick picks (24, 30, 75, or 7–90 custom), and atomic confirmation when replacing an active challenge.
+  - Implemented `PastChallengesView` displaying completed and early-ended challenges.
+  - Added evidence-based habit science study links in Settings (Lally et al., NIDDK behavior change guidance, James Clear habit stacking).
+  - Ensured UI test isolation against duplicate `NSPersistentContainer` instances by sharing `context.persistentStoreCoordinator` directly with `ChallengeStore`.
+- Changed contracts/schema/identities: None. Core Data model and schema remain unchanged from GRU-53. UserDefaults preference key `Fasted.isChallengesEnabled` introduced for local feature visibility.
+- Tests (exact command, toolchain/device, exit/result, artifact):
+  - SwiftLint: `swiftlint lint --strict` -> exit 0, 0 violations, 0 serious across 116 files.
+  - Unit tests: `xcodebuild test -project Fasted.xcodeproj -scheme FastedTests -destination "platform=iOS Simulator,name=iPhone 17" -derivedDataPath /tmp/derived-fasted` -> exit 0, 183 passed, 0 failed, 0 skipped.
+  - UI tests: `xcodebuild test -project Fasted.xcodeproj -scheme FastedUITests -destination "platform=iOS Simulator,name=iPhone 17" -derivedDataPath /tmp/derived-fasted` -> exit 0, 21 passed, 0 failed, 0 skipped.
+- First failures and resolution:
+  - Unit test `testDayProgressCalculations`: Advancing 35 days on a 30-day challenge deactivated the challenge, returning `nil` for `currentDayNumber`. Adjusted test to verify Day 30 clamped at duration boundary.
+  - Unit test `testScheduledCommitmentsRespectWeekdayFilter`: Hardcoded Monday assumption failed because test anchor was Saturday. Dynamically computed tomorrow's weekday.
+  - Duplicate container regression in UI tests: `ContentView` instantiated a second `NSPersistentContainer` for `ChallengeManager`, causing Core Data entity registry collision for `@FetchRequest` in `HistoryListView`. Resolved by passing `context.persistentStoreCoordinator` directly from the single view context.
+  - Switch tap in XCTest: `challengesToggle.tap()` hit center of full cell width where iOS 18 doesn't trigger UISwitch. Updated test to tap with normalized offset `(dx: 0.9, dy: 0.5)` targeting the control.
+  - Dynamic `TabView` reload: Added `.id(challengeManager.isChallengesEnabled)` so `UITabBarController` rebuilds tabs dynamically when toggling mode.
+- Acceptance checklist:
+  - [x] Fasting-only mode remains clean default (`Fast`, `History`, `Settings`)
+  - [x] Challenges opt-in exposes `Today`, `Challenge`, `History`, `Settings`
+  - [x] Disabling challenges never deletes data or progress
+  - [x] Category-led builder with 6 categories, curated suggestions, 1–6 commitments, 24/30/75/custom days
+  - [x] Today commitments checklist with interactive check-ins
+  - [x] Calendar progress grid card with neutral missed days
+  - [x] Atomic challenge replacement preserves historical records
+  - [x] Archive early safely ends challenge without data loss
+  - [x] Settings gear available on all root tabs
+  - [x] Habit science resource links in Settings
+  - [x] 100% test pass rate across all unit and UI tests (183 unit + 21 UI)
+  - [x] 0 SwiftLint violations in strict mode
+- Remaining blockers, risk and recovery/compatibility notes: None. All backward compatibility with existing store, widget extensions, watch app, and app intents verified.
+- Independent reviewer / PR: To be reviewed on PR for `codex/gru-54-challenge-ui`.
+- Downstream handoff: Package 3 (Food Journal minimal timeline, Meal Photo capture, HealthKit dietary energy / macro integration).

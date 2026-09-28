@@ -2,18 +2,27 @@ import SwiftUI
 
 public struct SettingsView: View {
     @ObservedObject var fastManager: FastManager
+    var challengeManager: ChallengeManager?
     @State private var notificationsEnabled: Bool = false
     @State private var schedule: NotificationSchedule = .default
     @State private var showEraseConfirmation: Bool = false
     @State private var showDisclaimer: Bool = false
+    @State private var showBuilder: Bool = false
 
-    public init(fastManager: FastManager) {
+    init(fastManager: FastManager, challengeManager: ChallengeManager? = nil) {
         self.fastManager = fastManager
+        self.challengeManager = challengeManager
     }
 
     public var body: some View {
         List {
             protocolSection
+            if let challengeManager {
+                ChallengesSettingsSection(
+                    challengeManager: challengeManager,
+                    showBuilder: $showBuilder
+                )
+            }
             NotificationSettingsSection(
                 isEnabled: $notificationsEnabled,
                 schedule: $schedule,
@@ -26,12 +35,17 @@ public struct SettingsView: View {
             feedbackSection
             healthAndResourcesSection
             dataManagementSection
-            aboutSection
+            SettingsAboutSection()
         }
         .navigationTitle("Settings")
         .onAppear(perform: loadSettings)
         .sheet(isPresented: $showDisclaimer) {
             MedicalDisclaimerView()
+        }
+        .sheet(isPresented: $showBuilder) {
+            if let challengeManager {
+                ChallengeBuilderView(challengeManager: challengeManager)
+            }
         }
         .confirmationDialog(
             "Erase All Fasting Data?",
@@ -164,6 +178,31 @@ public struct SettingsView: View {
                 }
                 .accessibilityIdentifier("link_mayo_clinic")
             }
+
+            let lally = "https://onlinelibrary.wiley.com/doi/10.1002/ejsp.674"
+            if let lallyURL = URL(string: lally) {
+                Link(destination: lallyURL) {
+                    Label("Lally et al.: Habit Formation Study", systemImage: "arrow.up.right.square")
+                }
+                .accessibilityIdentifier("link_lally_study")
+            }
+
+            let niddk = "https://www.niddk.nih.gov/health-information/diet-nutrition/"
+                + "changing-habits-better-health"
+            if let niddkURL = URL(string: niddk) {
+                Link(destination: niddkURL) {
+                    Label("NIDDK: Behavior Change Guidance", systemImage: "arrow.up.right.square")
+                }
+                .accessibilityIdentifier("link_niddk_guidance")
+            }
+
+            let clearStacking = "https://jamesclear.com/habit-stacking"
+            if let clearURL = URL(string: clearStacking) {
+                Link(destination: clearURL) {
+                    Label("James Clear: Habit Stacking Guide", systemImage: "arrow.up.right.square")
+                }
+                .accessibilityIdentifier("link_james_clear_stacking")
+            }
         } header: {
             Text("Health & Evidence-Based Research")
         } footer: {
@@ -192,7 +231,28 @@ public struct SettingsView: View {
         }
     }
 
-    private var aboutSection: some View {
+    private func loadSettings() {
+        if let userSettings = fastManager.userSettings {
+            notificationsEnabled = userSettings.notificationsEnabled
+        }
+        schedule = fastManager.notificationSchedule
+    }
+}
+
+struct SettingsAboutSection: View {
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? BuildMetadata.marketingVersion
+    }
+
+    private var buildNumber: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+    }
+
+    private var displayVersion: String {
+        "\(appVersion) (\(buildNumber))"
+    }
+
+    var body: some View {
         Section {
             HStack {
                 Text("Version")
@@ -221,24 +281,5 @@ public struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-    }
-
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? BuildMetadata.marketingVersion
-    }
-
-    private var buildNumber: String {
-        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-    }
-
-    private var displayVersion: String {
-        "\(appVersion) (\(buildNumber))"
-    }
-
-    private func loadSettings() {
-        if let userSettings = fastManager.userSettings {
-            notificationsEnabled = userSettings.notificationsEnabled
-        }
-        schedule = fastManager.notificationSchedule
     }
 }
