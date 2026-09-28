@@ -1,0 +1,38 @@
+# GRU-55 Photo/Text Food Journal & Fasting Integration handoff
+
+- Issue / task: GRU-55 — Photo/Text Food Journal & Fasting Integration (Package 4 from Challenge & Food Journal plan).
+- Branch / worktree / base SHA / head SHA: `codex/gru-55-food-journal`; `/Users/grusy/repos/fasting-app/.worktrees/gru-55-food-journal`; base `0c52183` (head of PR #70 `codex/gru-54-challenge-ui`); head is the commit containing this handoff.
+- Claimed paths and concurrent-work check: `Fasted/Journal/*`, `Fasted/Fasted.xcdatamodeld/FastedFoodJournal.xcdatamodel/`, `Fasted/Fasted.xcdatamodeld/.xccurrentversion`, `Fasted/ContentView.swift`, `Fasted/FastTrackerView.swift`, `Fasted/SettingsView.swift`, `Fasted/Challenges/Views/TodayTabView.swift`, `FastedTests/MealManagerTests.swift`, `FastedTests/MealStoreTests.swift`, `FastedUITests/JournalUITests.swift`, `FastedUITests/UITestIsolation.swift`, and this handoff. No conflicting persistent-model or UI writers active.
+- Prerequisites: PR #70 (`codex/gru-54-challenge-ui`) commit `0c52183`.
+- Changed behavior and rationale:
+  - Fasting-only mode remains 100% default for fresh installs and existing users (`Fast`, `History`, `Settings`).
+  - Food journal is strictly opt-in via Settings or post-fast invitations; turning it off never deletes past meals or photos.
+  - Durable opt-out: "Don't ask again" on post-fast prompt permanently stops post-fast invitations across app relaunch and reset, with zero nagging.
+  - Local sandboxed photo storage (`Application Support/Fasted/MealPhotos/`) with thumbnail generation (max 1920px full, 300px thumbnail); Core Data stores only metadata and filenames.
+  - Transactional Core Data storage (`MealStore`) with rollback and orphan photo cleanup.
+  - Meal logging during an active fast prompts user to confirm whether they ate during the fast.
+  - Journal tab integrates segmented control (`Meals` · `Fasts`), top-left "+" quick log, top-right Settings gear.
+- Changed contracts/schema/identities:
+  - Additive Core Data model version `FastedFoodJournal.xcdatamodel` with `MealEntryRecord` and `MealAttachmentRecord` (UUID primary keys, cascade deletion, reverse relations).
+  - App bundle identifiers, App Group, and existing 6 XcodeGen schemes preserved without modification.
+- Tests:
+  - Xcode 26.1, iPhone 17 iOS 26.1 simulator.
+  - `swiftlint lint --strict`: 0 violations across all 128 files.
+  - `xcodebuild test -scheme FastedTests`: 193/193 passed (including 6 MealStore tests and 4 MealManager tests).
+  - `xcodebuild test -scheme FastedUITests`: 26/26 passed (including 4 new JournalUITests: default disabled, settings toggle, meal logging & persistence across relaunch, post-fast prompt & permanent "Don't ask again").
+- First failures and resolution:
+  - SwiftLint rules in test files flagged implicitly unwrapped optionals and force unwrap; updated to optionals and `try XCTUnwrap(...)`.
+  - Swift compilation caught actor-isolated default parameter values in `MealManager` initializers; separated required inits and convenience inits resolving defaults.
+  - SwiftUI `Section(header: ...)` syntax error fixed to `Section { ... } header: { ... } footer: { ... }`.
+  - In `JournalUITests`, updated notes field lookup to `app.textFields` and end fast confirmation button to `"Save Fast"`.
+- Acceptance checklist:
+  - Default fasting-only layout preserved: pass.
+  - Journal toggle enables/disables Journal tab seamlessly: pass.
+  - Meals persist across relaunch: pass.
+  - "Don't ask again" permanently silences post-fast prompts: pass.
+  - Local photo storage + thumbnail generation + orphan cleanup: pass.
+  - Fasting overlap confirmation: pass.
+- Remaining blockers, risk and recovery/compatibility notes:
+  - Stacked on PR #70 (`codex/gru-54-challenge-ui`).
+- Independent reviewer / PR: Stacked PR opened on `jagrusy/fasting-app`.
+- Downstream handoff: Package 3 (Curated Challenges) or Package 5 (Social Share / Export) can build upon this foundation.

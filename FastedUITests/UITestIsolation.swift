@@ -8,12 +8,20 @@ extension XCTestCase {
     /// `terminate()` + relaunch within one test to reopen the same store and verify persistence.
     func launchIsolatedApp(
         storeId: String = UUID().uuidString,
-        enableChallenges: Bool = false
+        enableChallenges: Bool = false,
+        enableJournal: Bool = false,
+        enablePostFastPrompt: Bool = false
     ) -> XCUIApplication {
         let app = XCUIApplication()
         var args = ["-uiTesting"]
         if enableChallenges {
             args.append("-enableChallenges")
+        }
+        if enableJournal {
+            args.append("-enableJournal")
+        }
+        if enablePostFastPrompt {
+            args.append("-enablePostFastPrompt")
         }
         app.launchArguments = args
         app.launchEnvironment = ["UITEST_STORE_ID": storeId]
