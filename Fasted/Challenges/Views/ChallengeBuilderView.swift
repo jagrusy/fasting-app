@@ -267,6 +267,7 @@ struct ChallengeBuilderView: View {
             try challengeManager.startChallenge(draft: draft, replacing: replacing)
             dismiss()
         } catch {
+            challengeManager.errorMessage = nil
             errorMessage = error.localizedDescription
         }
     }
