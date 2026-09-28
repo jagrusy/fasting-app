@@ -92,4 +92,36 @@ final class OptimisticStreakTests: XCTestCase {
 
         XCTAssertEqual(ended.currentStreak, 4)
     }
+
+    /// A multi-day fast credits every whole day it spans, matching `StreakCalculator`.
+    func testCompletedMultiDayFastBumpsTheStreakForEachWholeDaySpanned() {
+        let snapshot = FastingStateSnapshot(
+            isFasting: true,
+            startDate: day(10, hour: 20),
+            targetDuration: 72 * 3600,
+            protocolType: "72h",
+            currentStreak: 2,
+            longestStreak: 2,
+            lastCompletedFastStartDate: day(9, hour: 20)
+        )
+        // 10th 20:00 → 13th 20:00 credits the 10th, 11th and 12th.
+        let ended = snapshot.endingNow(at: day(13, hour: 20), calendar: calendar)
+
+        XCTAssertEqual(ended.currentStreak, 5)
+        XCTAssertEqual(ended.longestStreak, 5)
+    }
+
+    func testIncompleteMultiDayFastDoesNotBumpTheStreak() {
+        let snapshot = FastingStateSnapshot(
+            isFasting: true,
+            startDate: day(10, hour: 20),
+            targetDuration: 72 * 3600,
+            protocolType: "72h",
+            currentStreak: 2,
+            longestStreak: 2
+        )
+        let ended = snapshot.endingNow(at: day(12, hour: 20), calendar: calendar)
+
+        XCTAssertEqual(ended.currentStreak, 2)
+    }
 }

@@ -46,10 +46,7 @@ extension FastManager {
         }
 
         coordinator.writeSnapshot(snapshot)
-        WatchSessionManager.shared.syncSnapshotToWatch(snapshot)
-        #if canImport(ActivityKit)
-        FastLiveActivityController.shared.sync(with: snapshot)
-        #endif
+        effects.syncWatch(snapshot)
         return true
     }
 
@@ -124,6 +121,7 @@ extension FastManager {
     @discardableResult
     public func deleteFast(_ fast: Fast) -> Bool {
         let wasActive = activeFast === fast
+        let deletedID = fast.id
         viewContext.delete(fast)
 
         do {
@@ -133,8 +131,9 @@ extension FastManager {
                 notificationManager.cancelGoalNotification()
                 notificationManager.cancelStageTransitionNotifications()
             }
-            clearSnoozeOffset(for: fast)
+            if let deletedID { defaults.removeObject(forKey: snoozeOffsetKey(for: deletedID)) }
             self.objectWillChange.send()
+            syncNotifications()
             publishSnapshot()
             return true
         } catch {

@@ -141,4 +141,14 @@ final class FastingStateSnapshotTests: XCTestCase {
         let nextAt25h = snapshot.nextStageBoundary(at: twentyFiveHours)
         XCTAssertNil(nextAt25h)
     }
+
+    func testEatingWindowOnlyExistsForProtocolsThatHaveOne() {
+        let lastEnd = Date(timeIntervalSince1970: 1_700_000_000)
+        var snapshot = FastingStateSnapshot(isFasting: false, protocolType: "16:8", lastCompletedFastDate: lastEnd)
+        XCTAssertEqual(snapshot.eatingWindowEnd(), lastEnd.addingTimeInterval(8 * 3600))
+
+        snapshot.protocolType = "36h"
+        XCTAssertNil(snapshot.eatingWindowEnd())
+        XCTAssertNil(snapshot.eatingWindowProgress(at: lastEnd.addingTimeInterval(3600)))
+    }
 }

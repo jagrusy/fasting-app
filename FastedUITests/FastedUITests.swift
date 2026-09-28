@@ -345,3 +345,53 @@ final class FastedUITests: XCTestCase {
         XCTAssertFalse(app.navigationBars["Solstice"].exists)
     }
 }
+
+// MARK: - Start menu
+
+extension FastedUITests {
+    /// The menu must start the chosen fast, not the default: the ring's label shows the stored
+    /// goal ("24h" rather than the default "16:8"), and it survives reopening the same store.
+    func testStartMenuStartsAnExtendedFast() throws {
+        let storeId = UUID().uuidString
+        let app = launchIsolatedApp(storeId: storeId)
+
+        let fastTab = app.tabBars.buttons["Fast"]
+        XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
+        fastTab.tap()
+
+        let startButton = app.buttons["start_fast_button"]
+        XCTAssertTrue(startButton.waitForExistence(timeout: 5), "a fresh isolated store must start idle")
+
+        let menuButton = app.buttons["start_fast_menu"]
+        XCTAssertTrue(menuButton.waitForExistence(timeout: 3), "the protocol menu chevron must exist alongside Start")
+        // XCUITest's `tap()` first asks accessibility to scroll the element into view, which fails
+        // for a SwiftUI `Menu` (kAXErrorCannotComplete, hit point {-1, -1}) even when it is fully
+        // on screen. Tapping its centre coordinate still goes through normal hit-testing, so this
+        // fails if anything covers the chevron.
+        menuButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        let extendedItem = app.buttons["start_menu_24h"]
+        XCTAssertTrue(extendedItem.waitForExistence(timeout: 3), "the 24-Hour Fast item must appear in the menu")
+        extendedItem.tap()
+
+        XCTAssertTrue(app.buttons["end_fast_button"].waitForExistence(timeout: 4))
+        assertActiveGoalLabel(in: app, is: "24h", message: "the menu must start a 24-hour fast, not the default")
+
+        app.terminate()
+        XCTAssertTrue(app.wait(for: .notRunning, timeout: 5), "old process must fully exit before reopening its store")
+        let relaunched = launchIsolatedApp(storeId: storeId)
+
+        let relaunchedFastTab = relaunched.tabBars.buttons["Fast"]
+        XCTAssertTrue(relaunchedFastTab.waitForExistence(timeout: 5))
+        relaunchedFastTab.tap()
+        XCTAssertTrue(relaunched.buttons["end_fast_button"].waitForExistence(timeout: 5))
+        assertActiveGoalLabel(in: relaunched, is: "24h", message: "the 24-hour goal must persist across relaunch")
+    }
+
+    /// `progress_percentage_text` reads "<n>% · <goal label>" in the default elapsed display mode.
+    private func assertActiveGoalLabel(in app: XCUIApplication, is goal: String, message: String) {
+        let label = app.staticTexts["progress_percentage_text"]
+        XCTAssertTrue(label.waitForExistence(timeout: 3), message)
+        XCTAssertTrue(label.label.hasSuffix("· \(goal)"), "\(message) (was \"\(label.label)\")")
+    }
+}

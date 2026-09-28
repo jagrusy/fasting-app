@@ -1,5 +1,6 @@
 import XCTest
 import CoreData
+import UserNotifications
 @testable import Fasted
 
 @MainActor
@@ -14,7 +15,13 @@ final class FastManagerPersistenceFailureTests: XCTestCase {
         var failSaves = false
     }
 
+    private final class NotificationSpy {
+        var requests: [String: UNNotificationRequest] = [:]
+        var changes = 0
+    }
+
     private struct Fixture {
+        let notifications: NotificationSpy
         let manager: FastManager
         let coordinator: AppGroupCoordinator
         let failures: FailureSwitch
@@ -54,6 +61,7 @@ final class FastManagerPersistenceFailureTests: XCTestCase {
     func testFailedStartReturnsNoFastAndDoesNotReachDiskOrSnapshot() throws {
         let fixture = makeFixture()
         let before = fixture.coordinator.readSnapshot()
+        let notificationChanges = fixture.notifications.changes
         fixture.failures.failSaves = true
 
         let result = fixture.manager.startFast(startDate: Date().addingTimeInterval(-60))
@@ -62,6 +70,7 @@ final class FastManagerPersistenceFailureTests: XCTestCase {
         XCTAssertNil(fixture.manager.activeFast)
         XCTAssertNotNil(fixture.manager.operationError)
         XCTAssertEqual(fixture.coordinator.readSnapshot(), before)
+        XCTAssertEqual(fixture.notifications.changes, notificationChanges)
         XCTAssertEqual(try reopenedFasts(at: fixture.storeURL).count, 0)
     }
 
@@ -69,6 +78,7 @@ final class FastManagerPersistenceFailureTests: XCTestCase {
         let fixture = makeFixture()
         let fast = try XCTUnwrap(fixture.manager.startFast(startDate: Date().addingTimeInterval(-3600)))
         let before = fixture.coordinator.readSnapshot()
+        let notificationChanges = fixture.notifications.changes
         fixture.failures.failSaves = true
 
         XCTAssertFalse(fixture.manager.endFast(endDate: Date()))
@@ -76,6 +86,7 @@ final class FastManagerPersistenceFailureTests: XCTestCase {
         XCTAssertEqual(fixture.manager.activeFast, fast)
         XCTAssertNil(fast.endDate)
         XCTAssertEqual(fixture.coordinator.readSnapshot(), before)
+        XCTAssertEqual(fixture.notifications.changes, notificationChanges)
         let reopened = try XCTUnwrap(reopenedFasts(at: fixture.storeURL).first)
         XCTAssertNil(reopened.endDate)
     }
@@ -201,6 +212,64 @@ final class FastManagerPersistenceFailureTests: XCTestCase {
         XCTAssertEqual(reopened.endDate, committedEnd)
     }
 
+}
+
+extension FastManagerPersistenceFailureTests {
+    func testPostCommitSnapshotFailureDoesNotClaimSavedDataIsUnchanged() throws {
+        let fixture = makeFixture()
+        _ = try XCTUnwrap(fixture.manager.startFast(startDate: Date().addingTimeInterval(-3600)))
+        fixture.failures.failReads = true
+        let end = Date()
+
+        XCTAssertTrue(fixture.manager.endFast(endDate: end))
+        XCTAssertNil(fixture.manager.activeFast)
+        let error = try XCTUnwrap(fixture.manager.operationError)
+        XCTAssertFalse(error.message.contains("unchanged"))
+        XCTAssertEqual(try reopenedFasts(at: fixture.storeURL).first?.endDate, end)
+    }
+
+    func testDeleteFailureKeepsFastAndSnoozeThenSuccessfulDeleteClearsBoth() throws {
+        let fixture = makeFixture()
+        let fast = try XCTUnwrap(fixture.manager.startFast(startDate: Date().addingTimeInterval(-3600)))
+        let identifier = try XCTUnwrap(fast.id)
+        let key = fixture.manager.snoozeOffsetKey(for: identifier)
+        fixture.manager.defaults.set(1800, forKey: key)
+        let changes = fixture.notifications.changes
+        fixture.failures.failSaves = true
+        XCTAssertFalse(fixture.manager.deleteFast(fast))
+        XCTAssertEqual(try reopenedFasts(at: fixture.storeURL).count, 1)
+        XCTAssertEqual(fixture.manager.defaults.double(forKey: key), 1800)
+        XCTAssertEqual(fixture.notifications.changes, changes)
+
+        fixture.failures.failSaves = false
+        XCTAssertTrue(fixture.manager.deleteFast(fast))
+        XCTAssertEqual(try reopenedFasts(at: fixture.storeURL).count, 0)
+        XCTAssertNil(fixture.manager.defaults.object(forKey: key))
+    }
+
+    func testRetargetReschedulesRecurringRemindersAndDayMilestones() throws {
+        let fixture = makeFixture()
+        _ = try XCTUnwrap(fixture.manager.startFast(startDate: Date().addingTimeInterval(-60)))
+        XCTAssertTrue(fixture.manager.updateNotificationSchedule(enabled: true, schedule: .default))
+        let identifiers = Set(fixture.notifications.requests.keys)
+        XCTAssertFalse(identifiers.contains(NotificationManager.dayMilestoneIdentifier(forDay: 2)))
+
+        XCTAssertTrue(fixture.manager.updateSelectedProtocol("72h", retargetActiveFast: true))
+
+        XCTAssertNotNil(fixture.notifications.requests[NotificationManager.dayMilestoneIdentifier(forDay: 2)])
+        let goal = try XCTUnwrap(fixture.manager.activeFastGoalDate())
+        let reminders = fixture.notifications.requests.values.filter { $0.identifier.hasPrefix("recurring_start") }
+        XCTAssertFalse(reminders.isEmpty)
+        for request in reminders {
+            let trigger = try XCTUnwrap(request.trigger as? UNCalendarNotificationTrigger)
+            let next = try XCTUnwrap(trigger.nextTriggerDate())
+            XCTAssertGreaterThan(next, goal)
+        }
+    }
+
+}
+
+extension FastManagerPersistenceFailureTests {
     private func makeFixture() -> Fixture {
         let storeURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("fast-manager-failure-\(UUID().uuidString).sqlite")
@@ -237,17 +306,38 @@ final class FastManagerPersistenceFailureTests: XCTestCase {
             userDefaults: defaults,
             commandsDirectory: commandDirectory
         )
+        let notifications = NotificationSpy()
         let manager = FastManager(
             context: context,
+            notificationManager: NotificationManager(delivery: notificationDelivery(for: notifications)),
             defaults: defaults,
             coordinator: coordinator,
-            persistence: persistence
+            persistence: persistence,
+            effects: FastManagerEffects(syncWatch: { _ in }, requestReview: { _, _ in }),
+            observeExternalCommands: false
         )
         return Fixture(
+            notifications: notifications,
             manager: manager,
             coordinator: coordinator,
             failures: failures,
             storeURL: storeURL
+        )
+    }
+
+    private func notificationDelivery(for notifications: NotificationSpy) -> NotificationDelivery {
+        NotificationDelivery(
+            add: { request, completion in
+                notifications.requests[request.identifier] = request
+                notifications.changes += 1
+                completion(nil)
+            },
+            remove: { identifiers in
+                identifiers.forEach { notifications.requests.removeValue(forKey: $0) }
+                notifications.changes += 1
+            },
+            register: { _ in },
+            requestAuthorization: { $0(false, nil) }
         )
     }
 

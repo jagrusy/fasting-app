@@ -4,6 +4,9 @@ public struct ProgressRingView: View {
     public let progress: Double
     public let isFasting: Bool
     public var ringWidth: CGFloat = 22
+    /// The active fast's goal duration, used only to place day-boundary tick marks on the ring.
+    /// Defaults to 0 (no ticks) so existing call sites compile unchanged.
+    public var targetDuration: TimeInterval = 0
     /// Fires per drag frame with a small incremental fraction of a full revolution (not an absolute
     /// position), so the caller can accumulate elapsed time continuously across the 12-o'clock wrap
     /// point and past 100% without the knob's angle ever needing to represent more than one lap.
@@ -18,12 +21,14 @@ public struct ProgressRingView: View {
         progress: Double,
         isFasting: Bool,
         ringWidth: CGFloat = 22,
+        targetDuration: TimeInterval = 0,
         onProgressDragged: ((Double) -> Void)? = nil,
         onProgressDragEnded: (() -> Void)? = nil
     ) {
         self.progress = progress
         self.isFasting = isFasting
         self.ringWidth = ringWidth
+        self.targetDuration = targetDuration
         self.onProgressDragged = onProgressDragged
         self.onProgressDragEnded = onProgressDragEnded
     }
@@ -44,6 +49,7 @@ public struct ProgressRingView: View {
                 overGoalGlow(radius: radius)
                 progressArc(radius: radius)
                 if isFasting {
+                    dayBoundaryTicks(center: center, radius: radius)
                     dragKnob(center: center, radius: radius)
                 }
             }
@@ -99,6 +105,29 @@ public struct ProgressRingView: View {
             .frame(width: radius * 2, height: radius * 2)
             .rotationEffect(.degrees(-90))
             .animation(isDragging ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: progress)
+    }
+
+    /// Subtle radial ticks at each whole 24-hour boundary inside the goal, so a multi-day fast's
+    /// single lap still reads as multiple days. Purely decorative: cheap to draw, hidden from
+    /// accessibility, and visible against both the track and the filled arc in light/dark mode.
+    private func dayBoundaryTicks(center: CGPoint, radius: CGFloat) -> some View {
+        let fractions = DialMath.dayBoundaryFractions(targetDuration: targetDuration)
+        return ForEach(fractions, id: \.self) { fraction in
+            dayBoundaryTick(fraction: fraction, center: center, radius: radius)
+        }
+    }
+
+    private func dayBoundaryTick(fraction: Double, center: CGPoint, radius: CGFloat) -> some View {
+        let angle = Angle.degrees(fraction * 360.0 - 90.0)
+        let tickX = center.x + CGFloat(cos(angle.radians)) * radius
+        let tickY = center.y + CGFloat(sin(angle.radians)) * radius
+
+        return Capsule()
+            .fill(Color.primary.opacity(0.35))
+            .frame(width: 2, height: ringWidth)
+            .rotationEffect(.degrees(fraction * 360.0))
+            .position(x: tickX, y: tickY)
+            .accessibilityHidden(true)
     }
 
     private func dragKnob(center: CGPoint, radius: CGFloat) -> some View {

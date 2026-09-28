@@ -12,8 +12,10 @@ extension FastManager {
             persistence.rollback()
         }
         NSLog("[Solstice] \(operation) failed: \(error)")
-        let message = "Solstice couldn't \(operation.lowercased()). "
-            + "Your saved fasting data is unchanged. Please try again."
+        let recovery = rollback
+            ? "Your saved fasting data is unchanged. Please try again."
+            : "Please try refreshing again."
+        let message = "Solstice couldn't \(operation.lowercased()). " + recovery
         operationError = FastManagerOperationError(message: message)
         return false
     }

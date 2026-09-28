@@ -19,18 +19,7 @@ extension FastManager {
         do {
             try persistence.save()
             self.objectWillChange.send()
-            if let active, let startDate = active.startDate {
-                let targetEnd = startDate.addingTimeInterval(active.targetDuration + snoozeOffset(for: active))
-                notificationManager.scheduleGoalNotification(
-                    targetEndDate: targetEnd,
-                    protocolName: protocolType,
-                    enabled: notificationSchedule.notifyOnGoalReached
-                )
-                notificationManager.scheduleStageTransitionNotifications(
-                    startDate: startDate,
-                    enabled: notificationSchedule.notifyOnStageChange
-                )
-            }
+            if active != nil { syncNotifications() }
             publishSnapshot()
             return true
         } catch {
@@ -53,7 +42,7 @@ extension FastManager {
             try persistence.save()
             self.objectWillChange.send()
 
-            notificationManager.scheduleRecurringReminders(schedule: schedule, enabled: enabled)
+            rescheduleStartReminders(schedule: schedule, enabled: enabled)
             rescheduleGoalNotificationForActiveFast(notifyOnGoalReached: schedule.notifyOnGoalReached)
             rescheduleStageNotificationsForActiveFast(notifyOnStageChange: schedule.notifyOnStageChange)
             publishSnapshot()
@@ -64,21 +53,33 @@ extension FastManager {
     }
 
     /// Re-registers all notifications from current state. Call on launch / foreground so a goal
-    /// notification lost to a late permission grant, or a recurring reminder pruned by iOS, recovers,
-    /// and so that any reminder identifiers retired in a previous app version get purged.
+    /// notification lost to a late permission grant, or a reminder pruned by iOS, recovers, and so
+    /// that any reminder identifiers retired in a previous app version get purged. Also call after
+    /// any change to the active fast: start reminders are skipped while it runs, and its goal, stage
+    /// and day-milestone notifications follow its start date and goal.
     public func syncNotifications() {
         let schedule = notificationSchedule
-        notificationManager.scheduleRecurringReminders(
-            schedule: schedule,
-            enabled: userSettings?.notificationsEnabled ?? false
-        )
+        rescheduleStartReminders(schedule: schedule, enabled: userSettings?.notificationsEnabled ?? false)
         rescheduleGoalNotificationForActiveFast(notifyOnGoalReached: schedule.notifyOnGoalReached)
         rescheduleStageNotificationsForActiveFast(notifyOnStageChange: schedule.notifyOnStageChange)
     }
 
+    /// When the active fast is due to reach its goal, including any snooze. Nil when not fasting.
+    func activeFastGoalDate() -> Date? {
+        guard let fast = activeFast, let start = fast.startDate else { return nil }
+        return start.addingTimeInterval(fast.targetDuration + snoozeOffset(for: fast))
+    }
+
+    func rescheduleStartReminders(schedule: NotificationSchedule, enabled: Bool) {
+        notificationManager.scheduleRecurringReminders(
+            schedule: schedule,
+            enabled: enabled,
+            suppressUntil: activeFastGoalDate()
+        )
+    }
+
     func rescheduleGoalNotificationForActiveFast(notifyOnGoalReached: Bool) {
-        guard let fast = activeFast, let start = fast.startDate else { return }
-        let targetEnd = start.addingTimeInterval(fast.targetDuration + snoozeOffset(for: fast))
+        guard let fast = activeFast, let targetEnd = activeFastGoalDate() else { return }
         let proto = fast.protocolType ?? FastingProtocol.default.ratioString
         notificationManager.scheduleGoalNotification(
             targetEndDate: targetEnd,
@@ -91,6 +92,7 @@ extension FastManager {
         guard let fast = activeFast, let start = fast.startDate else { return }
         notificationManager.scheduleStageTransitionNotifications(
             startDate: start,
+            targetDuration: fast.targetDuration,
             enabled: notifyOnStageChange
         )
     }
@@ -122,5 +124,23 @@ extension FastManager {
     func clearAllSnoozeOffsets() {
         let keys = defaults.dictionaryRepresentation().keys.filter { $0.hasPrefix(Self.snoozeOffsetKeyPrefix) }
         keys.forEach { defaults.removeObject(forKey: $0) }
+    }
+
+    // MARK: - Last custom fast length
+
+    private static let lastCustomFastHoursKey = "com.solstice.lastCustomFastHours"
+
+    /// The last length the user picked from the custom-fast sheet, offered again as a shortcut in
+    /// the Start menu. Nil when never set, or when the stored value no longer parses as a valid
+    /// custom length (e.g. a stale value from a future app version).
+    public var lastCustomFastHours: Int? {
+        let stored = defaults.integer(forKey: Self.lastCustomFastHoursKey)
+        guard stored != 0, FastingProtocol.customHoursRange.contains(stored) else { return nil }
+        return stored
+    }
+
+    public func rememberCustomFastHours(_ hours: Int) {
+        guard FastingProtocol.customHoursRange.contains(hours) else { return }
+        defaults.set(hours, forKey: Self.lastCustomFastHoursKey)
     }
 }

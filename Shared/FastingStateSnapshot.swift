@@ -84,10 +84,11 @@ public struct FastingStateSnapshot: Codable, Sendable, Equatable {
     }
 
     /// When the current eating window closes, derived from the protocol's eating hours. Nil while
-    /// fasting, or before any fast has been completed.
+    /// fasting, before any fast has been completed, or when the protocol has no eating window.
     public func eatingWindowEnd() -> Date? {
         guard !isFasting, let last = lastCompletedFastDate else { return nil }
         let proto = fastingProtocol ?? .default
+        guard proto.hasEatingWindow else { return nil }
         return last.addingTimeInterval(proto.eatingSeconds)
     }
 
@@ -123,5 +124,21 @@ public struct FastingStateSnapshot: Codable, Sendable, Equatable {
     public var fastingProtocol: FastingProtocol? {
         guard let proto = protocolType else { return nil }
         return FastingProtocol.from(protocolType: proto)
+    }
+}
+
+/// Which calendar days a completed fast counts toward a streak: the day it started, plus every day it
+/// spans from midnight to midnight. A 72-hour fast from Friday evening to Monday evening credits
+/// Friday, Saturday and Sunday; an overnight 16:8 credits only its start day.
+public enum StreakDays {
+    public static func credited(start: Date, end: Date, calendar: Calendar = .current) -> [Date] {
+        let startDay = calendar.startOfDay(for: start)
+        var days = [startDay]
+        guard var day = calendar.date(byAdding: .day, value: 1, to: startDay) else { return days }
+        while let next = calendar.date(byAdding: .day, value: 1, to: day), next <= end {
+            days.append(day)
+            day = next
+        }
+        return days
     }
 }

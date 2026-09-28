@@ -25,6 +25,8 @@ public final class FastManager: ObservableObject {
 
     @Published public internal(set) var activeFast: Fast?
     @Published public internal(set) var userSettings: UserSettings?
+    let effects: FastManagerEffects
+
     @Published public internal(set) var operationError: FastManagerOperationError?
 
     public convenience init(
@@ -47,15 +49,18 @@ public final class FastManager: ObservableObject {
         notificationManager: NotificationManager = .shared,
         defaults: UserDefaults = .standard,
         coordinator: AppGroupCoordinator = .shared,
-        persistence: FastManagerPersistence
+        persistence: FastManagerPersistence,
+        effects: FastManagerEffects = .live,
+        observeExternalCommands: Bool = true
     ) {
         self.viewContext = context
+        self.effects = effects
         self.persistence = persistence
         self.notificationManager = notificationManager
         self.defaults = defaults
         self.coordinator = coordinator
         self.setupNotificationCallbacks()
-        self.setupDarwinObserver()
+        if observeExternalCommands { self.setupDarwinObserver() }
         self.refresh()
     }
 
@@ -187,17 +192,7 @@ public final class FastManager: ObservableObject {
         do {
             try persistence.save()
             self.activeFast = fast
-
-            let targetEnd = startDate.addingTimeInterval(duration)
-            notificationManager.scheduleGoalNotification(
-                targetEndDate: targetEnd,
-                protocolName: proto,
-                enabled: notificationSchedule.notifyOnGoalReached
-            )
-            notificationManager.scheduleStageTransitionNotifications(
-                startDate: startDate,
-                enabled: notificationSchedule.notifyOnStageChange
-            )
+            syncNotifications()
             publishSnapshot()
             return fast
         } catch {
@@ -224,15 +219,13 @@ public final class FastManager: ObservableObject {
             notificationManager.cancelGoalNotification()
             notificationManager.cancelStageTransitionNotifications()
             clearSnoozeOffset(for: fast)
+            syncNotifications()
             publishSnapshot()
 
             let request: NSFetchRequest<Fast> = Fast.fetchRequest()
             request.predicate = NSPredicate(format: "endDate != nil AND isCompleted == YES")
             let allCompleted = (try? viewContext.fetch(request)) ?? []
-            ReviewPromptManager.shared.checkAndPromptIfEligible(
-                completedFast: completed,
-                allCompletedFasts: allCompleted
-            )
+            effects.requestReview(completed, allCompleted)
             return true
         } catch {
             return fail(error, operation: "End the fast")
@@ -258,18 +251,7 @@ public final class FastManager: ObservableObject {
         do {
             try persistence.save()
             self.objectWillChange.send()
-
-            let targetEnd = startDate.addingTimeInterval(fast.targetDuration + snoozeOffset(for: fast))
-            let proto = fast.protocolType ?? FastingProtocol.default.ratioString
-            notificationManager.scheduleGoalNotification(
-                targetEndDate: targetEnd,
-                protocolName: proto,
-                enabled: notificationSchedule.notifyOnGoalReached
-            )
-            notificationManager.scheduleStageTransitionNotifications(
-                startDate: startDate,
-                enabled: notificationSchedule.notifyOnStageChange
-            )
+            syncNotifications()
             publishSnapshot()
             return true
         } catch {
@@ -281,15 +263,7 @@ public final class FastManager: ObservableObject {
         guard let fast = activeFast, let id = fast.id else { return }
         let newOffset = defaults.double(forKey: snoozeOffsetKey(for: id)) + extensionSeconds
         defaults.set(newOffset, forKey: snoozeOffsetKey(for: id))
-
-        let start = fast.startDate ?? Date()
-        let targetEnd = start.addingTimeInterval(fast.targetDuration + newOffset)
-        let proto = fast.protocolType ?? FastingProtocol.default.ratioString
-        notificationManager.scheduleGoalNotification(
-            targetEndDate: targetEnd,
-            protocolName: proto,
-            enabled: notificationSchedule.notifyOnGoalReached
-        )
+        syncNotifications()
         publishSnapshot()
     }
 }
