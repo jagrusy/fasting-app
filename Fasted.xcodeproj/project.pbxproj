@@ -13,6 +13,7 @@
 		043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */; };
 		084F697FBF35CB11AABC725E /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		089D9A852E6784E04D5691EF /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
+		090DB76BCD03CA27F1C47248 /* ChallengeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53046B641488AE77086E2E34 /* ChallengeManager.swift */; };
 		09FEE3627E0CA18F31C7AC0E /* ChallengeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF512965A5D99AB8BD0EB6D /* ChallengeStore.swift */; };
 		0B2AD02224339FDBB03BCC7B /* CalendarHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C410780F466CF5987E506477 /* CalendarHeatmapView.swift */; };
 		0D1721A6FF6C785BE29D7488 /* DialMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71CDC6BEC973FA849ACE8BB /* DialMath.swift */; };
@@ -23,7 +24,9 @@
 		19C70B2B4B19C83424685877 /* FastStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3A7103D0883246EA1A90ECD /* FastStatusWidget.swift */; };
 		1A1CEC7520DE250DBA021796 /* FastDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44F4C21FE2197D21744A872 /* FastDetailView.swift */; };
 		1C2D0A64D8220A8783332DCF /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
+		1CAB7412451CA2C49AD6864E /* ChallengeManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D772D51E84F22824B874556 /* ChallengeManagerTests.swift */; };
 		1D42DAA75426B7751F9AA21A /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
+		1F4DA1C7D214278A4001C2E9 /* ChallengeBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483747437C5059980C0AB3F /* ChallengeBuilderView.swift */; };
 		1FE8AA08F4C17F9DF6C267FE /* FastDurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3450BE8B5B0F980D4687D09 /* FastDurationFormatter.swift */; };
 		203C8F4DEC49656BCE19B8FD /* WidgetTimelineBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3CE3910952492A92BB64DD0 /* WidgetTimelineBuilderTests.swift */; };
 		2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFF304C7359306211445686 /* NotificationSchedule.swift */; };
@@ -31,6 +34,7 @@
 		250B6E2DE094437E20F3DC66 /* FastManagerValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776385FA5C186C9AFB85A306 /* FastManagerValidationTests.swift */; };
 		26C19A5BD6BDB1553F38F4C1 /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
 		281063BCF8438C5CECA4B923 /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
+		289BA4884EAD71650DCC02CC /* ChallengeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 626DB1C07BE691A8B77C13E1 /* ChallengeUITests.swift */; };
 		290EB23E7C0C6FB242F90E6F /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
 		2AEB2AFC805215E2DE91E60D /* FastSnapshotModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1531E653470400439AB8B40 /* FastSnapshotModifiers.swift */; };
 		2B5CB84B8C663BBC81EC2877 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
@@ -61,6 +65,7 @@
 		51EBE5DFAF8D1E643F74CB41 /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E28C03F62B53456BC8E2DF /* WidgetTimelineBuilder.swift */; };
 		52E86FE9CE2ED8B27EDB571E /* FastExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6C9E4A998368D7123C81D98 /* FastExtensionsTests.swift */; };
 		531868EFC09E78273AEE5663 /* AppGroupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */; };
+		53AF44324EAD15A8BAEE65F9 /* ChallengeProgressGridCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22140BB38E8445DA26434C9C /* ChallengeProgressGridCard.swift */; };
 		5486C5C7B0B72DBCE4F69F01 /* AppGroupResilienceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268CC999FE8C890B9E92083D /* AppGroupResilienceTests.swift */; };
 		54BB535ADD7C60AF2F74DE6D /* OptimisticStreakTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21569A5F6036D31B3C7A4B5D /* OptimisticStreakTests.swift */; };
 		558062F10AACD30B80898353 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
@@ -70,6 +75,7 @@
 		5E28F103B04991B5DC71121C /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98639EA5CF96432052AC501B /* NotificationManager.swift */; };
 		5FE1C9CFE67C485C58B7FFF4 /* FastDurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3450BE8B5B0F980D4687D09 /* FastDurationFormatter.swift */; };
 		60B63C7C538AA3271C824FEB /* BuildMetadataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74435CB885215FB2DBEC2E5A /* BuildMetadataTests.swift */; };
+		6111A391F35C6FC4AD187E5F /* ChallengePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F391EADC5BD5CF79D4FA509 /* ChallengePreferences.swift */; };
 		62B0C00563C611B6973E931E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */; };
 		62C792327092914FB7C2CEF0 /* Fast+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B59CA62211138ECBF72E75 /* Fast+Extensions.swift */; };
 		63AA188B0D1CF981C33B4F9E /* StartFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */; };
@@ -103,6 +109,7 @@
 		83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */; };
 		8343AF3A1CFD480B1A021E44 /* FastingActionCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */; };
 		83E2EB75A702AD6976FAFBFF /* FastedWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7683DDF7EF4692383D712670 /* FastedWatchApp.swift */; };
+		85FF8B0BEBB528FBBBFCC18B /* ChallengeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06BE040F34266CCC3EE7D7B0 /* ChallengeTabView.swift */; };
 		86055F2337D28D87733DB3A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E0AA730541330E520D556185 /* Assets.xcassets */; };
 		8887E910A75D71DC6B8927C6 /* FastTimePickerSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556AA56BFF312CEBC9395C9D /* FastTimePickerSheetView.swift */; };
 		8C37E9CABAB67BC19B684F22 /* StartFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C27E835E13F5E64A3C90C7 /* StartFastIntent.swift */; };
@@ -117,7 +124,9 @@
 		96879764CAD6001EABED713F /* BuildMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C95DACC66EF1CE6953C6D0 /* BuildMetadata.swift */; };
 		98548E8AD56DF8EE3923EC20 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		994FE67C1CE31DACA5B1898F /* WatchPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */; };
+		99959F1DD53619873BC9C123 /* ChallengeCommitmentsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A7579145D480B7E044A74E /* ChallengeCommitmentsCard.swift */; };
 		9A0AB9AAC0BD4A7E2D9BD49E /* UITestIsolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84B2C22AB93A0FBC932336E /* UITestIsolation.swift */; };
+		9A4F9202D7CE323A2CCB5D9A /* ChallengesSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4E7F484C2D8FB91312542C /* ChallengesSettingsSection.swift */; };
 		9AECBC71B2D7B00723DF7DA5 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
 		9BB47C1977B50828F59E41C0 /* FastManager+AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3740D6FCC59A6BDB6F776A5A /* FastManager+AppGroup.swift */; };
 		9BE30CD05FF60B9801D9FE66 /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
@@ -140,6 +149,8 @@
 		B3BB572FF472857F693B828A /* FastingArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D4D805535A363DDAF977B89 /* FastingArcShape.swift */; };
 		B3F4D66F591A6BC5540BFFE6 /* AppGroupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */; };
 		B5E7355066BFAF0A110D29DD /* FastDurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3450BE8B5B0F980D4687D09 /* FastDurationFormatter.swift */; };
+		B7FCCC192756513A15E5AB18 /* ChallengeTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EFA9A48B2572EE3F2F3F99 /* ChallengeTemplates.swift */; };
+		B8E64081C3C352481ED994DE /* PastChallengesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556F16D7FE53459CA8FA7648 /* PastChallengesView.swift */; };
 		BAC60C4DD062EAB06EA240E2 /* MedicalDisclaimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852019A5CF61816906B49C41 /* MedicalDisclaimerView.swift */; };
 		BC2CF35F91EA9AC368E7444F /* FastingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66847625426DFA2D05A362D2 /* FastingProtocol.swift */; };
 		BD7B9EA2D7B7CB3207FC128C /* SnoozeFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */; };
@@ -171,6 +182,7 @@
 		E8A5B963DF26327D10D275D0 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
 		E9AFDD35443083072B92D138 /* BuildMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C95DACC66EF1CE6953C6D0 /* BuildMetadata.swift */; };
 		EAB59149E74AD57EA1933FDA /* FastGaugeMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225FC5D6935A29EA6DD836F1 /* FastGaugeMetricsTests.swift */; };
+		EAEC7DAB2CB3EB2269E172DF /* TodayTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF3CAB953E65E608E035C8A /* TodayTabView.swift */; };
 		EC997B42B09ED34EDDF1B7F0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DE8B4FD5DF967B569F2716A6 /* PrivacyInfo.xcprivacy */; };
 		ED7B5E3EAD068684F3CA73C1 /* FastStageWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3DA7AE2C21D352A26B1BAE4 /* FastStageWidget.swift */; };
 		EFF109DE04A205D5B0C972DB /* DeepLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68222DD80B162A582A18EB12 /* DeepLinkTests.swift */; };
@@ -255,6 +267,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		06BE040F34266CCC3EE7D7B0 /* ChallengeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeTabView.swift; sourceTree = "<group>"; };
 		0AF512965A5D99AB8BD0EB6D /* ChallengeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeStore.swift; sourceTree = "<group>"; };
 		0B49461E82EC597415611F11 /* FastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManager.swift; sourceTree = "<group>"; };
 		133D5524D58FDC210D137DE4 /* WatchSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSessionManager.swift; sourceTree = "<group>"; };
@@ -264,14 +277,17 @@
 		15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetabolicStageBadgeView.swift; sourceTree = "<group>"; };
 		1CFA4EEB688E8CA3F0D63709 /* NotificationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManagerTests.swift; sourceTree = "<group>"; };
 		1F11893E710BA95F8A4A0839 /* WatchPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPayload.swift; sourceTree = "<group>"; };
+		1F4E7F484C2D8FB91312542C /* ChallengesSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengesSettingsSection.swift; sourceTree = "<group>"; };
 		1F9F861B9889D9525710D09F /* SnoozeFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeFastIntent.swift; sourceTree = "<group>"; };
 		21569A5F6036D31B3C7A4B5D /* OptimisticStreakTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimisticStreakTests.swift; sourceTree = "<group>"; };
 		21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedDialMathTests.swift; sourceTree = "<group>"; };
+		22140BB38E8445DA26434C9C /* ChallengeProgressGridCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeProgressGridCard.swift; sourceTree = "<group>"; };
 		225FC5D6935A29EA6DD836F1 /* FastGaugeMetricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastGaugeMetricsTests.swift; sourceTree = "<group>"; };
 		23361B83B81FEAD6F4A84D7D /* SolsticeThemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolsticeThemeTests.swift; sourceTree = "<group>"; };
 		251507DCB0C4DAB1638C849C /* WatchSessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSessionManagerTests.swift; sourceTree = "<group>"; };
 		268CC999FE8C890B9E92083D /* AppGroupResilienceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupResilienceTests.swift; sourceTree = "<group>"; };
 		2861876CC85284102739ACA4 /* FastedWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedWidgetsBundle.swift; sourceTree = "<group>"; };
+		29A7579145D480B7E044A74E /* ChallengeCommitmentsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeCommitmentsCard.swift; sourceTree = "<group>"; };
 		2B538F1D5624D86393BC382B /* FastedWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = FastedWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D4D805535A363DDAF977B89 /* FastingArcShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingArcShape.swift; sourceTree = "<group>"; };
 		2EA35504122572AB7F1EB512 /* StreakCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalculator.swift; sourceTree = "<group>"; };
@@ -282,6 +298,7 @@
 		37F15CA34B550C7DFC463680 /* FastedTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FastedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		395C0D33B0C5BD626D2F69DF /* FastedChallenges.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FastedChallenges.xcdatamodel; sourceTree = "<group>"; };
 		3DCBC6565F8F188353EA37C0 /* FastingStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingStateSnapshotTests.swift; sourceTree = "<group>"; };
+		3DF3CAB953E65E608E035C8A /* TodayTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTabView.swift; sourceTree = "<group>"; };
 		3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackHelper.swift; sourceTree = "<group>"; };
 		3FB54CDEDABE68B0FE09508A /* CenterDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterDisplayMode.swift; sourceTree = "<group>"; };
 		430F756F747961AC57EF500D /* Fasted.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Fasted.entitlements; sourceTree = "<group>"; };
@@ -294,8 +311,12 @@
 		4F6EB86FD0EE011CBF07654B /* AppGroupCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupCoordinatorTests.swift; sourceTree = "<group>"; };
 		50419E8BE341F9BD49A034CD /* FastedWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FastedWidgets.entitlements; sourceTree = "<group>"; };
 		5093F93825789F6E237BD2A2 /* EndFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndFastIntent.swift; sourceTree = "<group>"; };
+		53046B641488AE77086E2E34 /* ChallengeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeManager.swift; sourceTree = "<group>"; };
 		53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingActionCommand.swift; sourceTree = "<group>"; };
 		556AA56BFF312CEBC9395C9D /* FastTimePickerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTimePickerSheetView.swift; sourceTree = "<group>"; };
+		556F16D7FE53459CA8FA7648 /* PastChallengesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastChallengesView.swift; sourceTree = "<group>"; };
+		5F391EADC5BD5CF79D4FA509 /* ChallengePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengePreferences.swift; sourceTree = "<group>"; };
+		626DB1C07BE691A8B77C13E1 /* ChallengeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeUITests.swift; sourceTree = "<group>"; };
 		627A7EC87F6C2FE2813F4227 /* PersistenceControllerUITestingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceControllerUITestingTests.swift; sourceTree = "<group>"; };
 		63DC7E46BF688F5ED5A31810 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		66847625426DFA2D05A362D2 /* FastingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingProtocol.swift; sourceTree = "<group>"; };
@@ -312,10 +333,12 @@
 		780051D49F273E66400D3B41 /* ReviewPromptManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptManagerTests.swift; sourceTree = "<group>"; };
 		794C6683A02015B541909A7E /* EatingWindowWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EatingWindowWidget.swift; sourceTree = "<group>"; };
 		7A4E30FBBD70FE6DA156368A /* FastedWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FastedWatchWidgets.entitlements; sourceTree = "<group>"; };
+		7D772D51E84F22824B874556 /* ChallengeManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeManagerTests.swift; sourceTree = "<group>"; };
 		7E2F0F37B26044C995133130 /* AppIntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntentsTests.swift; sourceTree = "<group>"; };
 		80ABF2C76FAC79CAD26EEC81 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		81E0320AF8E2D6046FFFFD73 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		844661071E1F175EB88B392E /* Challenge+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Challenge+CoreData.swift"; sourceTree = "<group>"; };
+		8483747437C5059980C0AB3F /* ChallengeBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeBuilderView.swift; sourceTree = "<group>"; };
 		8497D8C91E3BFD1172CDBDDC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		84DA6676FFAF269270CAB0BC /* DarwinNotificationCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarwinNotificationCenter.swift; sourceTree = "<group>"; };
 		84E793DE11CB215C34D949B9 /* FastStreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastStreakWidget.swift; sourceTree = "<group>"; };
@@ -335,6 +358,7 @@
 		9C1845606048434908EA9499 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListView.swift; sourceTree = "<group>"; };
 		A3A7103D0883246EA1A90ECD /* FastStatusWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastStatusWidget.swift; sourceTree = "<group>"; };
+		A4EFA9A48B2572EE3F2F3F99 /* ChallengeTemplates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeTemplates.swift; sourceTree = "<group>"; };
 		A71CDC6BEC973FA849ACE8BB /* DialMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialMath.swift; sourceTree = "<group>"; };
 		A8EA23F5BBB40B27B3345A15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AF4978E327A121B83FB6F7FD /* AppStoreScreenshotValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreScreenshotValidationTests.swift; sourceTree = "<group>"; };
@@ -434,7 +458,11 @@
 			children = (
 				C10A083342E1CAFA102D910B /* Challenge.swift */,
 				844661071E1F175EB88B392E /* Challenge+CoreData.swift */,
+				53046B641488AE77086E2E34 /* ChallengeManager.swift */,
+				5F391EADC5BD5CF79D4FA509 /* ChallengePreferences.swift */,
 				0AF512965A5D99AB8BD0EB6D /* ChallengeStore.swift */,
+				A4EFA9A48B2572EE3F2F3F99 /* ChallengeTemplates.swift */,
+				D2A744B2CA412148A9EB55BD /* Views */,
 			);
 			path = Challenges;
 			sourceTree = "<group>";
@@ -504,11 +532,26 @@
 			path = FastedWatchWidgets;
 			sourceTree = "<group>";
 		};
+		D2A744B2CA412148A9EB55BD /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				8483747437C5059980C0AB3F /* ChallengeBuilderView.swift */,
+				29A7579145D480B7E044A74E /* ChallengeCommitmentsCard.swift */,
+				22140BB38E8445DA26434C9C /* ChallengeProgressGridCard.swift */,
+				1F4E7F484C2D8FB91312542C /* ChallengesSettingsSection.swift */,
+				06BE040F34266CCC3EE7D7B0 /* ChallengeTabView.swift */,
+				556F16D7FE53459CA8FA7648 /* PastChallengesView.swift */,
+				3DF3CAB953E65E608E035C8A /* TodayTabView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		D69B656B0B03041654851581 /* FastedUITests */ = {
 			isa = PBXGroup;
 			children = (
 				EE58434F42AC6CAEFC60420A /* AGENTS.md */,
 				E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */,
+				626DB1C07BE691A8B77C13E1 /* ChallengeUITests.swift */,
 				E95F8810ED7037826FE830C9 /* FastedUITests.swift */,
 				B84B2C22AB93A0FBC932336E /* UITestIsolation.swift */,
 			);
@@ -578,6 +621,7 @@
 				7E2F0F37B26044C995133130 /* AppIntentsTests.swift */,
 				AF4978E327A121B83FB6F7FD /* AppStoreScreenshotValidationTests.swift */,
 				74435CB885215FB2DBEC2E5A /* BuildMetadataTests.swift */,
+				7D772D51E84F22824B874556 /* ChallengeManagerTests.swift */,
 				D07D4C1C96B57B4A83B7CEE8 /* ChallengeStoreTests.swift */,
 				68222DD80B162A582A18EB12 /* DeepLinkTests.swift */,
 				93A9AA51C89A1605E7B9D157 /* FastControlStateTests.swift */,
@@ -852,6 +896,7 @@
 				B24EE21CBC7DABBBEE6BC9E5 /* AppIntentsTests.swift in Sources */,
 				56BBADCE8A6AA771C2DF241C /* AppStoreScreenshotValidationTests.swift in Sources */,
 				60B63C7C538AA3271C824FEB /* BuildMetadataTests.swift in Sources */,
+				1CAB7412451CA2C49AD6864E /* ChallengeManagerTests.swift in Sources */,
 				3C2252589BC3FB997316AD44 /* ChallengeStoreTests.swift in Sources */,
 				EFF109DE04A205D5B0C972DB /* DeepLinkTests.swift in Sources */,
 				DC61CF2EAD9D12332B025B45 /* FastControlStateTests.swift in Sources */,
@@ -888,7 +933,15 @@
 				043E65AAC219FC22861FC692 /* CenterDisplayMode.swift in Sources */,
 				38C09642A50B1D0A119C3A50 /* Challenge+CoreData.swift in Sources */,
 				C2E635D25E334071944A800C /* Challenge.swift in Sources */,
+				1F4DA1C7D214278A4001C2E9 /* ChallengeBuilderView.swift in Sources */,
+				99959F1DD53619873BC9C123 /* ChallengeCommitmentsCard.swift in Sources */,
+				090DB76BCD03CA27F1C47248 /* ChallengeManager.swift in Sources */,
+				6111A391F35C6FC4AD187E5F /* ChallengePreferences.swift in Sources */,
+				53AF44324EAD15A8BAEE65F9 /* ChallengeProgressGridCard.swift in Sources */,
 				09FEE3627E0CA18F31C7AC0E /* ChallengeStore.swift in Sources */,
+				85FF8B0BEBB528FBBBFCC18B /* ChallengeTabView.swift in Sources */,
+				B7FCCC192756513A15E5AB18 /* ChallengeTemplates.swift in Sources */,
+				9A4F9202D7CE323A2CCB5D9A /* ChallengesSettingsSection.swift in Sources */,
 				F17E207B617FF92079C5DDCC /* ContentView.swift in Sources */,
 				6642F8D9E27AE3956A132F16 /* DarwinNotificationCenter.swift in Sources */,
 				80C56E1FB8BE6855AC3EAA4A /* DeepLink.swift in Sources */,
@@ -931,6 +984,7 @@
 				2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */,
 				83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */,
 				6927B96B7A95AA40711BF981 /* OpenFastTrackerIntent.swift in Sources */,
+				B8E64081C3C352481ED994DE /* PastChallengesView.swift in Sources */,
 				65BCCE113DE373261E9D27CF /* PersistenceController.swift in Sources */,
 				78B975439882F6B9107E507D /* ProgressRingView.swift in Sources */,
 				CC1512222894BCC3D47B9250 /* ProtocolCardView.swift in Sources */,
@@ -942,6 +996,7 @@
 				63AA188B0D1CF981C33B4F9E /* StartFastIntent.swift in Sources */,
 				F501504029E2FF98114B915E /* StreakCalculator.swift in Sources */,
 				B37DB30C8BDBD395661C9B33 /* StreakSummaryCardsView.swift in Sources */,
+				EAEC7DAB2CB3EB2269E172DF /* TodayTabView.swift in Sources */,
 				2B5CB84B8C663BBC81EC2877 /* WatchPayload.swift in Sources */,
 				46AF3A5C15F7732867DC594A /* WatchSessionManager.swift in Sources */,
 				281063BCF8438C5CECA4B923 /* WidgetTimelineBuilder.swift in Sources */,
@@ -1013,6 +1068,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				830AB177EA6601337FCA6524 /* AppStoreScreenshotTests.swift in Sources */,
+				289BA4884EAD71650DCC02CC /* ChallengeUITests.swift in Sources */,
 				94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */,
 				9A0AB9AAC0BD4A7E2D9BD49E /* UITestIsolation.swift in Sources */,
 			);

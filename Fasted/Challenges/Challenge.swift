@@ -104,4 +104,12 @@ struct Challenge: Identifiable {
             $0.commitmentID == commitment.id && $0.status == .done && scheduled.contains($0.day)
         }.count
     }
+
+    func formattedDate(_ date: Date, dateStyle: DateFormatter.Style = .medium) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = dateStyle
+        formatter.timeStyle = .none
+        formatter.timeZone = calendar.timeZone
+        return formatter.string(from: date)
+    }
 }

@@ -6,9 +6,16 @@ import XCTest
 extension XCTestCase {
     /// Launches against an on-disk store isolated from `.shared`. Pass the same `storeId` across a
     /// `terminate()` + relaunch within one test to reopen the same store and verify persistence.
-    func launchIsolatedApp(storeId: String = UUID().uuidString) -> XCUIApplication {
+    func launchIsolatedApp(
+        storeId: String = UUID().uuidString,
+        enableChallenges: Bool = false
+    ) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-uiTesting"]
+        var args = ["-uiTesting"]
+        if enableChallenges {
+            args.append("-enableChallenges")
+        }
+        app.launchArguments = args
         app.launchEnvironment = ["UITEST_STORE_ID": storeId]
         app.launch()
         return app
