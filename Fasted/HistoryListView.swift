@@ -107,7 +107,7 @@ public struct HistoryListView: View {
     }
 
     private var emptyMonthSection: some View {
-        Section(header: Text(monthTitle).font(.subheadline.weight(.semibold))) {
+        Section(header: Text(monthTitle).font(Font.subheadline.weight(.semibold))) {
             VStack(spacing: 6) {
                 Text("No fasts recorded in \(monthTitle).")
                     .font(.subheadline)
@@ -129,7 +129,7 @@ public struct HistoryListView: View {
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button(role: .destructive) {
                         withAnimation {
-                            fastManager.deleteFast(fast)
+                            _ = fastManager.deleteFast(fast)
                         }
                     } label: {
                         Label("Delete", systemImage: "trash")
