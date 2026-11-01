@@ -67,6 +67,23 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      # project.yml is the source of truth, but Fasted.xcodeproj is committed so it can be opened
+      # without XcodeGen. Compare before version resolution rewrites MARKETING_VERSION in
+      # project.yml, print the exact diff, and fail at the end of the job so a stale project never
+      # hides build or test results.
+      - name: Check committed Xcode project matches project.yml
+        id: drift
+        run: |
+          xcodegen generate
+          git add --intent-to-add -- Fasted.xcodeproj
+          if git diff --quiet -- Fasted.xcodeproj; then
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Fasted.xcodeproj differs from what project.yml generates. Diff:"
+            git --no-pager diff -- Fasted.xcodeproj
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Resolve Version & Build Metadata
         id: version
         run: ./scripts/resolve_version.sh
@@ -121,6 +138,12 @@ jobs:
             -scheme FastedUITests \
             -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath TestResults-UI.xcresult
+
+      - name: Fail if the committed Xcode project is stale
+        if: steps.drift.outputs.stale == 'true'
+        run: |
+          echo "::error::Fasted.xcodeproj is out of date with project.yml. See the 'Check committed Xcode project' step for the diff."
+          exit 1
 
       - name: Upload Test Results
         if: always()

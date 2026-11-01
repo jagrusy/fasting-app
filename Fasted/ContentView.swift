@@ -101,6 +101,8 @@ struct ContentView: View {
             // alongside the seed flag so this can only ever run against the isolated store from
             // `resolveDefaultContext()`, never a developer's real local database.
             if ProcessInfo.processInfo.arguments.contains("-uiTesting") {
+                // Each UI test launch starts with developer tools hidden, whatever an earlier run set.
+                UserDefaults.standard.removeObject(forKey: DeveloperTools.enabledKey)
                 if ProcessInfo.processInfo.arguments.contains("-seedScreenshots80") {
                     fastManager.seedMockDataForScreenshots(progress: 0.80)
                 } else if ProcessInfo.processInfo.arguments.contains("-seedScreenshots100") {
