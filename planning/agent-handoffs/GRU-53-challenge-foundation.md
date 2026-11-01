@@ -1,0 +1,32 @@
+# Issue handoff: GRU-53 Challenge foundation
+
+- Issue / task: GRU-53 (First slice of GRU-52): Challenge foundation: versioned local persistence and calendar-safe check-ins
+- Branch / worktree / base SHA / head SHA: `codex/gru-53-challenge-foundation` / `/private/tmp/fasted-gru53-foundation` / base `c2b5e65`
+- Claimed paths and concurrent-work check: `Fasted/Challenges/*`, `Fasted/Fasted.xcdatamodeld/FastedChallenges.xcdatamodel/`, `Fasted/Fasted.xcdatamodeld/.xccurrentversion`, `FastedTests/ChallengeStoreTests.swift`, `Fasted.xcodeproj/project.pbxproj`, `planning/agent-handoffs/GRU-53-challenge-foundation.md`. No concurrent writers on persistent store.
+- Prerequisites: PR #62 merged into main (`c2b5e65`). Owner approval recorded on 2026-09-28 for GRU-52 / GRU-53.
+- Changed behavior and rationale:
+  - Added additive versioned Core Data model `FastedChallenges.xcdatamodel` with entities `ChallengeRecord`, `CommitmentRecord`, and `ChallengeCheckInRecord`.
+  - Added domain types and validation in `Fasted/Challenges/Challenge.swift` (7–90 days, 1–6 unique non-blank commitments, daily or selected Gregorian weekdays, fixed timezone).
+  - Added Core Data mapper and decoding in `Fasted/Challenges/Challenge+CoreData.swift`.
+  - Added isolated main-queue writer and atomic start/replacement transaction manager in `Fasted/Challenges/ChallengeStore.swift`.
+  - Added unit test suite in `FastedTests/ChallengeStoreTests.swift`.
+- Changed contracts/schema/identities: Additive versioned Core Data model added (`FastedChallenges.xcdatamodel`). Existing `Fast` and `UserSettings` entities and Core Data store URL/App Group remain unchanged.
+- Tests (exact command, toolchain/device, exit/result, artifact):
+  - SwiftLint: `swiftlint lint --strict` -> exit 0, 0 violations across 105 files.
+  - Unit tests: `xcodebuild test -project Fasted.xcodeproj -scheme FastedTests -destination 'platform=iOS Simulator,name=iPhone 17 Pro' CODE_SIGNING_ALLOWED=NO` -> exit 0, 175 passed, 0 failed, 0 skipped.
+- First failures and resolution:
+  - Core Data relationship validation error: `Entity ChallengeRecord cannot have uniqueness constraints and to-one mandatory inverse relationship CommitmentRecord.challenge`. Resolved by setting `optional="YES"` on `CommitmentRecord.challenge` and `ChallengeCheckInRecord.commitment`.
+  - SwiftLint force-unwrapping and implicitly unwrapped optional violations in tests: Resolved.
+- Acceptance checklist:
+  - [x] One active challenge; 7–90 calendar days
+  - [x] 1–6 unique non-blank commitments
+  - [x] Daily / selected weekdays
+  - [x] Timezone fixed at creation
+  - [x] No future or unscheduled check-ins allowed
+  - [x] Duplicate check-in actions idempotent
+  - [x] Missed dates preserved without auto-reset
+  - [x] Replacement atomically archives old challenge and creates new
+  - [x] Failed saves roll back without touching unrelated contexts
+- Remaining blockers, risk and recovery/compatibility notes: None.
+- Independent reviewer / PR: To be reviewed on PR for GRU-53.
+- Downstream handoff: Package 2 (Today / Challenge / Journal navigation dock and manual category-led challenge builder).

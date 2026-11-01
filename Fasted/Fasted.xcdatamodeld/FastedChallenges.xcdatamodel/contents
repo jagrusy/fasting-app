@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="1" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Fast" representedClassName="Fast" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="startDate" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="targetDuration" optional="NO" attributeType="Double" defaultValueString="57600.0" usesScalarValueType="YES"/>
+        <attribute name="protocolType" optional="NO" attributeType="String" defaultValueString="16:8"/>
+        <attribute name="moodRating" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isCompleted" optional="NO" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="UserSettings" representedClassName="UserSettings" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="selectedProtocol" optional="NO" attributeType="String" defaultValueString="16:8"/>
+        <attribute name="notificationsEnabled" optional="NO" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="notificationSchedule" optional="YES" attributeType="Binary" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="ChallengeRecord" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="title" attributeType="String"/>
+        <attribute name="reason" optional="YES" attributeType="String"/>
+        <attribute name="startDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dayCount" attributeType="Integer 16" defaultValueString="24" usesScalarValueType="YES"/>
+        <attribute name="timeZoneID" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="endedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="commitments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CommitmentRecord" inverseName="challenge" inverseEntity="CommitmentRecord"/>
+        <uniquenessConstraints><uniquenessConstraint><constraint value="id"/></uniquenessConstraint></uniquenessConstraints>
+    </entity>
+    <entity name="CommitmentRecord" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="title" attributeType="String"/>
+        <attribute name="cue" optional="YES" attributeType="String"/>
+        <attribute name="smallStart" optional="YES" attributeType="String"/>
+        <attribute name="category" attributeType="String"/>
+        <attribute name="weekdays" attributeType="Integer 16" defaultValueString="127" usesScalarValueType="YES"/>
+        <attribute name="position" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="challenge" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChallengeRecord" inverseName="commitments" inverseEntity="ChallengeRecord"/>
+        <relationship name="checkIns" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ChallengeCheckInRecord" inverseName="commitment" inverseEntity="ChallengeCheckInRecord"/>
+        <uniquenessConstraints><uniquenessConstraint><constraint value="id"/></uniquenessConstraint></uniquenessConstraints>
+    </entity>
+    <entity name="ChallengeCheckInRecord" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="key" attributeType="String"/>
+        <attribute name="day" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="status" attributeType="String"/>
+        <attribute name="recordedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="commitment" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CommitmentRecord" inverseName="checkIns" inverseEntity="CommitmentRecord"/>
+        <uniquenessConstraints><uniquenessConstraint><constraint value="key"/></uniquenessConstraint></uniquenessConstraints>
+    </entity>
+    <elements>
+        <element name="Fast" positionX="-63" positionY="-18" width="128" height="180"/>
+        <element name="UserSettings" positionX="108" positionY="-18" width="128" height="105"/>
+    </elements>
+</model>
