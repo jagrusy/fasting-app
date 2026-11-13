@@ -25,7 +25,11 @@ public final class ReviewPromptManager {
         guard completedFast.isCompleted else { return false }
 
         let completedCount = allCompletedFasts.filter { $0.isCompleted }.count
-        let streak = StreakCalculator.calculate(from: allCompletedFasts).currentStreak
+        let streak = StreakCalculator.calculate(
+            from: allCompletedFasts,
+            calendar: calendar,
+            relativeTo: currentDate
+        ).currentStreak
 
         // Milestone triggers: 3rd fast, 7-day streak, 7th fast, 14th fast
         let isMilestone = (completedCount == 3) || (streak == 7) || (completedCount == 7) || (completedCount == 14)

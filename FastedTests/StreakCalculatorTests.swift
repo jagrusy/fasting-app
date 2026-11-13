@@ -95,7 +95,20 @@ final class StreakCalculatorTests: XCTestCase {
 
     func testDailyFastStatusUpdatesWhenFastIsShortenedOrExtended() throws {
         let ctx = try XCTUnwrap(context)
-        let manager = FastManager(context: ctx)
+        let suite = "StreakCalculatorTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite) ?? .standard
+        let commandsDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(suite, isDirectory: true)
+        defer {
+            UserDefaults.standard.removePersistentDomain(forName: suite)
+            try? FileManager.default.removeItem(at: commandsDir)
+        }
+        let coord = AppGroupCoordinator(
+            userDefaults: defaults,
+            appGroupId: suite,
+            commandsDirectory: commandsDir
+        )
+        let manager = FastManager(context: ctx, defaults: defaults, coordinator: coord)
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let start = today.addingTimeInterval(3600)
@@ -196,5 +209,56 @@ final class StreakCalculatorTests: XCTestCase {
         // Only partly covered, so not credited.
         XCTAssertEqual(StreakCalculator.fastStatus(for: utcDate(day: 4, hour: 12), in: [fast], calendar: calendar),
                        .none)
+    }
+
+    func testOvernightFastKeepsStreakAliveTheFollowingMorning() throws {
+        let ctx = try XCTUnwrap(context)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .current
+
+        // Monday 8:00 PM -> Tuesday 12:00 PM (16h overnight fast)
+        let mondayStart = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2026, month: 3, day: 9, hour: 20))
+        )
+        let tuesdayEnd = mondayStart.addingTimeInterval(16 * 3600)
+
+        let mondayFast = Fast(context: ctx)
+        mondayFast.id = UUID()
+        mondayFast.startDate = mondayStart
+        mondayFast.endDate = tuesdayEnd
+        mondayFast.targetDuration = 16 * 3600
+        mondayFast.isCompleted = true
+
+        // Wednesday 9:00 AM while Tuesday night's fast is still running
+        let wednesdayMorning = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2026, month: 3, day: 11, hour: 9))
+        )
+        let morningInfo = StreakCalculator.calculate(
+            from: [mondayFast],
+            calendar: calendar,
+            relativeTo: wednesdayMorning
+        )
+        XCTAssertEqual(morningInfo.currentStreak, 1)
+
+        // Tuesday 8:00 PM -> Wednesday 12:00 PM completes
+        let tuesdayStart = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2026, month: 3, day: 10, hour: 20))
+        )
+        let tuesdayFast = Fast(context: ctx)
+        tuesdayFast.id = UUID()
+        tuesdayFast.startDate = tuesdayStart
+        tuesdayFast.endDate = tuesdayStart.addingTimeInterval(16 * 3600)
+        tuesdayFast.targetDuration = 16 * 3600
+        tuesdayFast.isCompleted = true
+
+        let wednesdayNoon = try XCTUnwrap(
+            calendar.date(from: DateComponents(year: 2026, month: 3, day: 11, hour: 12))
+        )
+        let noonInfo = StreakCalculator.calculate(
+            from: [mondayFast, tuesdayFast],
+            calendar: calendar,
+            relativeTo: wednesdayNoon
+        )
+        XCTAssertEqual(noonInfo.currentStreak, 2)
     }
 }

@@ -25,6 +25,8 @@ public final class AppGroupCoordinator: @unchecked Sendable {
     public static let snapshotKey = "fasting_state_snapshot"
     public static let pendingCommandsKey = "pending_fasting_commands"
     public static let pendingDeepLinkKey = "pending_deep_link"
+    public static let processedCommandIdsKey = "processed_fasting_command_ids"
+    private static let maxProcessedCommandIds = 200
 
     public init(
         userDefaults: UserDefaults? = nil,
@@ -67,11 +69,20 @@ public final class AppGroupCoordinator: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
 
+        let previous: FastingStateSnapshot? = {
+            guard let data = userDefaults.data(forKey: Self.snapshotKey) else { return nil }
+            return try? JSONDecoder().decode(FastingStateSnapshot.self, from: data)
+        }()
+
         if let encoded = try? JSONEncoder().encode(snapshot) {
             userDefaults.set(encoded, forKey: Self.snapshotKey)
         }
-        notifyWidgetsOfUpdate()
-        DarwinNotificationCenter.shared.post()
+
+        let contentChanged = previous.map { !$0.isContentEquivalent(to: snapshot) } ?? true
+        if contentChanged {
+            notifyWidgetsOfUpdate()
+            DarwinNotificationCenter.shared.post()
+        }
     }
 
     public func readSnapshot() -> FastingStateSnapshot {
@@ -135,37 +146,28 @@ public final class AppGroupCoordinator: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
 
+        var processedIds = userDefaults.stringArray(forKey: Self.processedCommandIdsKey) ?? []
+        var seenSet = Set(processedIds)
+        var processedChanged = false
         var envelopes: [PendingCommandEnvelope] = []
 
-        if let fileURLs = try? fileManager.contentsOfDirectory(
-            at: commandsDirectory,
-            includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles]
-        ) {
-            let jsonFiles = fileURLs.filter { $0.pathExtension == "json" }
-            for url in jsonFiles {
-                guard let data = try? Data(contentsOf: url) else {
-                    // Unreadable now rather than invalid — most likely data protection while the
-                    // device is locked. Leave it queued so the next drain can pick it up.
-                    continue
-                }
-                guard let envelope = try? JSONDecoder().decode(
-                    PendingCommandEnvelope.self,
-                    from: data
-                ) else {
-                    quarantine(url)
-                    continue
-                }
-                envelopes.append(envelope)
-                try? fileManager.removeItem(at: url)
-            }
+        func accept(_ envelope: PendingCommandEnvelope) {
+            let idString = envelope.id.uuidString
+            guard !seenSet.contains(idString) else { return }
+            seenSet.insert(idString)
+            processedIds.append(idString)
+            processedChanged = true
+            envelopes.append(envelope)
         }
 
-        // Drain any legacy commands stored in UserDefaults for backward compatibility
-        if let data = userDefaults.data(forKey: Self.pendingCommandsKey),
-           let legacyCommands = try? JSONDecoder().decode([PendingCommandEnvelope].self, from: data) {
-            envelopes.append(contentsOf: legacyCommands)
-            userDefaults.removeObject(forKey: Self.pendingCommandsKey)
+        drainCommandFiles(accept: accept)
+        drainLegacyUserDefaultsCommands(accept: accept)
+
+        if processedChanged {
+            if processedIds.count > Self.maxProcessedCommandIds {
+                processedIds = Array(processedIds.suffix(Self.maxProcessedCommandIds))
+            }
+            userDefaults.set(processedIds, forKey: Self.processedCommandIdsKey)
         }
 
         return envelopes.sorted { lhs, rhs in
@@ -174,6 +176,55 @@ public final class AppGroupCoordinator: @unchecked Sendable {
             }
             return lhs.id.uuidString < rhs.id.uuidString
         }
+    }
+
+    private func drainCommandFiles(accept: (PendingCommandEnvelope) -> Void) {
+        guard let fileURLs = try? fileManager.contentsOfDirectory(
+            at: commandsDirectory,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        ) else {
+            return
+        }
+        for url in fileURLs where url.pathExtension == "json" {
+            guard let data = try? Data(contentsOf: url) else {
+                // Unreadable now rather than invalid — most likely data protection while the
+                // device is locked. Leave it queued so the next drain can pick it up.
+                continue
+            }
+            guard let envelope = try? JSONDecoder().decode(PendingCommandEnvelope.self, from: data) else {
+                quarantine(url)
+                continue
+            }
+            accept(envelope)
+            try? fileManager.removeItem(at: url)
+        }
+    }
+
+    private func drainLegacyUserDefaultsCommands(accept: (PendingCommandEnvelope) -> Void) {
+        if let data = userDefaults.data(forKey: Self.pendingCommandsKey),
+           let legacyCommands = try? JSONDecoder().decode([PendingCommandEnvelope].self, from: data) {
+            for envelope in legacyCommands {
+                accept(envelope)
+            }
+            userDefaults.removeObject(forKey: Self.pendingCommandsKey)
+        }
+    }
+
+    public func clearPendingCommands() {
+        lock.lock()
+        defer { lock.unlock() }
+
+        if let fileURLs = try? fileManager.contentsOfDirectory(
+            at: commandsDirectory,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        ) {
+            for url in fileURLs where url.pathExtension == "json" {
+                try? fileManager.removeItem(at: url)
+            }
+        }
+        userDefaults.removeObject(forKey: Self.pendingCommandsKey)
     }
 
     /// Moves a malformed command out of the queue without destroying it.
@@ -202,6 +253,11 @@ public final class AppGroupCoordinator: @unchecked Sendable {
     public func notifyWidgetsOfUpdate() {
         #if canImport(WidgetKit)
         WidgetCenter.shared.reloadAllTimelines()
+        #if os(iOS)
+        if #available(iOS 18.0, *) {
+            ControlCenter.shared.reloadAllControls()
+        }
+        #endif
         #endif
     }
 }

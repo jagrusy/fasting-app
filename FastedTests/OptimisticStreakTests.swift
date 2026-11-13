@@ -124,4 +124,25 @@ final class OptimisticStreakTests: XCTestCase {
 
         XCTAssertEqual(ended.currentStreak, 2)
     }
+
+    func testStartingAndSnoozingPreserveLastCompletedStartDay() {
+        let lastStart = day(10, hour: 2)
+        let idle = FastingStateSnapshot(
+            isFasting: false,
+            protocolType: "16:8",
+            currentStreak: 3,
+            longestStreak: 5,
+            lastCompletedFastDate: day(10, hour: 18),
+            lastCompletedFastStartDate: lastStart
+        )
+
+        let started = idle.startingNow(startDate: day(10, hour: 20), duration: 4 * 3600, protocolType: "16:8")
+        XCTAssertEqual(started.lastCompletedFastStartDate, lastStart)
+
+        let snoozed = started.snoozed(by: 1800)
+        XCTAssertEqual(snoozed.lastCompletedFastStartDate, lastStart)
+
+        let endedSameDay = snoozed.endingNow(at: day(11, hour: 2), calendar: calendar)
+        XCTAssertEqual(endedSameDay.currentStreak, 3)
+    }
 }

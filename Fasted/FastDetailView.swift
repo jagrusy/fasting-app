@@ -119,8 +119,13 @@ public struct FastDetailView: View {
                 )
                 .datePickerStyle(.compact)
                 .onChange(of: startDate) { _, newStart in
-                    if endDate < newStart {
-                        endDate = newStart
+                    let normalizedStart = floorToMinute(newStart)
+                    if normalizedStart != newStart {
+                        startDate = normalizedStart
+                        return
+                    }
+                    if endDate <= normalizedStart {
+                        endDate = normalizedStart.addingTimeInterval(60)
                     }
                     hasChanges = true
                 }
@@ -143,8 +148,13 @@ public struct FastDetailView: View {
                 )
                 .datePickerStyle(.compact)
                 .onChange(of: endDate) { _, newEnd in
-                    if startDate > newEnd {
-                        startDate = newEnd
+                    let normalizedEnd = floorToMinute(newEnd)
+                    if normalizedEnd != newEnd {
+                        endDate = normalizedEnd
+                        return
+                    }
+                    if startDate >= normalizedEnd {
+                        startDate = normalizedEnd.addingTimeInterval(-60)
                     }
                     hasChanges = true
                 }
@@ -191,5 +201,10 @@ public struct FastDetailView: View {
             hasChanges = false
             dismiss()
         }
+    }
+
+    private func floorToMinute(_ date: Date) -> Date {
+        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        return Calendar.current.date(from: components) ?? date
     }
 }

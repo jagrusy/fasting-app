@@ -79,9 +79,12 @@ extension FastManager {
             }
             activeFast = nil
             notificationManager.cancelGoalNotification()
+            notificationManager.cancelStageTransitionNotifications()
             notificationManager.cancelRecurringReminders()
             clearAllSnoozeOffsets()
+            coordinator.clearPendingCommands()
             self.objectWillChange.send()
+            syncNotifications()
             publishSnapshot()
             return true
         } catch {

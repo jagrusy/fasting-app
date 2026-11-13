@@ -73,19 +73,30 @@ extension FastManager {
         publishSnapshot()
     }
 
+    private static let clockSkewTolerance: TimeInterval = 60
+
     private func apply(_ command: FastingActionCommand) {
+        let now = Date()
         switch command {
         case .startFast(let startDate, let duration, let proto):
-            guard activeFast == nil, validateInterval(startDate: startDate).isValid else { return }
-            startFast(startDate: startDate, targetDuration: duration, protocolType: proto)
+            let clampedStart = (startDate > now && startDate.timeIntervalSince(now) <= Self.clockSkewTolerance)
+                ? now
+                : startDate
+            guard activeFast == nil, validateInterval(startDate: clampedStart).isValid else { return }
+            startFast(startDate: clampedStart, targetDuration: duration, protocolType: proto)
         case .endFast(let endDate):
+            let clampedEnd = (endDate > now && endDate.timeIntervalSince(now) <= Self.clockSkewTolerance)
+                ? now
+                : endDate
             // A stale end can arrive after the phone already ended that fast and started a new
             // one; applying it verbatim would write an endDate before the startDate.
-            guard let start = activeFast?.startDate, endDate > start else { return }
-            endFast(endDate: endDate)
+            guard let start = activeFast?.startDate, clampedEnd > start else { return }
+            endFast(endDate: clampedEnd)
         case .snoozeFast(let extensionSeconds):
             guard activeFast != nil else { return }
             snoozeFast(by: extensionSeconds)
+        case .discardFast:
+            _ = discardActiveFast()
         }
     }
 

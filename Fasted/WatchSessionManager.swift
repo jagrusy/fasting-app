@@ -4,6 +4,8 @@ import WatchConnectivity
 public final class WatchSessionManager: NSObject, WCSessionDelegate {
     public static let shared = WatchSessionManager()
 
+    public var onCommandReceived: (@MainActor () -> Void)?
+
     private override init() {
         super.init()
     }
@@ -37,7 +39,9 @@ public final class WatchSessionManager: NSObject, WCSessionDelegate {
     ) {
         if activationState == .activated {
             let snapshot = AppGroupCoordinator.shared.readSnapshot()
-            syncSnapshotToWatch(snapshot)
+            if snapshot.updatedAt > Date(timeIntervalSince1970: 0) {
+                syncSnapshotToWatch(snapshot)
+            }
         }
     }
 
@@ -58,5 +62,12 @@ public final class WatchSessionManager: NSObject, WCSessionDelegate {
     func handleIncomingDictionary(_ dict: [String: Any]) {
         guard let envelope = WatchPayload.decodeCommand(from: dict) else { return }
         AppGroupCoordinator.shared.enqueueEnvelope(envelope)
+        Task { @MainActor [weak self] in
+            if let handler = self?.onCommandReceived {
+                handler()
+            } else if !ProcessInfo.processInfo.arguments.contains("-uiTesting") {
+                _ = FastManager(context: PersistenceController.shared.container.viewContext)
+            }
+        }
     }
 }

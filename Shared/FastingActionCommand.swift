@@ -4,6 +4,7 @@ public enum FastingActionCommand: Codable, Sendable, Equatable {
     case startFast(startDate: Date, duration: TimeInterval, protocolType: String)
     case endFast(endDate: Date)
     case snoozeFast(extensionSeconds: TimeInterval)
+    case discardFast
 }
 
 public struct PendingCommandEnvelope: Codable, Sendable, Equatable {

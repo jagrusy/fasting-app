@@ -4,9 +4,12 @@ import SwiftUI
 struct FastedWatchApp: App {
     init() {
         WatchSessionCoordinator.shared.activate()
+        #if DEBUG
         seedMockDataIfNeeded()
+        #endif
     }
 
+    #if DEBUG
     private func seedMockDataIfNeeded() {
         let args = ProcessInfo.processInfo.arguments
         let duration: TimeInterval = 16 * 3600
@@ -36,6 +39,7 @@ struct FastedWatchApp: App {
             )
         }
     }
+    #endif
 
     var body: some Scene {
         WindowGroup {

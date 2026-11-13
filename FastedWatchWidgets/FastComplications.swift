@@ -44,8 +44,57 @@ struct FastStageComplicationEntryView: View {
                     }
                     .tint(stage?.color ?? SolsticeColors.solarGold)
                 }
+        case .accessoryRectangular:
+            WatchStageRectangularView(snapshot: entry.snapshot, currentDate: entry.date)
         default:
             FastStageGaugeView(snapshot: entry.snapshot, currentDate: entry.date)
+        }
+    }
+}
+
+struct WatchStageRectangularView: View {
+    let snapshot: FastingStateSnapshot
+    let currentDate: Date
+
+    var body: some View {
+        if snapshot.isFasting, let stage = snapshot.currentStage(at: currentDate) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Image(systemName: stage.systemIcon)
+                    Text(stage.title)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                }
+                .font(.caption2)
+
+                if let next = snapshot.nextStageBoundary(at: currentDate) {
+                    Text("\(next.stage.shortTitle) in \(next.date, style: .timer)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                } else {
+                    Text("Final stage")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+
+                Gauge(value: snapshot.stageProgress(at: currentDate) ?? 0, in: 0...1) {
+                    EmptyView()
+                }
+                .gaugeStyle(.accessoryLinearCapacity)
+                .tint(stage.color)
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Solstice")
+                    .font(.caption)
+                    .fontWeight(.bold)
+                Text("Not Fasting")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }

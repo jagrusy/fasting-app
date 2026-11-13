@@ -130,7 +130,25 @@ public struct CalendarHeatmapView: View {
             }
         }
         .frame(height: 34)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(dayAccessibilityLabel(for: date))
+        .accessibilityValue(dayAccessibilityValue(for: status))
         .accessibilityIdentifier("calendar_day_\(dayNumber)")
+    }
+
+    private func dayAccessibilityLabel(for date: Date) -> String {
+        date.formatted(date: .abbreviated, time: .omitted)
+    }
+
+    private func dayAccessibilityValue(for status: DayFastStatus) -> String {
+        switch status {
+        case .none:
+            return "No fast"
+        case .partial(let hours):
+            return String(format: "Partial fast, %.1f hours", hours)
+        case .goalMet(let hours):
+            return String(format: "Goal met, %.1f hours", hours)
+        }
     }
 
     private var daysGrid: some View {
@@ -145,7 +163,6 @@ public struct CalendarHeatmapView: View {
                 }
             }
         }
-        .id("\(currentMonthDate.timeIntervalSince1970)_\(fastsSignature)")
     }
 
     private func cellFillColor(status: DayFastStatus) -> Color {

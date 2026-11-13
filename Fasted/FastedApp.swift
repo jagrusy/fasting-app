@@ -4,6 +4,7 @@ import CoreData
 @main
 struct FastedApp: App {
     init() {
+        _ = NotificationManager.shared
         WatchSessionManager.shared.activate()
     }
 

@@ -29,7 +29,25 @@ public struct WidgetTimelineBuilder {
         now: Date = Date()
     ) -> [FastWidgetEntry] {
         guard snapshot.isFasting, let start = snapshot.startDate else {
-            return [FastWidgetEntry(date: now, snapshot: snapshot)]
+            guard let windowEnd = snapshot.eatingWindowEnd(), windowEnd > now else {
+                return [FastWidgetEntry(date: now, snapshot: snapshot)]
+            }
+            let horizon = now.addingTimeInterval(refreshHorizon)
+            let windowSpan = snapshot.lastCompletedFastDate.map { windowEnd.timeIntervalSince($0) }
+            let step = gaugeStep(for: windowSpan)
+            let limit = min(horizon, windowEnd)
+            var transitionDates: Set<Date> = [now]
+            var cursor = now.addingTimeInterval(step)
+            while cursor < limit {
+                transitionDates.insert(cursor)
+                cursor = cursor.addingTimeInterval(step)
+            }
+            if windowEnd <= horizon {
+                transitionDates.insert(windowEnd)
+            }
+            return transitionDates.sorted().map { date in
+                FastWidgetEntry(date: date, snapshot: snapshot)
+            }
         }
 
         let horizon = now.addingTimeInterval(refreshHorizon)

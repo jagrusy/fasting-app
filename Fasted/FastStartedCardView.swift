@@ -6,6 +6,7 @@ public struct FastStartedCardView: View {
     /// Start time to display instead of the stored one while a ring drag is in progress — the
     /// drag isn't written to Core Data until release, so `fast.startDate` is stale until then.
     public let previewStartDate: Date?
+    public let effectiveTargetDuration: TimeInterval?
     public let onSelectDayOffset: (Int) -> Void
     public let onSelectTime: () -> Void
 
@@ -13,19 +14,20 @@ public struct FastStartedCardView: View {
         fast: Fast,
         now: Date,
         previewStartDate: Date? = nil,
+        effectiveTargetDuration: TimeInterval? = nil,
         onSelectDayOffset: @escaping (Int) -> Void,
         onSelectTime: @escaping () -> Void
     ) {
         self.fast = fast
         self.now = now
         self.previewStartDate = previewStartDate
+        self.effectiveTargetDuration = effectiveTargetDuration
         self.onSelectDayOffset = onSelectDayOffset
         self.onSelectTime = onSelectTime
     }
 
     public var body: some View {
         let startDate = previewStartDate ?? fast.startDate ?? now
-        let isStartedYesterday = Calendar.current.isDateInYesterday(startDate)
 
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
@@ -34,7 +36,7 @@ public struct FastStartedCardView: View {
                     .foregroundStyle(.secondary)
 
                 HStack(spacing: 6) {
-                    dateMenu(isStartedYesterday: isStartedYesterday)
+                    dateMenu(startDate: startDate)
                     timeButton(startDate: startDate)
                 }
             }
@@ -56,13 +58,13 @@ public struct FastStartedCardView: View {
         .padding(.horizontal, 16)
     }
 
-    private func dateMenu(isStartedYesterday: Bool) -> some View {
+    private func dateMenu(startDate: Date) -> some View {
         Menu {
             Button("Today") { onSelectDayOffset(0) }
             Button("Yesterday") { onSelectDayOffset(-1) }
         } label: {
             HStack(spacing: 4) {
-                Text(isStartedYesterday ? "Yesterday" : "Today")
+                Text(startDayLabel(for: startDate))
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 Image(systemName: "chevron.down")
@@ -76,6 +78,17 @@ public struct FastStartedCardView: View {
             .fixedSize(horizontal: true, vertical: false)
         }
         .accessibilityIdentifier("start_date_menu")
+    }
+
+    private func startDayLabel(for startDate: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(startDate) {
+            return "Today"
+        } else if calendar.isDateInYesterday(startDate) {
+            return "Yesterday"
+        } else {
+            return startDate.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
+        }
     }
 
     private func timeButton(startDate: Date) -> some View {
@@ -98,7 +111,8 @@ public struct FastStartedCardView: View {
     }
 
     private func goalTargetView(startDate: Date) -> some View {
-        let targetDate = startDate.addingTimeInterval(fast.targetDuration)
+        let targetDuration = effectiveTargetDuration ?? fast.targetDuration
+        let targetDate = startDate.addingTimeInterval(targetDuration)
         let calendar = Calendar.current
 
         let dayLabel: String?

@@ -1,5 +1,8 @@
 import AppIntents
 import Foundation
+#if canImport(UserNotifications)
+import UserNotifications
+#endif
 
 public struct StartFastIntent: AppIntent {
     public static var title: LocalizedStringResource = "Start Fast"
@@ -30,6 +33,14 @@ public struct StartFastIntent: AppIntent {
             protocolType: proto.ratioString
         )
         coordinator.writeSnapshot(optimistic)
+        #if canImport(UserNotifications)
+        let reminderIds = (1...7).flatMap { weekday in
+            (0..<4).map { week in
+                week == 0 ? "recurring_start_day_\(weekday)" : "recurring_start_day_\(weekday)_\(week)"
+            }
+        }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: reminderIds)
+        #endif
         return .result()
     }
 }

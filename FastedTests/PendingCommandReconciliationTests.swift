@@ -10,12 +10,19 @@ final class PendingCommandReconciliationTests: XCTestCase {
     private var notificationManager: NotificationManager?
     private var fastManager: FastManager?
     private var testSuiteName: String?
+    private var tempCommandsDir: URL?
 
     override func setUp() {
         super.setUp()
         let suiteName = "test.solstice.reconciliation.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName) ?? .standard
-        let coord = AppGroupCoordinator(userDefaults: defaults, appGroupId: suiteName)
+        let commandsDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(suiteName, isDirectory: true)
+        let coord = AppGroupCoordinator(
+            userDefaults: defaults,
+            appGroupId: suiteName,
+            commandsDirectory: commandsDir
+        )
         let persistence = PersistenceController(inMemory: true)
         let notif = NotificationManager.shared
         let manager = FastManager(
@@ -25,6 +32,7 @@ final class PendingCommandReconciliationTests: XCTestCase {
             coordinator: coord
         )
         self.testSuiteName = suiteName
+        self.tempCommandsDir = commandsDir
         self.testDefaults = defaults
         self.coordinator = coord
         self.persistenceController = persistence
@@ -36,6 +44,10 @@ final class PendingCommandReconciliationTests: XCTestCase {
         if let suite = testSuiteName {
             testDefaults?.removePersistentDomain(forName: suite)
         }
+        if let dir = tempCommandsDir {
+            try? FileManager.default.removeItem(at: dir)
+        }
+        tempCommandsDir = nil
         testDefaults = nil
         coordinator = nil
         persistenceController = nil
@@ -173,5 +185,47 @@ final class PendingCommandReconciliationTests: XCTestCase {
         XCTAssertEqual(completed.count, 1)
         XCTAssertEqual(completed.first?.startDate, startTime)
         XCTAssertEqual(completed.first?.endDate, endTime)
+    }
+
+    func testSlightlyFutureStartAndEndDatesAreClampedRatherThanDropped() {
+        guard let fastManager = fastManager, let coordinator = coordinator else {
+            XCTFail("Setup failed")
+            return
+        }
+        let skewedStart = Date().addingTimeInterval(5)
+        coordinator.enqueueCommand(
+            .startFast(startDate: skewedStart, duration: 16 * 3600, protocolType: "16:8")
+        )
+        fastManager.processPendingCommands()
+
+        XCTAssertTrue(fastManager.isFasting)
+        if let actualStart = fastManager.activeFast?.startDate {
+            XCTAssertLessThanOrEqual(actualStart, Date())
+        } else {
+            XCTFail("Expected active fast startDate")
+        }
+
+        let skewedEnd = Date().addingTimeInterval(5)
+        coordinator.enqueueCommand(.endFast(endDate: skewedEnd))
+        fastManager.processPendingCommands()
+
+        XCTAssertFalse(fastManager.isFasting)
+    }
+
+    func testDiscardFastCommandDiscardsWithoutRecordingHistory() throws {
+        let manager = try XCTUnwrap(fastManager)
+        let coord = try XCTUnwrap(coordinator)
+        let ctx = try XCTUnwrap(persistenceController?.container.viewContext)
+
+        manager.startFast(startDate: Date().addingTimeInterval(-3600))
+        XCTAssertTrue(manager.isFasting)
+
+        coord.enqueueCommand(.discardFast)
+        manager.processPendingCommands()
+
+        XCTAssertFalse(manager.isFasting)
+        XCTAssertNil(manager.activeFast)
+        let count = try ctx.count(for: Fast.fetchRequest())
+        XCTAssertEqual(count, 0)
     }
 }

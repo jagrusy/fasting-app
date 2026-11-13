@@ -5,8 +5,20 @@ public struct NotificationSettingsSection: View {
     @Binding public var schedule: NotificationSchedule
     public let onSave: (Bool, NotificationSchedule) -> Void
 
-    private let dayNames = [
-        (1, "S"), (2, "M"), (3, "T"), (4, "W"), (5, "T"), (6, "F"), (7, "S")
+    private struct WeekdayOption {
+        let id: Int
+        let short: String
+        let full: String
+    }
+
+    private let dayNames: [WeekdayOption] = [
+        WeekdayOption(id: 1, short: "S", full: "Sunday"),
+        WeekdayOption(id: 2, short: "M", full: "Monday"),
+        WeekdayOption(id: 3, short: "T", full: "Tuesday"),
+        WeekdayOption(id: 4, short: "W", full: "Wednesday"),
+        WeekdayOption(id: 5, short: "T", full: "Thursday"),
+        WeekdayOption(id: 6, short: "F", full: "Friday"),
+        WeekdayOption(id: 7, short: "S", full: "Saturday")
     ]
 
     public init(
@@ -45,18 +57,6 @@ public struct NotificationSettingsSection: View {
                 }
                 .accessibilityIdentifier("start_reminder_picker")
 
-                Toggle("Goal Reached Alert", isOn: $schedule.notifyOnGoalReached)
-                    .onChange(of: schedule.notifyOnGoalReached) {
-                        onSave(isEnabled, schedule)
-                    }
-                    .accessibilityIdentifier("goal_reached_toggle")
-
-                Toggle("Stage Transitions", isOn: $schedule.notifyOnStageChange)
-                    .onChange(of: schedule.notifyOnStageChange) {
-                        onSave(isEnabled, schedule)
-                    }
-                    .accessibilityIdentifier("stage_transitions_toggle")
-
                 VStack(alignment: .leading, spacing: 10) {
 
                     Text("ACTIVE DAYS")
@@ -64,12 +64,12 @@ public struct NotificationSettingsSection: View {
                         .foregroundStyle(.secondary)
 
                     HStack(spacing: 8) {
-                        ForEach(dayNames, id: \.0) { day in
-                            let isDaySelected = schedule.selectedDays.contains(day.0)
+                        ForEach(dayNames, id: \.id) { day in
+                            let isDaySelected = schedule.selectedDays.contains(day.id)
                             Button {
-                                toggleDay(day.0)
+                                toggleDay(day.id)
                             } label: {
-                                Text(day.1)
+                                Text(day.short)
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundStyle(isDaySelected ? Color.white : Color.primary)
                                     .frame(maxWidth: .infinity)
@@ -78,21 +78,33 @@ public struct NotificationSettingsSection: View {
                                     .clipShape(Circle())
                             }
                             .buttonStyle(.plain)
-                            .accessibilityIdentifier("day_button_\(day.0)")
+                            .accessibilityLabel(day.full)
+                            .accessibilityAddTraits(isDaySelected ? .isSelected : [])
+                            .accessibilityIdentifier("day_button_\(day.id)")
                         }
                     }
                 }
                 .padding(.vertical, 4)
             }
+
+            Toggle("Goal Reached Alert", isOn: $schedule.notifyOnGoalReached)
+                .onChange(of: schedule.notifyOnGoalReached) {
+                    onSave(isEnabled, schedule)
+                }
+                .accessibilityIdentifier("goal_reached_toggle")
+
+            Toggle("Stage Transitions", isOn: $schedule.notifyOnStageChange)
+                .onChange(of: schedule.notifyOnStageChange) {
+                    onSave(isEnabled, schedule)
+                }
+                .accessibilityIdentifier("stage_transitions_toggle")
         } header: {
             Text("Reminders")
         } footer: {
-            if isEnabled {
-                Text(
-                    "Get a reminder to start fasting, stage transition alerts, " +
-                    "and an alert when your fast timer completes."
-                )
-            }
+            Text(
+                "Schedule daily reminders to start fasting, or configure stage transition and " +
+                "goal completion alerts for active fasts."
+            )
         }
 
     }

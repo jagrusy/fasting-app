@@ -60,7 +60,14 @@ public final class FastManager: ObservableObject {
         self.defaults = defaults
         self.coordinator = coordinator
         self.setupNotificationCallbacks()
-        if observeExternalCommands { self.setupDarwinObserver() }
+        if observeExternalCommands {
+            self.setupDarwinObserver()
+            if coordinator === AppGroupCoordinator.shared {
+                WatchSessionManager.shared.onCommandReceived = { [weak self] in
+                    self?.processPendingCommands()
+                }
+            }
+        }
         self.refresh()
     }
 
@@ -73,6 +80,9 @@ public final class FastManager: ObservableObject {
     }
 
     private func setupNotificationCallbacks() {
+        notificationManager.isCurrentlyFasting = { [weak self] in
+            self?.isFasting ?? false
+        }
         notificationManager.onStartFastRequested = { [weak self] in
             _ = self?.startFast()
         }
@@ -239,6 +249,9 @@ public final class FastManager: ObservableObject {
         protocolType: String? = nil
     ) -> Bool {
         guard let fast = activeFast else { return false }
+        let hadDurationOrProtocolChange =
+            (targetDuration != nil && targetDuration != fast.targetDuration)
+            || (protocolType != nil && protocolType != fast.protocolType)
         fast.startDate = startDate
         if let duration = targetDuration {
             fast.targetDuration = duration
@@ -250,6 +263,9 @@ public final class FastManager: ObservableObject {
 
         do {
             try persistence.save()
+            if hadDurationOrProtocolChange {
+                clearSnoozeOffset(for: fast)
+            }
             self.objectWillChange.send()
             syncNotifications()
             publishSnapshot()
@@ -263,6 +279,7 @@ public final class FastManager: ObservableObject {
         guard let fast = activeFast, let id = fast.id else { return }
         let newOffset = defaults.double(forKey: snoozeOffsetKey(for: id)) + extensionSeconds
         defaults.set(newOffset, forKey: snoozeOffsetKey(for: id))
+        self.objectWillChange.send()
         syncNotifications()
         publishSnapshot()
     }

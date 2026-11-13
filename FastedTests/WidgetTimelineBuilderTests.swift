@@ -120,4 +120,23 @@ final class WidgetTimelineBuilderTests: XCTestCase {
         XCTAssertEqual(WidgetTimelineBuilder.gaugeStep(for: 0), WidgetTimelineBuilder.maxStep)
         XCTAssertEqual(WidgetTimelineBuilder.gaugeStep(for: 16 * 3600), 576)
     }
+
+    func testActiveEatingWindowGeneratesGaugeStepsAndEndTransition() {
+        let completedAt = Date(timeIntervalSince1970: 1700000000)
+        let now = completedAt.addingTimeInterval(60 * 60)
+        // 16:8 eating window is 8h; window closes 7h after `now` (or test within 4h horizon)
+        let nearEnd = completedAt.addingTimeInterval(6 * 3600)
+        let snapshot = FastingStateSnapshot(
+            isFasting: false,
+            protocolType: "16:8",
+            lastCompletedFastDate: completedAt
+        )
+        let entries = WidgetTimelineBuilder.entries(for: snapshot, now: nearEnd)
+        let expectedEnd = completedAt.addingTimeInterval(8 * 3600)
+
+        XCTAssertGreaterThan(entries.count, 5)
+        XCTAssertEqual(entries.first?.date, nearEnd)
+        XCTAssertTrue(entries.contains { $0.date == expectedEnd })
+        _ = now
+    }
 }

@@ -10,10 +10,16 @@ final class WatchSessionCoordinator: NSObject, ObservableObject, WCSessionDelega
     static let shared = WatchSessionCoordinator()
 
     @Published var snapshot: FastingStateSnapshot
+    private var darwinObserverToken: DarwinNotificationCenter.ObserverToken?
 
     private override init() {
         self.snapshot = AppGroupCoordinator.shared.readSnapshot()
         super.init()
+        self.darwinObserverToken = DarwinNotificationCenter.shared.observe { [weak self] in
+            Task { @MainActor [weak self] in
+                self?.refreshFromLocalStore()
+            }
+        }
     }
 
     func activate() {
@@ -53,10 +59,38 @@ final class WatchSessionCoordinator: NSObject, ObservableObject, WCSessionDelega
         updateLocalSnapshot(optimistic)
     }
 
+    func discardFast() {
+        let envelope = PendingCommandEnvelope(command: .discardFast)
+        sendCommandToPhone(envelope)
+
+        let optimistic = FastingStateSnapshot(
+            isFasting: false,
+            startDate: nil,
+            targetDuration: nil,
+            protocolType: snapshot.protocolType,
+            currentStreak: snapshot.currentStreak,
+            longestStreak: snapshot.longestStreak,
+            lastCompletedFastDate: snapshot.lastCompletedFastDate,
+            lastCompletedFastStartDate: snapshot.lastCompletedFastStartDate,
+            updatedAt: Date()
+        )
+        updateLocalSnapshot(optimistic)
+    }
+
+    func refreshFromLocalStore() {
+        let stored = AppGroupCoordinator.shared.readSnapshot()
+        if stored.updatedAt > snapshot.updatedAt {
+            self.snapshot = stored
+        }
+    }
+
     private func sendCommandToPhone(_ envelope: PendingCommandEnvelope) {
         guard WCSession.isSupported() else { return }
         let session = WCSession.default
-        guard session.activationState == .activated else { return }
+        guard session.activationState == .activated else {
+            AppGroupCoordinator.shared.enqueueEnvelope(envelope)
+            return
+        }
         guard let payload = WatchPayload.encodeCommand(envelope) else { return }
 
         if session.isReachable {
@@ -82,7 +116,22 @@ final class WatchSessionCoordinator: NSObject, ObservableObject, WCSessionDelega
         _ session: WCSession,
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
-    ) {}
+    ) {
+        guard activationState == .activated else { return }
+        let pending = AppGroupCoordinator.shared.drainPendingCommands()
+        let contextPayload = session.receivedApplicationContext
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            if !pending.isEmpty {
+                for envelope in pending {
+                    self.sendCommandToPhone(envelope)
+                }
+            } else if let incoming = WatchPayload.decodeSnapshot(from: contextPayload),
+                      incoming.updatedAt > self.snapshot.updatedAt {
+                self.updateLocalSnapshot(incoming)
+            }
+        }
+    }
 
     nonisolated func session(
         _ session: WCSession,
@@ -90,7 +139,9 @@ final class WatchSessionCoordinator: NSObject, ObservableObject, WCSessionDelega
     ) {
         guard let incoming = WatchPayload.decodeSnapshot(from: applicationContext) else { return }
         Task { @MainActor in
-            self.updateLocalSnapshot(incoming)
+            if incoming.updatedAt >= self.snapshot.updatedAt {
+                self.updateLocalSnapshot(incoming)
+            }
         }
     }
 }

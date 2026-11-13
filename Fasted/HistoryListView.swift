@@ -70,7 +70,6 @@ public struct HistoryListView: View {
                         fasts: Array(completedFasts),
                         currentMonthDate: $currentMonthDate
                     )
-                    .id(heatmapSignature)
                 }
             }
             .listRowInsets(EdgeInsets())

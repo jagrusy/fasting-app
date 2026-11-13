@@ -39,12 +39,31 @@ public struct StreakCalculator {
             acc + fast.duration(relativeTo: now)
         }
 
-        let completedDaysSet = Set(completedFasts.flatMap { fast -> [Date] in
-            guard let start = fast.startDate else { return [] }
-            return StreakDays.credited(start: start, end: fast.resolvedEndDate(relativeTo: now), calendar: calendar)
-        })
+        var completedDaysSet = Set<Date>()
+        var lastCreditedByEndDay: [Date: Date] = [:]
+        for fast in completedFasts {
+            guard let start = fast.startDate else { continue }
+            let end = fast.resolvedEndDate(relativeTo: now)
+            let credited = StreakDays.credited(start: start, end: end, calendar: calendar)
+            completedDaysSet.formUnion(credited)
+            if let lastCredited = credited.last {
+                let endDay = calendar.startOfDay(for: end)
+                if let existing = lastCreditedByEndDay[endDay] {
+                    if lastCredited > existing {
+                        lastCreditedByEndDay[endDay] = lastCredited
+                    }
+                } else {
+                    lastCreditedByEndDay[endDay] = lastCredited
+                }
+            }
+        }
 
-        let currentStreak = computeCurrentStreak(days: completedDaysSet, calendar: calendar, now: now)
+        let currentStreak = computeCurrentStreak(
+            days: completedDaysSet,
+            lastCreditedByEndDay: lastCreditedByEndDay,
+            calendar: calendar,
+            now: now
+        )
         let bestStreak = computeBestStreak(days: completedDaysSet, calendar: calendar)
 
         return StreakInfo(
@@ -55,7 +74,12 @@ public struct StreakCalculator {
         )
     }
 
-    private static func computeCurrentStreak(days: Set<Date>, calendar: Calendar, now: Date) -> Int {
+    private static func computeCurrentStreak(
+        days: Set<Date>,
+        lastCreditedByEndDay: [Date: Date],
+        calendar: Calendar,
+        now: Date
+    ) -> Int {
         let today = calendar.startOfDay(for: now)
         let yesterday = calendar.date(byAdding: .day, value: -1, to: today) ?? today
 
@@ -64,6 +88,8 @@ public struct StreakCalculator {
             checkDate = today
         } else if days.contains(yesterday) {
             checkDate = yesterday
+        } else if let endMatchedDay = lastCreditedByEndDay[today] ?? lastCreditedByEndDay[yesterday] {
+            checkDate = endMatchedDay
         }
 
         guard let startCheck = checkDate else { return 0 }

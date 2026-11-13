@@ -9,6 +9,8 @@ final class FastManagerValidationTests: XCTestCase {
     var fastManager: FastManager?
     var testDefaults: UserDefaults?
     var testDefaultsSuiteName: String?
+    var testCoordinator: AppGroupCoordinator?
+    var tempCommandsDir: URL?
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -16,20 +18,34 @@ final class FastManagerValidationTests: XCTestCase {
         let ctx = controller.container.viewContext
         let suiteName = "FastManagerValidationTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName) ?? .standard
+        let commandsDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(suiteName, isDirectory: true)
+        let coord = AppGroupCoordinator(
+            userDefaults: defaults,
+            appGroupId: suiteName,
+            commandsDirectory: commandsDir
+        )
         self.persistenceController = controller
         self.context = ctx
         self.testDefaultsSuiteName = suiteName
         self.testDefaults = defaults
-        self.fastManager = FastManager(context: ctx, defaults: defaults)
+        self.tempCommandsDir = commandsDir
+        self.testCoordinator = coord
+        self.fastManager = FastManager(context: ctx, defaults: defaults, coordinator: coord)
     }
 
     override func tearDownWithError() throws {
         fastManager = nil
         persistenceController = nil
         context = nil
+        testCoordinator = nil
         if let suiteName = testDefaultsSuiteName {
             UserDefaults.standard.removePersistentDomain(forName: suiteName)
         }
+        if let dir = tempCommandsDir {
+            try? FileManager.default.removeItem(at: dir)
+        }
+        tempCommandsDir = nil
         testDefaults = nil
         testDefaultsSuiteName = nil
         try super.tearDownWithError()
@@ -83,17 +99,22 @@ final class FastManagerValidationTests: XCTestCase {
     func testClearAllFastingData() throws {
         let manager = try XCTUnwrap(fastManager)
         let ctx = try XCTUnwrap(context)
+        let coord = try XCTUnwrap(testCoordinator)
 
         _ = manager.startFast(startDate: Date().addingTimeInterval(-3600))
         manager.endFast(endDate: Date())
         _ = manager.startFast(startDate: Date())
+        coord.enqueueCommand(.snoozeFast(extensionSeconds: 1800))
 
         XCTAssertTrue(manager.isFasting)
+        XCTAssertTrue(coord.readSnapshot().isFasting)
 
         manager.clearAllFastingData()
 
         XCTAssertFalse(manager.isFasting)
         XCTAssertNil(manager.activeFast)
+        XCTAssertFalse(coord.readSnapshot().isFasting)
+        XCTAssertTrue(coord.drainPendingCommands().isEmpty)
 
         let request: NSFetchRequest<Fast> = Fast.fetchRequest()
         let count = try ctx.count(for: request)

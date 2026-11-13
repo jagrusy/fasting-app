@@ -15,6 +15,7 @@ extension FastingStateSnapshot {
             currentStreak: currentStreak,
             longestStreak: longestStreak,
             lastCompletedFastDate: lastCompletedFastDate,
+            lastCompletedFastStartDate: lastCompletedFastStartDate,
             updatedAt: Date()
         )
     }
@@ -65,6 +66,7 @@ extension FastingStateSnapshot {
             currentStreak: currentStreak,
             longestStreak: longestStreak,
             lastCompletedFastDate: lastCompletedFastDate,
+            lastCompletedFastStartDate: lastCompletedFastStartDate,
             updatedAt: Date()
         )
     }

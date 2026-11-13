@@ -18,6 +18,11 @@ final class PersistenceControllerUITestingTests: XCTestCase {
                 .appendingPathExtension("sqlite")
             try? FileManager.default.removeItem(at: url)
         }
+        for (suite, dir) in createdSuites {
+            UserDefaults.standard.removePersistentDomain(forName: suite)
+            try? FileManager.default.removeItem(at: dir)
+        }
+        createdSuites = []
         createdIdentifiers = []
         try super.tearDownWithError()
     }
@@ -27,8 +32,28 @@ final class PersistenceControllerUITestingTests: XCTestCase {
         return PersistenceController.uiTesting(storeIdentifier: identifier)
     }
 
+    private func makeManager(identifier: String = UUID().uuidString) -> FastManager {
+        let suite = "PersistenceUITests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite) ?? .standard
+        let commandsDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(suite, isDirectory: true)
+        let coord = AppGroupCoordinator(
+            userDefaults: defaults,
+            appGroupId: suite,
+            commandsDirectory: commandsDir
+        )
+        createdSuites.append((suite, commandsDir))
+        return FastManager(
+            context: makeController(identifier: identifier).container.viewContext,
+            defaults: defaults,
+            coordinator: coord
+        )
+    }
+
+    private var createdSuites: [(String, URL)] = []
+
     func testFreshIdentifierStartsWithNoActiveFast() throws {
-        let manager = FastManager(context: makeController().container.viewContext)
+        let manager = makeManager()
         XCTAssertNil(manager.activeFast)
     }
 
@@ -38,21 +63,21 @@ final class PersistenceControllerUITestingTests: XCTestCase {
     func testReopeningTheSameIdentifierSeesPreviouslyWrittenData() throws {
         let identifier = UUID().uuidString
 
-        let firstManager = FastManager(context: makeController(identifier: identifier).container.viewContext)
+        let firstManager = makeManager(identifier: identifier)
         firstManager.startFast(startDate: Date(), targetDuration: 16 * 3600, protocolType: "16:8")
         XCTAssertNotNil(firstManager.activeFast)
 
-        let secondManager = FastManager(context: makeController(identifier: identifier).container.viewContext)
+        let secondManager = makeManager(identifier: identifier)
         secondManager.refresh()
         XCTAssertNotNil(secondManager.activeFast, "reopening the same identifier must resume the same store")
     }
 
     func testDifferentIdentifiersAreFullyIsolated() throws {
-        let firstManager = FastManager(context: makeController().container.viewContext)
+        let firstManager = makeManager()
         firstManager.startFast(startDate: Date(), targetDuration: 16 * 3600, protocolType: "16:8")
         XCTAssertNotNil(firstManager.activeFast)
 
-        let secondManager = FastManager(context: makeController().container.viewContext)
+        let secondManager = makeManager()
         XCTAssertNil(secondManager.activeFast, "a different identifier must not see another store's data")
     }
 }

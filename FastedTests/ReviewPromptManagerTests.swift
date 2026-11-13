@@ -97,4 +97,36 @@ final class ReviewPromptManagerTests: XCTestCase {
         )
         XCTAssertFalse(eligible)
     }
+
+    func testSevenDayStreakUsesInjectedCurrentDate() throws {
+        let context = createTestContext()
+        let suiteName = "ReviewPromptTest5.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName) ?? .standard
+        defer { UserDefaults.standard.removePersistentDomain(forName: suiteName) }
+        let calendar = Calendar(identifier: .gregorian)
+        let reviewManager = ReviewPromptManager(userDefaults: defaults, calendar: calendar)
+
+        let anchorDate = try XCTUnwrap(calendar.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 12)))
+        var fasts: [Fast] = []
+        for offset in 0..<7 {
+            let fast = Fast(context: context)
+            fast.id = UUID()
+            let start = calendar.date(byAdding: .day, value: -offset, to: anchorDate) ?? anchorDate
+            fast.startDate = start
+            fast.endDate = start.addingTimeInterval(16 * 3600)
+            fast.targetDuration = 16 * 3600
+            fast.isCompleted = true
+            fast.protocolType = "16:8"
+            fasts.append(fast)
+        }
+
+        let lastFast = try XCTUnwrap(fasts.first)
+        XCTAssertTrue(
+            reviewManager.isEligibleForReviewPrompt(
+                completedFast: lastFast,
+                allCompletedFasts: fasts,
+                currentDate: anchorDate
+            )
+        )
+    }
 }

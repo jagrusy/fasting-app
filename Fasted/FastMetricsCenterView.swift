@@ -9,6 +9,7 @@ public struct FastMetricsCenterView: View {
     /// Start time to display instead of the stored one while a ring drag is in progress — the
     /// drag isn't written to Core Data until release, so `fast.startDate` is stale until then.
     public let previewStartDate: Date?
+    public let effectiveTargetDuration: TimeInterval?
 
     public init(
         fast: Fast?,
@@ -16,7 +17,8 @@ public struct FastMetricsCenterView: View {
         progress: Double,
         centerDisplayMode: CenterDisplayMode,
         now: Date,
-        previewStartDate: Date? = nil
+        previewStartDate: Date? = nil,
+        effectiveTargetDuration: TimeInterval? = nil
     ) {
         self.fast = fast
         self.currentProtocol = currentProtocol
@@ -24,6 +26,7 @@ public struct FastMetricsCenterView: View {
         self.centerDisplayMode = centerDisplayMode
         self.now = now
         self.previewStartDate = previewStartDate
+        self.effectiveTargetDuration = effectiveTargetDuration
     }
 
     public var body: some View {
@@ -39,7 +42,8 @@ public struct FastMetricsCenterView: View {
     private func activeDisplay(fast: Fast) -> some View {
         let startDate = previewStartDate ?? fast.startDate ?? now
         let elapsed = max(0, now.timeIntervalSince(startDate))
-        let remaining = fast.targetDuration - elapsed
+        let targetDuration = effectiveTargetDuration ?? fast.targetDuration
+        let remaining = targetDuration - elapsed
 
         return VStack(spacing: 6) {
             Text(centerDisplayMode.rawValue)
@@ -48,11 +52,11 @@ public struct FastMetricsCenterView: View {
 
             switch centerDisplayMode {
             case .elapsed:
-                elapsedContent(elapsed: elapsed, targetDuration: fast.targetDuration, protocolType: fast.protocolType)
+                elapsedContent(elapsed: elapsed, targetDuration: targetDuration, protocolType: fast.protocolType)
             case .remaining:
-                remainingContent(startDate: startDate, duration: fast.targetDuration, remaining: remaining)
+                remainingContent(startDate: startDate, duration: targetDuration, remaining: remaining)
             case .percentage:
-                percentageContent(elapsed: elapsed, targetDuration: fast.targetDuration)
+                percentageContent(elapsed: elapsed, targetDuration: targetDuration)
             }
 
             Text("Tap to switch metric")

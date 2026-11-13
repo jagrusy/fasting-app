@@ -19,7 +19,10 @@ extension FastManager {
         do {
             try persistence.save()
             self.objectWillChange.send()
-            if active != nil { syncNotifications() }
+            if let active {
+                clearSnoozeOffset(for: active)
+                syncNotifications()
+            }
             publishSnapshot()
             return true
         } catch {
@@ -74,8 +77,12 @@ extension FastManager {
         notificationManager.scheduleRecurringReminders(
             schedule: schedule,
             enabled: enabled,
-            suppressUntil: activeFastGoalDate()
+            suppressUntil: activeFastGoalDate().map { max($0, Date().addingTimeInterval(60)) }
         )
+    }
+
+    public func effectiveTargetDuration(for fast: Fast) -> TimeInterval {
+        fast.targetDuration + snoozeOffset(for: fast)
     }
 
     func rescheduleGoalNotificationForActiveFast(notifyOnGoalReached: Bool) {

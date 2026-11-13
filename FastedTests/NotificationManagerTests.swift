@@ -10,6 +10,7 @@ final class NotificationManagerTests: XCTestCase {
     var fastManager: FastManager?
     var testDefaults: UserDefaults?
     var testDefaultsSuiteName: String?
+    var tempCommandsDir: URL?
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -17,11 +18,19 @@ final class NotificationManagerTests: XCTestCase {
         let ctx = controller.container.viewContext
         let suiteName = "NotificationManagerTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName) ?? .standard
+        let commandsDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(suiteName, isDirectory: true)
+        let coord = AppGroupCoordinator(
+            userDefaults: defaults,
+            appGroupId: suiteName,
+            commandsDirectory: commandsDir
+        )
         self.persistenceController = controller
         self.context = ctx
         self.testDefaultsSuiteName = suiteName
         self.testDefaults = defaults
-        self.fastManager = FastManager(context: ctx, defaults: defaults)
+        self.tempCommandsDir = commandsDir
+        self.fastManager = FastManager(context: ctx, defaults: defaults, coordinator: coord)
     }
 
     override func tearDownWithError() throws {
@@ -31,6 +40,10 @@ final class NotificationManagerTests: XCTestCase {
         if let suiteName = testDefaultsSuiteName {
             UserDefaults.standard.removePersistentDomain(forName: suiteName)
         }
+        if let dir = tempCommandsDir {
+            try? FileManager.default.removeItem(at: dir)
+        }
+        tempCommandsDir = nil
         testDefaults = nil
         testDefaultsSuiteName = nil
         try super.tearDownWithError()

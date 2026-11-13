@@ -159,6 +159,8 @@
 		D38F2D85CD0BA970935C2573 /* MetabolicStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7BB4BB40FDF8C866A9C1E4 /* MetabolicStage.swift */; };
 		D48B0A4D04512F7E3D7B0977 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
 		D4F2AFBE8351BC02953E6CA4 /* AppGroupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2809860678C4008E8EE2119 /* AppGroupCoordinator.swift */; };
+		D54D54A2C235142F82BB0622 /* NotificationManager+Reminders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A7DA10ED4B5919E349BD9D8 /* NotificationManager+Reminders.swift */; };
+		D968E4C86E60821220E14766 /* ExtendedFastTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D785A78560208865D8A3B71 /* ExtendedFastTests.swift */; };
 		DC61CF2EAD9D12332B025B45 /* FastControlStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A9AA51C89A1605E7B9D157 /* FastControlStateTests.swift */; };
 		DD2A1F1E7D941774BADAAAAA /* PendingCommandReconciliationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18C07DDCC7D9F2D9FB5D6B8 /* PendingCommandReconciliationTests.swift */; };
 		DE1AB550E15F0FD3FE38F435 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1455AA140C0695813955B378 /* DeepLink.swift */; };
@@ -272,6 +274,7 @@
 		251507DCB0C4DAB1638C849C /* WatchSessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSessionManagerTests.swift; sourceTree = "<group>"; };
 		268CC999FE8C890B9E92083D /* AppGroupResilienceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupResilienceTests.swift; sourceTree = "<group>"; };
 		2861876CC85284102739ACA4 /* FastedWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedWidgetsBundle.swift; sourceTree = "<group>"; };
+		2A7DA10ED4B5919E349BD9D8 /* NotificationManager+Reminders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationManager+Reminders.swift"; sourceTree = "<group>"; };
 		2B538F1D5624D86393BC382B /* FastedWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = FastedWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D4D805535A363DDAF977B89 /* FastingArcShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingArcShape.swift; sourceTree = "<group>"; };
 		2EA35504122572AB7F1EB512 /* StreakCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalculator.swift; sourceTree = "<group>"; };
@@ -333,6 +336,7 @@
 		97ABFA5E1D53249C053A768E /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		98639EA5CF96432052AC501B /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		9C1845606048434908EA9499 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		9D785A78560208865D8A3B71 /* ExtendedFastTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedFastTests.swift; sourceTree = "<group>"; };
 		9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListView.swift; sourceTree = "<group>"; };
 		A3A7103D0883246EA1A90ECD /* FastStatusWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastStatusWidget.swift; sourceTree = "<group>"; };
 		A71CDC6BEC973FA849ACE8BB /* DialMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialMath.swift; sourceTree = "<group>"; };
@@ -552,6 +556,7 @@
 				15FC5AA6E9919636B710860E /* MetabolicStageBadgeView.swift */,
 				FFB9914B8CCB443682E2056A /* MetabolicStagesSheetView.swift */,
 				98639EA5CF96432052AC501B /* NotificationManager.swift */,
+				2A7DA10ED4B5919E349BD9D8 /* NotificationManager+Reminders.swift */,
 				FEFF304C7359306211445686 /* NotificationSchedule.swift */,
 				7015722CE91DCBC142CA99A4 /* NotificationSettingsSection.swift */,
 				97ABFA5E1D53249C053A768E /* PersistenceController.swift */,
@@ -580,6 +585,7 @@
 				74435CB885215FB2DBEC2E5A /* BuildMetadataTests.swift */,
 				D07D4C1C96B57B4A83B7CEE8 /* ChallengeStoreTests.swift */,
 				68222DD80B162A582A18EB12 /* DeepLinkTests.swift */,
+				9D785A78560208865D8A3B71 /* ExtendedFastTests.swift */,
 				93A9AA51C89A1605E7B9D157 /* FastControlStateTests.swift */,
 				451A59AE22137ED94C1A12D3 /* FastDurationFormatterTests.swift */,
 				21707A7980A79A143EAE2C2D /* FastedDialMathTests.swift */,
@@ -854,6 +860,7 @@
 				60B63C7C538AA3271C824FEB /* BuildMetadataTests.swift in Sources */,
 				3C2252589BC3FB997316AD44 /* ChallengeStoreTests.swift in Sources */,
 				EFF109DE04A205D5B0C972DB /* DeepLinkTests.swift in Sources */,
+				D968E4C86E60821220E14766 /* ExtendedFastTests.swift in Sources */,
 				DC61CF2EAD9D12332B025B45 /* FastControlStateTests.swift in Sources */,
 				7D7E4E7BB19DCAE3CC48218E /* FastDurationFormatterTests.swift in Sources */,
 				52E86FE9CE2ED8B27EDB571E /* FastExtensionsTests.swift in Sources */,
@@ -927,6 +934,7 @@
 				30455C3CE0B719CD5AB1526C /* MetabolicStage.swift in Sources */,
 				67747AFA11317A45528691C1 /* MetabolicStageBadgeView.swift in Sources */,
 				AAD783B848631089CFCFAEA1 /* MetabolicStagesSheetView.swift in Sources */,
+				D54D54A2C235142F82BB0622 /* NotificationManager+Reminders.swift in Sources */,
 				5E28F103B04991B5DC71121C /* NotificationManager.swift in Sources */,
 				2257D035EF19CD1D5EC5B635 /* NotificationSchedule.swift in Sources */,
 				83184FFCA959C78857882F99 /* NotificationSettingsSection.swift in Sources */,

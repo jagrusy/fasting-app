@@ -133,4 +133,22 @@ final class AppGroupCoordinatorTests: XCTestCase {
         XCTAssertEqual(drained.count, count)
         XCTAssertTrue(coordinator.drainPendingCommands().isEmpty)
     }
+
+    func testDuplicateEnvelopeIdIsIgnoredAcrossDrains() {
+        guard let coordinator = coordinator else {
+            XCTFail("Coordinator not initialized")
+            return
+        }
+
+        let envelope = PendingCommandEnvelope(
+            timestamp: Date(timeIntervalSince1970: 1700000000),
+            command: .snoozeFast(extensionSeconds: 3600)
+        )
+        coordinator.enqueueEnvelope(envelope)
+        XCTAssertEqual(coordinator.drainPendingCommands().count, 1)
+
+        // Re-delivering the exact same envelope ID (e.g. sendMessage + transferUserInfo fallback)
+        coordinator.enqueueEnvelope(envelope)
+        XCTAssertTrue(coordinator.drainPendingCommands().isEmpty)
+    }
 }

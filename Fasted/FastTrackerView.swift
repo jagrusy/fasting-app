@@ -73,12 +73,9 @@ public struct FastTrackerView: View {
 
             if let fast = fastManager.activeFast {
                 FastStartedCardView(
-                    fast: fast,
-                    now: now,
-                    previewStartDate: previewStart,
-                    onSelectDayOffset: { offset in
-                        updateStartDate(dayOffset: offset, from: fast.startDate ?? now)
-                    },
+                    fast: fast, now: now, previewStartDate: previewStart,
+                    effectiveTargetDuration: activeTargetDuration,
+                    onSelectDayOffset: { updateStartDate(dayOffset: $0, from: fast.startDate ?? now) },
                     onSelectTime: {
                         tempTime = fast.startDate ?? now
                         showTimePickerSheet = true
@@ -125,19 +122,19 @@ public struct FastTrackerView: View {
         .padding(.top, 16)
     }
 
+    private var activeTargetDuration: TimeInterval {
+        fastManager.activeFast.map { fastManager.effectiveTargetDuration(for: $0) } ?? 0
+    }
+
     private func progressSection(now: Date, progress: Double, previewStart: Date?) -> some View {
         ZStack {
             ProgressRingView(
                 progress: progress,
                 isFasting: fastManager.isFasting,
                 ringWidth: 24,
-                targetDuration: fastManager.activeFast?.targetDuration ?? 0,
-                onProgressDragged: { deltaProgress in
-                    handleProgressDragDelta(deltaProgress: deltaProgress, now: now)
-                },
-                onProgressDragEnded: {
-                    commitProgressDrag(now: now)
-                }
+                targetDuration: activeTargetDuration,
+                onProgressDragged: { handleProgressDragDelta(deltaProgress: $0, now: now) },
+                onProgressDragEnded: { commitProgressDrag(now: now) }
             )
             .frame(width: 280, height: 280)
 
@@ -149,12 +146,9 @@ public struct FastTrackerView: View {
                 }
             } label: {
                 FastMetricsCenterView(
-                    fast: fastManager.activeFast,
-                    currentProtocol: fastManager.currentProtocol,
-                    progress: progress,
-                    centerDisplayMode: centerDisplayMode,
-                    now: now,
-                    previewStartDate: previewStart
+                    fast: fastManager.activeFast, currentProtocol: fastManager.currentProtocol,
+                    progress: progress, centerDisplayMode: centerDisplayMode, now: now,
+                    previewStartDate: previewStart, effectiveTargetDuration: activeTargetDuration
                 )
             }
             .buttonStyle(.plain)
@@ -173,7 +167,9 @@ public struct FastTrackerView: View {
         dateComponents.second = 0
 
         if let combinedDate = calendar.date(from: dateComponents) {
-            let finalDate = min(combinedDate, now)
+            let finalDate = (combinedDate > now && calendar.isDateInToday(originalDate))
+                ? (calendar.date(byAdding: .day, value: -1, to: combinedDate) ?? combinedDate)
+                : combinedDate
             applyValidatedStartDate(finalDate, excludingFastId: fast.id)
         }
     }
@@ -190,7 +186,7 @@ public struct FastTrackerView: View {
         combinedComponents.second = timeComponents.second
 
         if let newStartDate = calendar.date(from: combinedComponents) {
-            applyValidatedStartDate(min(newStartDate, Date()), excludingFastId: fast.id)
+            applyValidatedStartDate(newStartDate, excludingFastId: fast.id)
         }
     }
 
@@ -224,9 +220,10 @@ public struct FastTrackerView: View {
     /// past its goal (>100%) be nudged further without snapping back down to wherever the touch angle
     /// happens to land.
     private func handleProgressDragDelta(deltaProgress: Double, now: Date) {
-        guard let fast = fastManager.activeFast, fast.targetDuration > 0 else { return }
+        let target = activeTargetDuration
+        guard let fast = fastManager.activeFast, target > 0 else { return }
         let baseline = dragRawElapsed ?? now.timeIntervalSince(fast.startDate ?? now)
-        let rawElapsed = max(0, baseline + deltaProgress * fast.targetDuration)
+        let rawElapsed = max(0, baseline + deltaProgress * target)
         dragRawElapsed = rawElapsed
 
         let snappedElapsed = DialMath.snapInterval(rawElapsed, toMinutes: 5)
@@ -255,8 +252,9 @@ public struct FastTrackerView: View {
     }
 
     private func displayedProgress(now: Date) -> Double {
-        if let dragging = draggingElapsed, let fast = fastManager.activeFast, fast.targetDuration > 0 {
-            return max(0.0, dragging / fast.targetDuration)
+        let target = activeTargetDuration
+        if let dragging = draggingElapsed, target > 0 {
+            return max(0.0, dragging / target)
         }
         return calculateProgress(at: now)
     }
@@ -270,12 +268,13 @@ public struct FastTrackerView: View {
     }
 
     private func calculateProgress(at date: Date) -> Double {
-        guard let fast = fastManager.activeFast, fast.targetDuration > 0 else {
+        let target = activeTargetDuration
+        guard let fast = fastManager.activeFast, target > 0 else {
             return 0.0
         }
         let startDate = fast.startDate ?? date
         let elapsed = date.timeIntervalSince(startDate)
-        return max(0.0, elapsed / fast.targetDuration)
+        return max(0.0, elapsed / target)
     }
 }
 

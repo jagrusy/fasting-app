@@ -125,6 +125,19 @@ public struct FastingStateSnapshot: Codable, Sendable, Equatable {
         guard let proto = protocolType else { return nil }
         return FastingProtocol.from(protocolType: proto)
     }
+
+    /// Compares all semantic state fields while ignoring `updatedAt`, so publishers can avoid
+    /// triggering redundant WidgetKit reloads when nothing user-visible actually changed.
+    public func isContentEquivalent(to other: FastingStateSnapshot) -> Bool {
+        isFasting == other.isFasting
+            && startDate == other.startDate
+            && targetDuration == other.targetDuration
+            && protocolType == other.protocolType
+            && currentStreak == other.currentStreak
+            && longestStreak == other.longestStreak
+            && lastCompletedFastDate == other.lastCompletedFastDate
+            && lastCompletedFastStartDate == other.lastCompletedFastStartDate
+    }
 }
 
 /// Which calendar days a completed fast counts toward a streak: the day it started, plus every day it

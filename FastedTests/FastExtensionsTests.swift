@@ -5,21 +5,38 @@ import Combine
 
 @MainActor
 final class FastExtensionsTests: XCTestCase {
+    private var persistenceController = PersistenceController(inMemory: true)
     private var context: NSManagedObjectContext {
-        PersistenceController.preview.container.viewContext
+        persistenceController.container.viewContext
     }
     private var cancellables: Set<AnyCancellable> = []
 
     override func setUp() {
         super.setUp()
-        context.rollback()
+        persistenceController = PersistenceController(inMemory: true)
         cancellables.removeAll()
     }
 
     override func tearDown() {
-        context.rollback()
         cancellables.removeAll()
         super.tearDown()
+    }
+
+    private func makeFast(
+        startDate: Date = Date(timeIntervalSince1970: 100000),
+        endDate: Date? = nil,
+        targetDuration: TimeInterval = 16 * 3600,
+        isCompleted: Bool = false
+    ) -> Fast {
+        let fast = Fast(context: context)
+        fast.id = UUID()
+        fast.startDate = startDate
+        fast.endDate = endDate
+        fast.targetDuration = targetDuration
+        fast.isCompleted = isCompleted
+        fast.createdAt = startDate
+        fast.updatedAt = startDate
+        return fast
     }
 
     func testCompletedFastGoalMet() {
@@ -100,17 +117,29 @@ final class FastExtensionsTests: XCTestCase {
         XCTAssertTrue(fast.isGoalMet)
     }
 
-    func testShortenedFastClearsCompletion() {
-        let fastManager = FastManager(context: context)
-        let fast = Fast(context: context)
-        fast.id = UUID()
+    func testShortenedFastClearsCompletion() throws {
+        let suite = "FastExtensionsTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite) ?? .standard
+        let commandsDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(suite, isDirectory: true)
+        defer {
+            UserDefaults.standard.removePersistentDomain(forName: suite)
+            try? FileManager.default.removeItem(at: commandsDir)
+        }
+        let coord = AppGroupCoordinator(
+            userDefaults: defaults,
+            appGroupId: suite,
+            commandsDirectory: commandsDir
+        )
+        let fastManager = FastManager(context: context, defaults: defaults, coordinator: coord)
         let start = Date(timeIntervalSince1970: 100000)
-        fast.startDate = start
-        fast.endDate = start.addingTimeInterval(16 * 3600)
-        fast.targetDuration = 16 * 3600
-        fast.isCompleted = true
-        fast.createdAt = start
-        fast.updatedAt = start
+        let fast = makeFast(
+            startDate: start,
+            endDate: start.addingTimeInterval(16 * 3600),
+            targetDuration: 16 * 3600,
+            isCompleted: true
+        )
+        try context.save()
 
         XCTAssertTrue(fast.isGoalMet)
         XCTAssertTrue(fast.hasReachedTarget())

@@ -148,34 +148,46 @@ public struct ProgressRingView: View {
             .frame(width: 48, height: 48)
             .contentShape(Circle())
             .position(x: knobX, y: knobY)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Fast start time handle")
+            .accessibilityValue("\(Int((progress * 100).rounded())) percent of goal")
+            .accessibilityAdjustableAction { direction in
+                guard targetDuration > 0 else { return }
+                let stepFraction = (5 * 60) / targetDuration
+                let delta = direction == .increment ? stepFraction : -stepFraction
+                onProgressDragged?(delta)
+                onProgressDragEnded?()
+            }
             .accessibilityIdentifier("progress_knob")
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        if !isDragging {
-                            isDragging = true
-                            dragStartKnobPosition = CGPoint(x: knobX, y: knobY)
-                            lastTouchAngle = computeTouchAngle(point: dragStartKnobPosition, center: center)
-                        }
-                        let currentPoint = CGPoint(
-                            x: dragStartKnobPosition.x + value.translation.width,
-                            y: dragStartKnobPosition.y + value.translation.height
-                        )
-                        let touchAngle = computeTouchAngle(point: currentPoint, center: center)
+            .gesture(knobDragGesture(knobX: knobX, knobY: knobY, center: center))
+    }
 
-                        var delta = touchAngle - lastTouchAngle
-                        if delta > 180 { delta -= 360 }
-                        if delta < -180 { delta += 360 }
-                        lastTouchAngle = touchAngle
+    private func knobDragGesture(knobX: CGFloat, knobY: CGFloat, center: CGPoint) -> some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                if !isDragging {
+                    isDragging = true
+                    dragStartKnobPosition = CGPoint(x: knobX, y: knobY)
+                    lastTouchAngle = computeTouchAngle(point: dragStartKnobPosition, center: center)
+                }
+                let currentPoint = CGPoint(
+                    x: dragStartKnobPosition.x + value.translation.width,
+                    y: dragStartKnobPosition.y + value.translation.height
+                )
+                let touchAngle = computeTouchAngle(point: currentPoint, center: center)
 
-                        onProgressDragged?(delta / 360.0)
-                    }
-                    .onEnded { _ in
-                        isDragging = false
-                        dragStartKnobPosition = .zero
-                        onProgressDragEnded?()
-                    }
-            )
+                var delta = touchAngle - lastTouchAngle
+                if delta > 180 { delta -= 360 }
+                if delta < -180 { delta += 360 }
+                lastTouchAngle = touchAngle
+
+                onProgressDragged?(delta / 360.0)
+            }
+            .onEnded { _ in
+                isDragging = false
+                dragStartKnobPosition = .zero
+                onProgressDragEnded?()
+            }
     }
 
     private func computeTouchAngle(point: CGPoint, center: CGPoint) -> Double {

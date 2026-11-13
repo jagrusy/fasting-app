@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct WatchRootView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @ObservedObject var coordinator = WatchSessionCoordinator.shared
+    @State private var showStopConfirmation = false
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1.0)) { timeline in
@@ -50,14 +52,18 @@ struct WatchRootView: View {
                             .foregroundColor(SolsticeColors.emeraldGlow)
                     }
 
-                    Button(role: .destructive) {
-                        coordinator.endFast()
+                    Button(role: isGoalMet ? .none : .destructive) {
+                        if isGoalMet {
+                            coordinator.endFast()
+                        } else {
+                            showStopConfirmation = true
+                        }
                     } label: {
-                        Text("End Fast")
+                        Text(isGoalMet ? "Complete Fast" : "End Fast")
                             .font(.caption)
                             .fontWeight(.semibold)
                     }
-                    .tint(SolsticeColors.solarFlame)
+                    .tint(isGoalMet ? SolsticeColors.emeraldGlow : SolsticeColors.solarFlame)
                     .padding(.top, 4)
                 }
                 .padding(.horizontal)
@@ -98,5 +104,27 @@ struct WatchRootView: View {
             }
         }
     }
+    .onChange(of: scenePhase) { _, newPhase in
+        if newPhase == .active {
+            coordinator.refreshFromLocalStore()
+        }
+    }
+    .confirmationDialog(
+        "End Fast Early?",
+        isPresented: $showStopConfirmation,
+        titleVisibility: .visible,
+        actions: {
+            Button("Save Fast") {
+                coordinator.endFast()
+            }
+            Button("Discard Fast", role: .destructive) {
+                coordinator.discardFast()
+            }
+            Button("Cancel", role: .cancel) {}
+        },
+        message: {
+            Text("Save this shorter fast to history, or discard it.")
+        }
+    )
 }
 }
