@@ -17,8 +17,7 @@ public struct StartFastIntent: AppIntent {
             return .result()
         }
 
-        let protoName = snapshot.protocolType ?? FastingProtocol.default.ratioString
-        let proto = FastingProtocol.from(protocolType: protoName)
+        let proto = snapshot.resolvedProtocol
         let now = Date()
         let command = FastingActionCommand.startFast(
             startDate: now,
@@ -34,12 +33,8 @@ public struct StartFastIntent: AppIntent {
         )
         coordinator.writeSnapshot(optimistic)
         #if canImport(UserNotifications)
-        let reminderIds = (1...7).flatMap { weekday in
-            (0..<4).map { week in
-                week == 0 ? "recurring_start_day_\(weekday)" : "recurring_start_day_\(weekday)_\(week)"
-            }
-        }
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: reminderIds)
+        UNUserNotificationCenter.current()
+            .removePendingNotificationRequests(withIdentifiers: FastingReminderIDs.allStartReminderIdentifiers)
         #endif
         return .result()
     }

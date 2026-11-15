@@ -89,14 +89,25 @@ public struct FastingProtocol: Identifiable, Hashable {
     private static let extendedPresetHours = [24, 36, 48, 72]
 
     /// Longer fasts, identified by length alone ("36h").
-    ///
-    /// Watch builds before these existed read any such identifier as 16:8. The Watch starts fasts
-    /// from the idle snapshot's `protocolType`, which is the Settings selection, so keep that
-    /// selection limited to the daily `presets` until the Watch contract carries the goal length.
     public static let extendedPresets: [FastingProtocol] = extendedPresetHours.map { fixedLength(hours: $0) }
 
     public static var allPresets: [FastingProtocol] {
         presets + extendedPresets
+    }
+
+    /// True when this protocol is one of the built-in extended fixed-length presets (e.g. 24h, 36h).
+    public var isExtendedPreset: Bool {
+        Self.extendedPresets.contains(self)
+    }
+
+    /// True for any fixed-length protocol identifier such as "24h" or "30h".
+    public var isFixedLength: Bool {
+        id.hasSuffix("h")
+    }
+
+    /// Human-readable title without repeating the length on built-in extended presets.
+    public var displayTitle: String {
+        isExtendedPreset ? name : "\(name) (\(ratioString))"
     }
 
     /// Lengths offered for a custom fast.
@@ -150,5 +161,28 @@ public struct FastingProtocol: Identifiable, Hashable {
             return "Custom"
         }
         return proto.ratioString
+    }
+}
+
+/// Shared notification identifiers for daily start-fast reminders across the app and extensions.
+public enum FastingReminderIDs {
+    public static let deferredReminderWeeks = 4
+    public static let startReminderPrefix = "recurring_start_day_"
+
+    public static func startReminderIdentifier(weekday: Int, week: Int) -> String {
+        week == 0 ? "\(startReminderPrefix)\(weekday)" : "\(startReminderPrefix)\(weekday)_\(week)"
+    }
+
+    public static var allStartReminderIdentifiers: [String] {
+        (1...7).flatMap { weekday in
+            (0..<deferredReminderWeeks).map { week in
+                startReminderIdentifier(weekday: weekday, week: week)
+            }
+        }
+    }
+
+    public static var allRecurringIdentifiers: [String] {
+        let legacyEndIdentifiers = (1...7).map { "recurring_end_day_\($0)" }
+        return legacyEndIdentifiers + allStartReminderIdentifiers
     }
 }

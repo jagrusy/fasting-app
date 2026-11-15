@@ -46,6 +46,7 @@ extension FastManager {
         }
 
         coordinator.writeSnapshot(snapshot)
+        latestSnapshot = snapshot
         effects.syncWatch(snapshot)
         return true
     }

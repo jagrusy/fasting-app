@@ -11,7 +11,8 @@ struct FastTimePickerSheetView: View {
                 DatePicker(
                     "Start Time",
                     selection: $tempTime,
-                    displayedComponents: [.hourAndMinute]
+                    in: ...Date(),
+                    displayedComponents: [.date, .hourAndMinute]
                 )
                 .datePickerStyle(.wheel)
                 .labelsHidden()
@@ -31,19 +32,25 @@ struct FastTimePickerSheetView: View {
                 }
             }
         }
-        .presentationDetents([.height(300)])
+        .presentationDetents([.height(330)])
     }
 }
 
-/// Sheet for picking a custom fast length, offered from `FastTrackerView`'s Start menu's
-/// "Custom…" item.
+/// Sheet for picking a custom fast length, offered from Settings and Quick-Select "Custom…" items.
 struct CustomFastSheetView: View {
     @State private var hours: Int
+    let confirmTitle: (Int) -> String
     let onStart: (Int) -> Void
     let onCancel: () -> Void
 
-    init(initialHours: Int, onStart: @escaping (Int) -> Void, onCancel: @escaping () -> Void) {
+    init(
+        initialHours: Int,
+        confirmTitle: @escaping (Int) -> String = { "Start \($0)-Hour Fast" },
+        onStart: @escaping (Int) -> Void,
+        onCancel: @escaping () -> Void
+    ) {
         self._hours = State(initialValue: initialHours)
+        self.confirmTitle = confirmTitle
         self.onStart = onStart
         self.onCancel = onCancel
     }
@@ -64,7 +71,7 @@ struct CustomFastSheetView: View {
                 } label: {
                     // A minimum rather than fixed height, so the label wraps and grows with
                     // Dynamic Type instead of being clipped by the rounded background.
-                    Text("Start \(hours)-Hour Fast")
+                    Text(confirmTitle(hours))
                         .font(.headline.weight(.semibold))
                         .foregroundStyle(.white)
                         .multilineTextAlignment(.center)

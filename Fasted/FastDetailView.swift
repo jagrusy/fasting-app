@@ -29,6 +29,11 @@ public struct FastDetailView: View {
         duration >= fast.targetDuration
     }
 
+    private var goalProgressPercent: Int {
+        guard fast.targetDuration > 0 else { return 0 }
+        return Int((duration / fast.targetDuration) * 100)
+    }
+
     public var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -96,6 +101,12 @@ public struct FastDetailView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+
+            if fast.targetDuration > 0 {
+                Text("\(goalProgressPercent)% of \(fast.formattedGoal) goal")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(20)
@@ -119,7 +130,7 @@ public struct FastDetailView: View {
                 )
                 .datePickerStyle(.compact)
                 .onChange(of: startDate) { _, newStart in
-                    let normalizedStart = floorToMinute(newStart)
+                    let normalizedStart = FastDurationFormatter.floorToMinute(newStart)
                     if normalizedStart != newStart {
                         startDate = normalizedStart
                         return
@@ -148,7 +159,7 @@ public struct FastDetailView: View {
                 )
                 .datePickerStyle(.compact)
                 .onChange(of: endDate) { _, newEnd in
-                    let normalizedEnd = floorToMinute(newEnd)
+                    let normalizedEnd = FastDurationFormatter.floorToMinute(newEnd)
                     if normalizedEnd != newEnd {
                         endDate = normalizedEnd
                         return
@@ -201,10 +212,5 @@ public struct FastDetailView: View {
             hasChanges = false
             dismiss()
         }
-    }
-
-    private func floorToMinute(_ date: Date) -> Date {
-        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-        return Calendar.current.date(from: components) ?? date
     }
 }

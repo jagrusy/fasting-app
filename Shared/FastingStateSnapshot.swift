@@ -87,9 +87,8 @@ public struct FastingStateSnapshot: Codable, Sendable, Equatable {
     /// fasting, before any fast has been completed, or when the protocol has no eating window.
     public func eatingWindowEnd() -> Date? {
         guard !isFasting, let last = lastCompletedFastDate else { return nil }
-        let proto = fastingProtocol ?? .default
-        guard proto.hasEatingWindow else { return nil }
-        return last.addingTimeInterval(proto.eatingSeconds)
+        guard resolvedProtocol.hasEatingWindow else { return nil }
+        return last.addingTimeInterval(resolvedProtocol.eatingSeconds)
     }
 
     /// How much of the eating window has elapsed, 0...1. Nil when fasting or when no window is open.
@@ -124,6 +123,11 @@ public struct FastingStateSnapshot: Codable, Sendable, Equatable {
     public var fastingProtocol: FastingProtocol? {
         guard let proto = protocolType else { return nil }
         return FastingProtocol.from(protocolType: proto)
+    }
+
+    /// Resolved protocol for the snapshot, falling back to the app default (16:8).
+    public var resolvedProtocol: FastingProtocol {
+        fastingProtocol ?? .default
     }
 
     /// Compares all semantic state fields while ignoring `updatedAt`, so publishers can avoid

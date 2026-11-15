@@ -54,10 +54,8 @@ extension FastManager {
             guard let otherStart = other.startDate else { continue }
             let otherEnd = other.endDate ?? now
             if startDate < otherEnd && effectiveEnd > otherStart {
-                let formatter = DateFormatter()
-                formatter.dateStyle = .short
-                formatter.timeStyle = .short
-                return (false, "This time overlaps with another fast on \(formatter.string(from: otherStart)).")
+                let startText = FastDurationFormatter.formatShortDateTime(otherStart)
+                return (false, "This time overlaps with another fast on \(startText).")
             }
         }
         return (true, nil)

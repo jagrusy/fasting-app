@@ -46,7 +46,7 @@ struct WatchRootView: View {
                     }
 
                     if isGoalMet {
-                        Text("Goal Met ✨")
+                        Text("Goal Met! 🎉")
                             .font(.caption2)
                             .fontWeight(.bold)
                             .foregroundColor(SolsticeColors.emeraldGlow)
@@ -84,9 +84,7 @@ struct WatchRootView: View {
                     }
 
                     Button {
-                        let proto = FastingProtocol.from(
-                            protocolType: snapshot.protocolType ?? FastingProtocol.default.ratioString
-                        )
+                        let proto = snapshot.resolvedProtocol
                         coordinator.startFast(
                             startDate: Date(),
                             duration: proto.fastingSeconds,

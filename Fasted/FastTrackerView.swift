@@ -17,7 +17,7 @@ public struct FastTrackerView: View {
     @State private var dragRawElapsed: TimeInterval?
     @State private var showValidationAlert: Bool = false
     @State private var validationMessage: String?
-    @State private var showCustomFastSheet: Bool = false
+    @State private var quickSelectMode: QuickSelectMode?
 
     public init(fastManager: FastManager) {
         self.fastManager = fastManager
@@ -42,13 +42,15 @@ public struct FastTrackerView: View {
         } message: {
             Text(validationMessage ?? "That time overlaps with another fast.")
         }
-        .sheet(isPresented: $showCustomFastSheet) {
-            CustomFastSheetView(
-                initialHours: fastManager.lastCustomFastHours ?? 36,
-                onStart: { hours in
-                    startCustomFast(hours: hours)
-                },
-                onCancel: { showCustomFastSheet = false }
+        .sheet(item: $quickSelectMode) { mode in
+            ProtocolPickerView(
+                fastManager: fastManager,
+                presentation: mode.presentation(
+                    fastManager: fastManager,
+                    onStartFast: { proto in
+                        beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
+                    }
+                )
             )
         }
     }
@@ -69,6 +71,9 @@ public struct FastTrackerView: View {
                     showStagesSheet = true
                 }
                 .padding(.top, -6)
+            } else if let eatingEnd = fastManager.latestSnapshot.eatingWindowEnd(), eatingEnd > now {
+                eatingWindowBadge(until: eatingEnd)
+                    .padding(.top, -6)
             }
 
             if let fast = fastManager.activeFast {
@@ -79,14 +84,16 @@ public struct FastTrackerView: View {
                     onSelectTime: {
                         tempTime = fast.startDate ?? now
                         showTimePickerSheet = true
-                    }
+                    },
+                    onExtendOneHour: { fastManager.snoozeFast(by: 3600) },
+                    onChangeGoal: { quickSelectMode = .retargetGoal }
                 )
                 .sheet(isPresented: $showTimePickerSheet) {
                     FastTimePickerSheetView(
                         tempTime: $tempTime,
                         onCancel: { showTimePickerSheet = false },
                         onSave: { newTime in
-                            applyTimeChange(newTime: newTime, originalDate: fast.startDate ?? now, now: now)
+                            applyTimeChange(newTime: newTime, now: now)
                             showTimePickerSheet = false
                         }
                     )
@@ -100,24 +107,57 @@ public struct FastTrackerView: View {
         .padding(.bottom, 20)
     }
 
+    private func eatingWindowBadge(until eatingEnd: Date) -> some View {
+        Label(
+            "Eating window until \(FastDurationFormatter.formatTime(eatingEnd))",
+            systemImage: "fork.knife"
+        )
+        .font(.caption.weight(.medium))
+        .foregroundStyle(SolsticeColors.tealGlow)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(SolsticeColors.tealGlow.opacity(0.12), in: Capsule())
+        .accessibilityIdentifier("eating_window_badge")
+    }
+
     private func headerView(progress: Double) -> some View {
         VStack(spacing: 6) {
-            Text(fastManager.isFasting ? "Current Fast" : "Ready to Fast")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
+            if fastManager.isFasting {
+                let activeLabel = FastingProtocol.label(
+                    forTargetDuration: activeTargetDuration,
+                    protocolType: fastManager.activeFast?.protocolType
+                )
+                Text("CURRENT FAST · \(activeLabel)")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
 
-            let statusTitle: String = {
-                if !fastManager.isFasting {
-                    return "\(fastManager.currentProtocol.name) (\(fastManager.currentProtocol.ratioString))"
+                let title = progress >= 1.0 ? "Goal Reached! 🎉" : "Fasting in Progress"
+                Text(title)
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(progress >= 1.0 ? .green : Color.primary)
+                    .accessibilityIdentifier("fast_status_header")
+            } else {
+                Text("Ready to Fast")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+
+                Button {
+                    quickSelectMode = .choosePlan
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(fastManager.currentProtocol.displayTitle)
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(Color.primary)
+                        Image(systemName: "chevron.down")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                return progress >= 1.0 ? "Goal Reached! 🎉" : "Fasting in Progress"
-            }()
-
-            Text(statusTitle)
-                .font(.title2.weight(.bold))
-                .foregroundStyle(progress >= 1.0 && fastManager.isFasting ? .green : Color.primary)
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("fast_status_header")
+            }
         }
         .padding(.top, 16)
     }
@@ -143,6 +183,8 @@ public struct FastTrackerView: View {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         centerDisplayMode = centerDisplayMode.next
                     }
+                } else {
+                    quickSelectMode = .choosePlan
                 }
             } label: {
                 FastMetricsCenterView(
@@ -152,29 +194,22 @@ public struct FastTrackerView: View {
                 )
             }
             .buttonStyle(.plain)
-            .disabled(!fastManager.isFasting)
             .accessibilityIdentifier("progress_ring_button")
         }
     }
 
-    private func applyTimeChange(newTime: Date, originalDate: Date, now: Date) {
+    private func applyTimeChange(newTime: Date, now: Date) {
         guard let fast = fastManager.activeFast else { return }
-        let calendar = Calendar.current
-        let timeComponents = calendar.dateComponents([.hour, .minute], from: newTime)
-        var dateComponents = calendar.dateComponents([.year, .month, .day], from: originalDate)
-        dateComponents.hour = timeComponents.hour
-        dateComponents.minute = timeComponents.minute
-        dateComponents.second = 0
-
-        if let combinedDate = calendar.date(from: dateComponents) {
-            let finalDate = (combinedDate > now && calendar.isDateInToday(originalDate))
-                ? (calendar.date(byAdding: .day, value: -1, to: combinedDate) ?? combinedDate)
-                : combinedDate
-            applyValidatedStartDate(finalDate, excludingFastId: fast.id)
-        }
+        let normalized = FastDurationFormatter.floorToMinute(newTime)
+        let clamped = min(normalized, now)
+        applyValidatedStartDate(clamped, excludingFastId: fast.id)
     }
+}
 
-    private func updateStartDate(dayOffset: Int, from currentDate: Date) {
+// MARK: - Dragging, dates, and start controls
+
+private extension FastTrackerView {
+    func updateStartDate(dayOffset: Int, from currentDate: Date) {
         guard let fast = fastManager.activeFast else { return }
         let calendar = Calendar.current
         let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: currentDate)
@@ -190,7 +225,7 @@ public struct FastTrackerView: View {
         }
     }
 
-    private func applyValidatedStartDate(_ startDate: Date, excludingFastId: UUID?) {
+    func applyValidatedStartDate(_ startDate: Date, excludingFastId: UUID?) {
         let validation = fastManager.validateInterval(startDate: startDate, excludingFastId: excludingFastId)
         guard validation.isValid else {
             validationMessage = validation.message
@@ -200,7 +235,7 @@ public struct FastTrackerView: View {
         fastManager.updateActiveFast(startDate: startDate)
     }
 
-    private func actionButton(now: Date, progress: Double) -> some View {
+    func actionButton(now: Date, progress: Double) -> some View {
         Group {
             if fastManager.isFasting {
                 EndFastButtonView(
@@ -219,7 +254,7 @@ public struct FastTrackerView: View {
     /// this keeps the drag continuous across the 12-o'clock wrap point and lets a fast that's already
     /// past its goal (>100%) be nudged further without snapping back down to wherever the touch angle
     /// happens to land.
-    private func handleProgressDragDelta(deltaProgress: Double, now: Date) {
+    func handleProgressDragDelta(deltaProgress: Double, now: Date) {
         let target = activeTargetDuration
         guard let fast = fastManager.activeFast, target > 0 else { return }
         let baseline = dragRawElapsed ?? now.timeIntervalSince(fast.startDate ?? now)
@@ -235,7 +270,7 @@ public struct FastTrackerView: View {
         draggingElapsed = snappedElapsed
     }
 
-    private func commitProgressDrag(now: Date) {
+    func commitProgressDrag(now: Date) {
         defer {
             draggingElapsed = nil
             dragRawElapsed = nil
@@ -251,7 +286,7 @@ public struct FastTrackerView: View {
         fastManager.updateActiveFast(startDate: adjustedStart, targetDuration: fast.targetDuration)
     }
 
-    private func displayedProgress(now: Date) -> Double {
+    func displayedProgress(now: Date) -> Double {
         let target = activeTargetDuration
         if let dragging = draggingElapsed, target > 0 {
             return max(0.0, dragging / target)
@@ -262,12 +297,12 @@ public struct FastTrackerView: View {
     /// While a drag is in flight nothing is written to Core Data until release, so `fast.startDate`
     /// is stale. Every readout (elapsed clock, START time, GOAL TARGET) needs this instead, or the
     /// ring appears to move while all the numbers sit frozen until you lift your finger.
-    private func previewStartDate(now: Date) -> Date? {
+    func previewStartDate(now: Date) -> Date? {
         guard let dragging = draggingElapsed else { return nil }
         return now.addingTimeInterval(-dragging)
     }
 
-    private func calculateProgress(at date: Date) -> Double {
+    func calculateProgress(at date: Date) -> Double {
         let target = activeTargetDuration
         guard let fast = fastManager.activeFast, target > 0 else {
             return 0.0
@@ -276,14 +311,10 @@ public struct FastTrackerView: View {
         let elapsed = date.timeIntervalSince(startDate)
         return max(0.0, elapsed / target)
     }
-}
 
-// MARK: - Start button + protocol menu
-
-private extension FastTrackerView {
     var startMenuSegmentWidth: CGFloat { 56 }
 
-    /// Starts the default protocol, with a trailing menu for other protocols.
+    /// Starts the default protocol, with a trailing quick-select button for choosing any plan.
     func startFastButton(now: Date) -> some View {
         HStack(spacing: 0) {
             Button {
@@ -303,13 +334,14 @@ private extension FastTrackerView {
                 .fill(Color.white.opacity(0.35))
                 .frame(width: 1, height: 28)
 
-            Menu {
-                startMenuContent()
+            Button {
+                quickSelectMode = .startFast
             } label: {
-                Image(systemName: "chevron.down")
+                Image(systemName: "slider.horizontal.3")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
                     .frame(width: startMenuSegmentWidth, height: 56)
+                    .contentShape(Rectangle())
             }
             .accessibilityIdentifier("start_fast_menu")
             .accessibilityLabel("Choose fast type")
@@ -317,62 +349,6 @@ private extension FastTrackerView {
         .background(Color.accentColor)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .padding(.horizontal, 24)
-    }
-
-    @ViewBuilder
-    func startMenuContent() -> some View {
-        Section("Daily") {
-            ForEach(FastingProtocol.presets) { proto in
-                dailyMenuItem(proto)
-            }
-        }
-
-        Section("Extended") {
-            ForEach(FastingProtocol.extendedPresets) { proto in
-                Button(proto.name) {
-                    beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
-                }
-                .accessibilityIdentifier("start_menu_\(proto.ratioString)")
-            }
-        }
-
-        lastCustomMenuItem()
-
-        Button {
-            showCustomFastSheet = true
-        } label: {
-            Label("Custom…", systemImage: "slider.horizontal.3")
-        }
-        .accessibilityIdentifier("start_menu_custom")
-    }
-
-    @ViewBuilder
-    func dailyMenuItem(_ proto: FastingProtocol) -> some View {
-        let title = "\(proto.ratioString) · \(proto.name)"
-        Button {
-            beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
-        } label: {
-            if proto.ratioString == fastManager.currentProtocol.ratioString {
-                Label(title, systemImage: "checkmark")
-            } else {
-                Text(title)
-            }
-        }
-        .accessibilityIdentifier("start_menu_\(proto.ratioString)")
-    }
-
-    /// A shortcut for the last custom length picked, when it isn't already one of the extended
-    /// presets offered above it.
-    @ViewBuilder
-    func lastCustomMenuItem() -> some View {
-        if let lastCustom = fastManager.lastCustomFastHours,
-           !FastingProtocol.extendedPresets.contains(where: { Int($0.fastingHours) == lastCustom }) {
-            let proto = FastingProtocol.fixedLength(hours: lastCustom)
-            Button("Custom (\(lastCustom)h)") {
-                beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
-            }
-            .accessibilityIdentifier("start_menu_custom_last")
-        }
     }
 
     func beginFast(targetDuration: TimeInterval?, protocolType: String?) {
@@ -384,16 +360,5 @@ private extension FastTrackerView {
                 fastManager.syncNotifications()
             }
         }
-    }
-
-    /// `startFast` only sets `activeFast` once the save commits, so the length is remembered and
-    /// the sheet dismissed only for a fast that actually started; on a failed save the sheet stays
-    /// open rather than looking like it worked.
-    func startCustomFast(hours: Int) {
-        let proto = FastingProtocol.fixedLength(hours: hours)
-        beginFast(targetDuration: proto.fastingSeconds, protocolType: proto.ratioString)
-        guard fastManager.isFasting else { return }
-        fastManager.rememberCustomFastHours(hours)
-        showCustomFastSheet = false
     }
 }

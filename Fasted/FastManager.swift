@@ -25,6 +25,7 @@ public final class FastManager: ObservableObject {
 
     @Published public internal(set) var activeFast: Fast?
     @Published public internal(set) var userSettings: UserSettings?
+    @Published public internal(set) var latestSnapshot: FastingStateSnapshot = .idle
     let effects: FastManagerEffects
 
     @Published public internal(set) var operationError: FastManagerOperationError?

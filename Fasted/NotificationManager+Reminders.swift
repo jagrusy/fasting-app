@@ -59,23 +59,19 @@ extension NotificationManager {
     public func cancelRecurringReminders() {
         // `recurring_end_day_*` is no longer scheduled, but builds shipped before it was removed
         // may still have those requests pending — keep cancelling them or they fire forever.
-        let identifiers = (1...7).flatMap { weekday in
-            ["recurring_end_day_\(weekday)"]
-                + (0..<Self.deferredReminderWeeks).map { Self.startReminderIdentifier(weekday: weekday, week: $0) }
-        }
-        delivery.remove(identifiers)
+        delivery.remove(FastingReminderIDs.allRecurringIdentifiers)
     }
 
     /// How many weekly occurrences a deferred weekday is scheduled for, one-off, after the active
     /// fast's goal. iOS can't start a repeating trigger at a future date, so this bounds how long
     /// that weekday keeps reminding if the app is never opened again after the fast; any sync
     /// (launch, foreground, fast change, acting on a reminder) restores the weekly repeat.
-    public static let deferredReminderWeeks = 4
+    public static let deferredReminderWeeks = FastingReminderIDs.deferredReminderWeeks
 
     /// Week 0 keeps the identifier earlier builds used for the weekly repeat, so an upgrade replaces
     /// rather than duplicates it.
     public static func startReminderIdentifier(weekday: Int, week: Int) -> String {
-        week == 0 ? "recurring_start_day_\(weekday)" : "recurring_start_day_\(weekday)_\(week)"
+        FastingReminderIDs.startReminderIdentifier(weekday: weekday, week: week)
     }
 
     /// One start reminder per selected weekday.

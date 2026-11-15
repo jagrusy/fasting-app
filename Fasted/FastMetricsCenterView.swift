@@ -117,10 +117,10 @@ public struct FastMetricsCenterView: View {
 
     private var idleDisplay: some View {
         VStack(spacing: 6) {
-            Image(systemName: "flame.fill")
-                .font(.system(size: 44))
-                .foregroundStyle(.orange)
-                .padding(.bottom, 4)
+            Image(systemName: "sun.max.fill")
+                .font(.system(size: 40))
+                .foregroundStyle(SolsticeColors.solarGold)
+                .padding(.bottom, 2)
 
             Text(currentProtocol.ratioString)
                 .font(.system(size: 32, weight: .bold, design: .rounded))
@@ -131,6 +131,11 @@ public struct FastMetricsCenterView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
+
+            Text("Tap to change plan")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+                .padding(.top, 2)
         }
     }
 }

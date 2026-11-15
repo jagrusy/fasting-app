@@ -219,9 +219,7 @@ public struct CalendarHeatmapView: View {
     }
 
     private func monthYearString(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: date)
+        FastDurationFormatter.formatMonthYear(date)
     }
 
     private func daysInMonth(for date: Date) -> [Date?] {

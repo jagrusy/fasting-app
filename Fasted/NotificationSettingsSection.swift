@@ -32,6 +32,13 @@ public struct NotificationSettingsSection: View {
     }
 
     public var body: some View {
+        Group {
+            remindersSection
+            activeFastAlertsSection
+        }
+    }
+
+    private var remindersSection: some View {
         Section {
             Toggle("Daily Reminders", isOn: $isEnabled)
                 .onChange(of: isEnabled) { _, newValue in
@@ -86,7 +93,15 @@ public struct NotificationSettingsSection: View {
                 }
                 .padding(.vertical, 4)
             }
+        } header: {
+            Text("Reminders")
+        } footer: {
+            Text("Schedule daily reminders to start fasting.")
+        }
+    }
 
+    private var activeFastAlertsSection: some View {
+        Section {
             Toggle("Goal Reached Alert", isOn: $schedule.notifyOnGoalReached)
                 .onChange(of: schedule.notifyOnGoalReached) {
                     onSave(isEnabled, schedule)
@@ -99,14 +114,10 @@ public struct NotificationSettingsSection: View {
                 }
                 .accessibilityIdentifier("stage_transitions_toggle")
         } header: {
-            Text("Reminders")
+            Text("Active Fast Alerts")
         } footer: {
-            Text(
-                "Schedule daily reminders to start fasting, or configure stage transition and " +
-                "goal completion alerts for active fasts."
-            )
+            Text("Notify when your in-progress fast crosses a metabolic stage or reaches its goal.")
         }
-
     }
 
     private func toggleDay(_ day: Int) {

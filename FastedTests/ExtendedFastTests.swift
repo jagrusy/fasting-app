@@ -91,4 +91,73 @@ extension FastedTests {
         XCTAssertEqual(fast.targetDuration, 30 * 3600)
         XCTAssertEqual(manager.currentProtocol.ratioString, "16:8")
     }
+
+    func testDisplayTitleAndPresetClassification() {
+        let popular = FastingProtocol.from(protocolType: "16:8")
+        XCTAssertFalse(popular.isExtendedPreset)
+        XCTAssertFalse(popular.isFixedLength)
+        XCTAssertEqual(popular.displayTitle, "Popular (16:8)")
+
+        let extended = FastingProtocol.from(protocolType: "24h")
+        XCTAssertTrue(extended.isExtendedPreset)
+        XCTAssertTrue(extended.isFixedLength)
+        XCTAssertEqual(extended.displayTitle, "24-Hour Fast")
+
+        let custom = FastingProtocol.fixedLength(hours: 30)
+        XCTAssertFalse(custom.isExtendedPreset)
+        XCTAssertTrue(custom.isFixedLength)
+        XCTAssertEqual(custom.displayTitle, "Custom (30h)")
+    }
+
+    func testSnapshotResolvedProtocolFallsBackAndHonorsStoredIdentifier() {
+        let missingProto = FastingStateSnapshot.idle
+        XCTAssertEqual(missingProto.resolvedProtocol, .default)
+
+        let customSnapshot = FastingStateSnapshot(
+            isFasting: false,
+            startDate: nil,
+            targetDuration: nil,
+            protocolType: "36h",
+            currentStreak: 0,
+            longestStreak: 0,
+            lastCompletedFastDate: nil,
+            lastCompletedFastStartDate: nil,
+            updatedAt: Date()
+        )
+        XCTAssertEqual(customSnapshot.resolvedProtocol.ratioString, "36h")
+        XCTAssertEqual(customSnapshot.resolvedProtocol.fastingSeconds, 36 * 3600)
+    }
+
+    func testReminderIdentifiersCoverAllWeekdaysAndDeferredWeeks() {
+        let startIds = FastingReminderIDs.allStartReminderIdentifiers
+        XCTAssertEqual(startIds.count, 7 * FastingReminderIDs.deferredReminderWeeks)
+        XCTAssertEqual(FastingReminderIDs.startReminderIdentifier(weekday: 2, week: 0), "recurring_start_day_2")
+        XCTAssertEqual(FastingReminderIDs.startReminderIdentifier(weekday: 2, week: 1), "recurring_start_day_2_1")
+        XCTAssertTrue(startIds.allSatisfy { $0.hasPrefix(FastingReminderIDs.startReminderPrefix) })
+
+        let allIds = FastingReminderIDs.allRecurringIdentifiers
+        XCTAssertEqual(allIds.count, 7 + startIds.count)
+    }
+
+    func testDurationFormatterRelativeDayMonthYearAndFloorToMinute() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+        let now = try XCTUnwrap(calendar.date(from: DateComponents(
+            year: 2026, month: 9, day: 14, hour: 10, minute: 35, second: 42
+        )))
+        let yesterday = try XCTUnwrap(calendar.date(byAdding: .day, value: -1, to: now))
+        let tomorrow = try XCTUnwrap(calendar.date(byAdding: .day, value: 1, to: now))
+
+        XCTAssertEqual(FastDurationFormatter.formatRelativeDay(now, now: now, calendar: calendar), "Today")
+        XCTAssertEqual(
+            FastDurationFormatter.formatRelativeDay(yesterday, now: now, calendar: calendar),
+            "Yesterday"
+        )
+        XCTAssertEqual(FastDurationFormatter.formatRelativeDay(tomorrow, now: now, calendar: calendar), "Tomorrow")
+
+        let floored = FastDurationFormatter.floorToMinute(now, calendar: calendar)
+        XCTAssertEqual(calendar.component(.second, from: floored), 0)
+        XCTAssertEqual(calendar.component(.minute, from: floored), 35)
+        XCTAssertFalse(FastDurationFormatter.formatMonthYear(now).isEmpty)
+    }
 }

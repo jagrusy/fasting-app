@@ -67,9 +67,11 @@ public struct SettingsView: View {
                             Text(fastManager.currentProtocol.name)
                                 .font(.headline.weight(.semibold))
 
-                            Text("(\(fastManager.currentProtocol.ratioString))")
-                                .font(.subheadline.weight(.bold))
-                                .foregroundStyle(SolsticeColors.solarAmber)
+                            if !fastManager.currentProtocol.isExtendedPreset {
+                                Text("(\(fastManager.currentProtocol.ratioString))")
+                                    .font(.subheadline.weight(.bold))
+                                    .foregroundStyle(SolsticeColors.solarAmber)
+                            }
                         }
 
                         Text(fastManager.currentProtocol.description)
@@ -85,7 +87,7 @@ public struct SettingsView: View {
         } header: {
             Text("Fasting Plan")
         } footer: {
-            Text("Select your preferred fasting window ratio. If a fast is in progress, you'll be asked" +
+            Text("Select your preferred fasting plan. If a fast is in progress, you'll be asked" +
                  " whether to apply the change to it or only to future fasts.")
         }
     }

@@ -9,6 +9,8 @@ public struct FastStartedCardView: View {
     public let effectiveTargetDuration: TimeInterval?
     public let onSelectDayOffset: (Int) -> Void
     public let onSelectTime: () -> Void
+    public let onExtendOneHour: (() -> Void)?
+    public let onChangeGoal: (() -> Void)?
 
     public init(
         fast: Fast,
@@ -16,7 +18,9 @@ public struct FastStartedCardView: View {
         previewStartDate: Date? = nil,
         effectiveTargetDuration: TimeInterval? = nil,
         onSelectDayOffset: @escaping (Int) -> Void,
-        onSelectTime: @escaping () -> Void
+        onSelectTime: @escaping () -> Void,
+        onExtendOneHour: (() -> Void)? = nil,
+        onChangeGoal: (() -> Void)? = nil
     ) {
         self.fast = fast
         self.now = now
@@ -24,6 +28,8 @@ public struct FastStartedCardView: View {
         self.effectiveTargetDuration = effectiveTargetDuration
         self.onSelectDayOffset = onSelectDayOffset
         self.onSelectTime = onSelectTime
+        self.onExtendOneHour = onExtendOneHour
+        self.onChangeGoal = onChangeGoal
     }
 
     public var body: some View {
@@ -62,9 +68,11 @@ public struct FastStartedCardView: View {
         Menu {
             Button("Today") { onSelectDayOffset(0) }
             Button("Yesterday") { onSelectDayOffset(-1) }
+            Button(relativeDayOptionTitle(daysAgo: 2)) { onSelectDayOffset(-2) }
+            Button(relativeDayOptionTitle(daysAgo: 3)) { onSelectDayOffset(-3) }
         } label: {
             HStack(spacing: 4) {
-                Text(startDayLabel(for: startDate))
+                Text(FastDurationFormatter.formatRelativeDay(startDate, now: now))
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 Image(systemName: "chevron.down")
@@ -80,15 +88,10 @@ public struct FastStartedCardView: View {
         .accessibilityIdentifier("start_date_menu")
     }
 
-    private func startDayLabel(for startDate: Date) -> String {
+    private func relativeDayOptionTitle(daysAgo: Int) -> String {
         let calendar = Calendar.current
-        if calendar.isDateInToday(startDate) {
-            return "Today"
-        } else if calendar.isDateInYesterday(startDate) {
-            return "Yesterday"
-        } else {
-            return startDate.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
-        }
+        let target = calendar.date(byAdding: .day, value: -daysAgo, to: now) ?? now
+        return FastDurationFormatter.formatRelativeDay(target, now: now, calendar: calendar)
     }
 
     private func timeButton(startDate: Date) -> some View {
@@ -110,36 +113,61 @@ public struct FastStartedCardView: View {
         .accessibilityIdentifier("start_time_button")
     }
 
+    @ViewBuilder
     private func goalTargetView(startDate: Date) -> some View {
         let targetDuration = effectiveTargetDuration ?? fast.targetDuration
         let targetDate = startDate.addingTimeInterval(targetDuration)
-        let calendar = Calendar.current
+        let dayLabel = FastDurationFormatter.formatRelativeDay(targetDate, now: now)
+        let timeLabel = FastDurationFormatter.formatTime(targetDate)
 
-        let dayLabel: String?
-        if calendar.isDateInTomorrow(targetDate) {
-            dayLabel = "Tomorrow"
-        } else if !calendar.isDate(targetDate, inSameDayAs: startDate) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "EEE"
-            dayLabel = formatter.string(from: targetDate)
+        if onExtendOneHour != nil || onChangeGoal != nil {
+            goalTargetMenu(dayLabel: dayLabel, timeLabel: timeLabel)
         } else {
-            dayLabel = nil
+            goalTargetStaticLabel(dayLabel: dayLabel, timeLabel: timeLabel)
         }
+    }
 
-        return VStack(alignment: .trailing, spacing: 2) {
-            if let label = dayLabel {
-                Text(label)
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+    private func goalTargetMenu(dayLabel: String, timeLabel: String) -> some View {
+        Menu {
+            if let onExtendOneHour {
+                Button(action: onExtendOneHour) {
+                    Label("Extend +1 Hour", systemImage: "plus.circle")
+                }
+                .accessibilityIdentifier("extend_fast_one_hour_button")
             }
 
-            Text(FastDurationFormatter.formatTime(targetDate))
+            if let onChangeGoal {
+                Button(action: onChangeGoal) {
+                    Label("Change Fast Goal…", systemImage: "slider.horizontal.3")
+                }
+                .accessibilityIdentifier("change_fast_goal_button")
+            }
+        } label: {
+            HStack(spacing: 5) {
+                goalTargetStaticLabel(dayLabel: dayLabel, timeLabel: timeLabel)
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(Color(.tertiarySystemBackground))
+            .clipShape(Capsule())
+        }
+        .accessibilityIdentifier("goal_target_menu")
+    }
+
+    private func goalTargetStaticLabel(dayLabel: String, timeLabel: String) -> some View {
+        VStack(alignment: .trailing, spacing: 1) {
+            Text(dayLabel)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            Text(timeLabel)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color.primary)
                 .lineLimit(1)
         }
-        .padding(.vertical, dayLabel == nil ? 6 : 0)
         .fixedSize(horizontal: true, vertical: false)
     }
 }

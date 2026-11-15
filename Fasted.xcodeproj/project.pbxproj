@@ -116,6 +116,7 @@
 		9593E98FF911ECC385945DA6 /* EmptyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB20197A5EA7BD193AA1CEF /* EmptyHistoryView.swift */; };
 		96879764CAD6001EABED713F /* BuildMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C95DACC66EF1CE6953C6D0 /* BuildMetadata.swift */; };
 		98548E8AD56DF8EE3923EC20 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
+		990CF3BA8D4BAC7978C8A606 /* FastTrackerView+QuickSelect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072FA1EC36FADEF2DB564CC4 /* FastTrackerView+QuickSelect.swift */; };
 		994FE67C1CE31DACA5B1898F /* WatchPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC17964FA862C182B08D2088 /* WatchPayloadTests.swift */; };
 		9A0AB9AAC0BD4A7E2D9BD49E /* UITestIsolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84B2C22AB93A0FBC932336E /* UITestIsolation.swift */; };
 		9AECBC71B2D7B00723DF7DA5 /* WatchPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F11893E710BA95F8A4A0839 /* WatchPayload.swift */; };
@@ -168,6 +169,7 @@
 		DF3FF48801379EB3905E6F77 /* FastedWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2861876CC85284102739ACA4 /* FastedWidgetsBundle.swift */; };
 		E01E7F31897A2E898AB6CA0E /* FastedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47F0F9EAF3379520543128F /* FastedTests.swift */; };
 		E0C993AB8D2B4405872918E8 /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
+		E159D3E579676AF852FF2B11 /* FastedQuickSelectUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E519C0CF65CA73184D9AF7 /* FastedQuickSelectUITests.swift */; };
 		E4961D7D9EDBBE71BB479A7B /* EndFastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093F93825789F6E237BD2A2 /* EndFastIntent.swift */; };
 		E7C17F9DD2B294F3B8A4036E /* FastManagerEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9BB663AF02432B7CB39F54A /* FastManagerEffects.swift */; };
 		E8A5B963DF26327D10D275D0 /* FastingStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B29865E2520F93D8327B0F /* FastingStateSnapshot.swift */; };
@@ -257,6 +259,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		072FA1EC36FADEF2DB564CC4 /* FastTrackerView+QuickSelect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FastTrackerView+QuickSelect.swift"; sourceTree = "<group>"; };
 		0AF512965A5D99AB8BD0EB6D /* ChallengeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeStore.swift; sourceTree = "<group>"; };
 		0B49461E82EC597415611F11 /* FastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastManager.swift; sourceTree = "<group>"; };
 		133D5524D58FDC210D137DE4 /* WatchSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSessionManager.swift; sourceTree = "<group>"; };
@@ -297,6 +300,7 @@
 		4F6EB86FD0EE011CBF07654B /* AppGroupCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupCoordinatorTests.swift; sourceTree = "<group>"; };
 		50419E8BE341F9BD49A034CD /* FastedWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FastedWidgets.entitlements; sourceTree = "<group>"; };
 		5093F93825789F6E237BD2A2 /* EndFastIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndFastIntent.swift; sourceTree = "<group>"; };
+		51E519C0CF65CA73184D9AF7 /* FastedQuickSelectUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastedQuickSelectUITests.swift; sourceTree = "<group>"; };
 		53119D557F37A721F6EC8D96 /* FastingActionCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastingActionCommand.swift; sourceTree = "<group>"; };
 		556AA56BFF312CEBC9395C9D /* FastTimePickerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastTimePickerSheetView.swift; sourceTree = "<group>"; };
 		627A7EC87F6C2FE2813F4227 /* PersistenceControllerUITestingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceControllerUITestingTests.swift; sourceTree = "<group>"; };
@@ -513,6 +517,7 @@
 			children = (
 				EE58434F42AC6CAEFC60420A /* AGENTS.md */,
 				E5C4036BD9C204917C5C3CF3 /* AppStoreScreenshotTests.swift */,
+				51E519C0CF65CA73184D9AF7 /* FastedQuickSelectUITests.swift */,
 				E95F8810ED7037826FE830C9 /* FastedUITests.swift */,
 				B84B2C22AB93A0FBC932336E /* UITestIsolation.swift */,
 			);
@@ -549,6 +554,7 @@
 				EEA5922F11B927EA07F864DC /* FastStartedCardView.swift */,
 				556AA56BFF312CEBC9395C9D /* FastTimePickerSheetView.swift */,
 				DFB697D0D43C42DF7FA63305 /* FastTrackerView.swift */,
+				072FA1EC36FADEF2DB564CC4 /* FastTrackerView+QuickSelect.swift */,
 				3E9185E071FA46FFD576EEEA /* FeedbackHelper.swift */,
 				9D7B3EEB4348E1531BB604ED /* HistoryListView.swift */,
 				80ABF2C76FAC79CAD26EEC81 /* Info.plist */,
@@ -921,6 +927,7 @@
 				47653CDF25CE50B9A6FD65C4 /* FastSnapshotModifiers.swift in Sources */,
 				DEFA541DB7379B894DDBE400 /* FastStartedCardView.swift in Sources */,
 				8887E910A75D71DC6B8927C6 /* FastTimePickerSheetView.swift in Sources */,
+				990CF3BA8D4BAC7978C8A606 /* FastTrackerView+QuickSelect.swift in Sources */,
 				73B5FF9FD0E9363FCC6A241D /* FastTrackerView.swift in Sources */,
 				4C57B9976769EFFCFCD58D14 /* Fasted.xcdatamodeld in Sources */,
 				8DD586A9114C21E315384E87 /* FastedApp.swift in Sources */,
@@ -1021,6 +1028,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				830AB177EA6601337FCA6524 /* AppStoreScreenshotTests.swift in Sources */,
+				E159D3E579676AF852FF2B11 /* FastedQuickSelectUITests.swift in Sources */,
 				94EEC7BDF552341319744A15 /* FastedUITests.swift in Sources */,
 				9A0AB9AAC0BD4A7E2D9BD49E /* UITestIsolation.swift in Sources */,
 			);

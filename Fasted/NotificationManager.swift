@@ -211,11 +211,12 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
                 if let handler = self?.onStartFastRequested {
                     handler()
                 } else {
+                    let proto = AppGroupCoordinator.shared.readSnapshot().resolvedProtocol
                     AppGroupCoordinator.shared.enqueueCommand(
                         .startFast(
                             startDate: Date(),
-                            duration: FastingProtocol.default.fastingSeconds,
-                            protocolType: FastingProtocol.default.ratioString
+                            duration: proto.fastingSeconds,
+                            protocolType: proto.ratioString
                         )
                     )
                 }
@@ -251,7 +252,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
     ) {
         let content = notification.request.content
         let isStartReminder = content.categoryIdentifier == NotificationManager.startFastCategoryId
-            || notification.request.identifier.hasPrefix("recurring_start_day_")
+            || notification.request.identifier.hasPrefix(FastingReminderIDs.startReminderPrefix)
         if isStartReminder {
             let fasting = isCurrentlyFasting?() ?? AppGroupCoordinator.shared.readSnapshot().isFasting
             if fasting {
