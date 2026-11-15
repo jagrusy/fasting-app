@@ -131,11 +131,6 @@ public struct FastMetricsCenterView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
-
-            Text("Tap to change plan")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-                .padding(.top, 2)
         }
     }
 }

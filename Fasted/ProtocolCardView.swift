@@ -1,9 +1,15 @@
 import SwiftUI
 
+public enum ProtocolCardActionStyle {
+    case select
+    case immediateStart
+}
+
 public struct ProtocolCardView: View {
     public let fastingProtocol: FastingProtocol
     public let isSelected: Bool
     public let isCompact: Bool
+    public let actionStyle: ProtocolCardActionStyle
     public let accessibilityIdPrefix: String
     public let onSelect: () -> Void
 
@@ -11,12 +17,14 @@ public struct ProtocolCardView: View {
         fastingProtocol: FastingProtocol,
         isSelected: Bool,
         isCompact: Bool = false,
+        actionStyle: ProtocolCardActionStyle = .select,
         accessibilityIdPrefix: String = "protocol_card_",
         onSelect: @escaping () -> Void
     ) {
         self.fastingProtocol = fastingProtocol
         self.isSelected = isSelected
         self.isCompact = isCompact
+        self.actionStyle = actionStyle
         self.accessibilityIdPrefix = accessibilityIdPrefix
         self.onSelect = onSelect
     }
@@ -75,10 +83,22 @@ public struct ProtocolCardView: View {
             miniRingVisualizer(size: 28, lineWidth: 3.5)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(fastingProtocol.ratioString)
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.primary)
-                    .lineLimit(1)
+                HStack(spacing: 5) {
+                    Text(fastingProtocol.ratioString)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.primary)
+                        .lineLimit(1)
+
+                    if actionStyle == .immediateStart, isSelected {
+                        Text("DEFAULT")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundStyle(SolsticeColors.solarAmber)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(SolsticeColors.solarAmber.opacity(0.16), in: Capsule())
+                            .lineLimit(1)
+                    }
+                }
 
                 Text(fastingProtocol.name)
                     .font(.caption2)
@@ -88,18 +108,32 @@ public struct ProtocolCardView: View {
 
             Spacer(minLength: 0)
 
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 16))
-                    .foregroundStyle(SolsticeColors.solarAmber)
-                    .accessibilityIdentifier("protocol_selected_checkmark")
-            }
+            trailingAccessory
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground)
         .overlay(cardBorder)
+    }
+
+    @ViewBuilder
+    private var trailingAccessory: some View {
+        switch actionStyle {
+        case .select:
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 16))
+                    .foregroundStyle(SolsticeColors.solarAmber)
+                    .accessibilityIdentifier("protocol_selected_checkmark")
+            }
+        case .immediateStart:
+            Image(systemName: "play.fill")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(SolsticeColors.solarAmber)
+                .frame(width: 24, height: 24)
+                .background(SolsticeColors.solarAmber.opacity(isSelected ? 0.22 : 0.12), in: Circle())
+        }
     }
 
     private var cardBackground: some View {

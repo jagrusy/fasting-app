@@ -143,20 +143,10 @@ public struct FastTrackerView: View {
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
 
-                Button {
-                    quickSelectMode = .choosePlan
-                } label: {
-                    HStack(spacing: 6) {
-                        Text(fastManager.currentProtocol.displayTitle)
-                            .font(.title2.weight(.bold))
-                            .foregroundStyle(Color.primary)
-                        Image(systemName: "chevron.down")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("fast_status_header")
+                Text(fastManager.currentProtocol.displayTitle)
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(Color.primary)
+                    .accessibilityIdentifier("fast_status_header")
             }
         }
         .padding(.top, 16)
@@ -183,8 +173,6 @@ public struct FastTrackerView: View {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         centerDisplayMode = centerDisplayMode.next
                     }
-                } else {
-                    quickSelectMode = .choosePlan
                 }
             } label: {
                 FastMetricsCenterView(
@@ -194,6 +182,7 @@ public struct FastTrackerView: View {
                 )
             }
             .buttonStyle(.plain)
+            .disabled(!fastManager.isFasting)
             .accessibilityIdentifier("progress_ring_button")
         }
     }
@@ -337,8 +326,8 @@ private extension FastTrackerView {
             Button {
                 quickSelectMode = .startFast
             } label: {
-                Image(systemName: "slider.horizontal.3")
-                    .font(.headline.weight(.semibold))
+                Image(systemName: "chevron.down")
+                    .font(.subheadline.weight(.bold))
                     .foregroundStyle(.white)
                     .frame(width: startMenuSegmentWidth, height: 56)
                     .contentShape(Rectangle())

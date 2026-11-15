@@ -20,6 +20,9 @@ extension FastedUITests {
         XCTAssertTrue(menuButton.waitForExistence(timeout: 3), "the quick-select trigger must exist alongside Start")
         menuButton.tap()
 
+        let subtitle = app.staticTexts["quick_select_subtitle"]
+        XCTAssertTrue(subtitle.waitForExistence(timeout: 3), "the quick-select sheet must explain immediate start")
+
         let extendedItem = app.buttons["start_menu_24h"]
         XCTAssertTrue(extendedItem.waitForExistence(timeout: 3), "the 24-Hour Fast item must appear in the sheet")
         extendedItem.tap()
@@ -38,32 +41,32 @@ extension FastedUITests {
         assertActiveGoalLabel(in: relaunched, is: "24h", message: "the 24-hour goal must persist across relaunch")
     }
 
-    /// Tapping the idle header opens the compact Fasting Plan sheet; choosing 24h updates the plan
-    /// without starting a fast. Once started, GOAL TARGET allows retargeting the active fast goal.
-    func testIdleHeaderPlanSelectionAndActiveGoalMenu() throws {
+    /// Verifies there is only a single quick-select entry point while idle (`start_fast_menu`)
+    /// rather than competing header/ring pickers, and that GOAL TARGET retargets an active fast.
+    func testSingleIdleQuickSelectAndActiveGoalRetargeting() throws {
         let app = launchIsolatedApp()
 
         let fastTab = app.tabBars.buttons["Fast"]
         XCTAssertTrue(fastTab.waitForExistence(timeout: 5))
         fastTab.tap()
 
-        let headerButton = app.buttons["fast_status_header"]
-        XCTAssertTrue(headerButton.waitForExistence(timeout: 5))
-        headerButton.tap()
-
-        let plan24h = app.buttons["plan_menu_24h"]
-        XCTAssertTrue(plan24h.waitForExistence(timeout: 3), "24h option must appear in the Fasting Plan sheet")
-        plan24h.tap()
-
-        XCTAssertTrue(
-            headerButton.waitForExistence(timeout: 3) && headerButton.label.contains("24-Hour Fast"),
-            "idle header must update to 24-Hour Fast without starting a fast"
+        XCTAssertTrue(app.staticTexts["fast_status_header"].waitForExistence(timeout: 5))
+        XCTAssertFalse(
+            app.buttons["fast_status_header"].exists,
+            "idle header must be static so only the split Start Fast button changes the fast"
         )
-        XCTAssertTrue(app.buttons["start_fast_button"].waitForExistence(timeout: 3))
-        app.buttons["start_fast_button"].tap()
+        XCTAssertFalse(app.staticTexts["Tap to change plan"].exists)
+
+        let menuButton = app.buttons["start_fast_menu"]
+        XCTAssertTrue(menuButton.waitForExistence(timeout: 3))
+        menuButton.tap()
+
+        let extendedItem = app.buttons["start_menu_24h"]
+        XCTAssertTrue(extendedItem.waitForExistence(timeout: 3))
+        extendedItem.tap()
 
         XCTAssertTrue(app.buttons["end_fast_button"].waitForExistence(timeout: 4))
-        assertActiveGoalLabel(in: app, is: "24h", message: "started fast should inherit the chosen 24h plan")
+        assertActiveGoalLabel(in: app, is: "24h", message: "quick-select should start a 24h fast")
 
         let goalMenu = app.buttons["goal_target_menu"]
         XCTAssertTrue(goalMenu.waitForExistence(timeout: 3))

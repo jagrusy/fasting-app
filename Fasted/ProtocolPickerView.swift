@@ -4,11 +4,48 @@ public enum ProtocolPickerPresentation {
     case settings
     case quickSelect(
         title: String,
+        subtitle: String? = nil,
+        actionStyle: ProtocolCardActionStyle = .select,
         customButtonTitle: (Int) -> String = { "Start \($0)-Hour Fast" },
         selectedProtocolId: String? = nil,
         accessibilityIdPrefix: String = "start_menu_",
         onPick: (FastingProtocol) -> Void
     )
+}
+
+extension ProtocolPickerPresentation {
+    struct QuickSelectOptions {
+        let title: String
+        let subtitle: String?
+        let actionStyle: ProtocolCardActionStyle
+        let customButtonTitle: (Int) -> String
+        let selectedProtocolId: String?
+        let accessibilityIdPrefix: String
+        let onPick: (FastingProtocol) -> Void
+    }
+
+    var quickSelect: QuickSelectOptions? {
+        guard case .quickSelect(
+            let title,
+            let subtitle,
+            let actionStyle,
+            let customButtonTitle,
+            let selectedProtocolId,
+            let accessibilityIdPrefix,
+            let onPick
+        ) = self else {
+            return nil
+        }
+        return QuickSelectOptions(
+            title: title,
+            subtitle: subtitle,
+            actionStyle: actionStyle,
+            customButtonTitle: customButtonTitle,
+            selectedProtocolId: selectedProtocolId,
+            accessibilityIdPrefix: accessibilityIdPrefix,
+            onPick: onPick
+        )
+    }
 }
 
 public struct ProtocolPickerView: View {
@@ -26,15 +63,10 @@ public struct ProtocolPickerView: View {
 
     public var body: some View {
         Group {
-            switch presentation {
-            case .settings:
-                pickerScrollContent
-                    .navigationTitle("Fasting Protocol")
-                    .navigationBarTitleDisplayMode(.inline)
-            case .quickSelect(let title, _, _, _, _):
+            if let options = presentation.quickSelect {
                 NavigationStack {
                     pickerScrollContent
-                        .navigationTitle(title)
+                        .navigationTitle(options.title)
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
@@ -43,6 +75,10 @@ public struct ProtocolPickerView: View {
                         }
                 }
                 .presentationDetents([.fraction(0.75), .large])
+            } else {
+                pickerScrollContent
+                    .navigationTitle("Fasting Protocol")
+                    .navigationBarTitleDisplayMode(.inline)
             }
         }
         .accessibilityIdentifier("protocol_picker_list")
@@ -95,6 +131,19 @@ public struct ProtocolPickerView: View {
     private var pickerScrollContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: isCompact ? 14 : 16) {
+                if let subtitle = presentation.quickSelect?.subtitle {
+                    HStack(spacing: 6) {
+                        Image(systemName: "play.circle.fill")
+                            .foregroundStyle(SolsticeColors.solarAmber)
+                            .accessibilityHidden(true)
+                        Text(subtitle)
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(.secondary)
+                            .accessibilityIdentifier("quick_select_subtitle")
+                    }
+                    .padding(.horizontal, 4)
+                }
+
                 sectionGroup(title: "Daily", protocols: FastingProtocol.presets)
                 sectionGroup(title: "Extended", protocols: FastingProtocol.extendedPresets)
                 customSectionGroup
@@ -167,6 +216,7 @@ public struct ProtocolPickerView: View {
             fastingProtocol: proto,
             isSelected: activeSelectionId == proto.ratioString,
             isCompact: isCompact,
+            actionStyle: presentation.quickSelect?.actionStyle ?? .select,
             accessibilityIdPrefix: accessibilityIdPrefix,
             onSelect: { handleSelection(proto) }
         )
@@ -189,31 +239,15 @@ public struct ProtocolPickerView: View {
         [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
     }
 
-    private var isCompact: Bool {
-        if case .quickSelect = presentation { return true }
-        return false
-    }
-
-    private var accessibilityIdPrefix: String {
-        if case .quickSelect(_, _, _, let prefix, _) = presentation {
-            return prefix
-        }
-        return "protocol_card_"
-    }
+    private var isCompact: Bool { presentation.quickSelect != nil }
+    private var accessibilityIdPrefix: String { presentation.quickSelect?.accessibilityIdPrefix ?? "protocol_card_" }
 
     private var activeSelectionId: String {
-        if case .quickSelect(_, _, let overrideId, _, _) = presentation,
-           let overrideId {
-            return overrideId
-        }
-        return fastManager.currentProtocol.ratioString
+        presentation.quickSelect?.selectedProtocolId ?? fastManager.currentProtocol.ratioString
     }
 
     private var customConfirmTitle: (Int) -> String {
-        if case .quickSelect(_, let titleBuilder, _, _, _) = presentation {
-            return titleBuilder
-        }
-        return { "Select \($0)-Hour Plan" }
+        presentation.quickSelect?.customButtonTitle ?? { "Select \($0)-Hour Plan" }
     }
 
     private var lastCustomProtocol: FastingProtocol? {
@@ -225,12 +259,11 @@ public struct ProtocolPickerView: View {
     }
 
     private func handleSelection(_ proto: FastingProtocol) {
-        switch presentation {
-        case .settings:
-            selectProtocol(proto)
-        case .quickSelect(_, _, _, _, let onPick):
-            onPick(proto)
+        if let quickSelect = presentation.quickSelect {
+            quickSelect.onPick(proto)
             dismiss()
+        } else {
+            selectProtocol(proto)
         }
     }
 
